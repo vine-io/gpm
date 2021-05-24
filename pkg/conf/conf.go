@@ -21,3 +21,10 @@
 // SOFTWARE.
 
 package conf
+
+type ServerConf struct {
+	// 进程配置文件所在目录
+	DaemonCfg string `json:"daemonCfg,omitempty"`
+	// 进程管理目录，进程相关的文件保存在这个路径中
+	DaemonRoot string `json:"daemonRoot,omitempty"`
+}

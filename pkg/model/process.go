@@ -22,7 +22,9 @@
 
 package model
 
-import "os"
+import (
+	"os"
+)
 
 type ProcessExec string
 
@@ -59,16 +61,14 @@ type Process struct {
 	Name string `json:"name,omitempty"`
 	// 进程执行器，默认为 fork
 	Exec ProcessExec `json:"exec,omitempty"`
-	// 执行器路径, Exec 为 fork 时, ExecBin 为二进制文件,否则 ExecBin 为执行器路径
-	ExecBin string `json:"execBin,omitempty"`
+	// 执行器路径, Exec 为 fork 时, Bin 为二进制文件,否则 Bin 为执行器路径
+	Bin string `json:"bin,omitempty"`
 	// 进程启动参数
 	Args string `json:"args,omitempty"`
 	// 进程执行时的 pid
 	PID int64 `json:"pid,omitempty"`
 	// 执行命令时所在的目录
 	Chroot string `json:"chroot,omitempty"`
-	// point to os.Process
-	Pointer *os.Process `json:"-"`
 	// 执行进程时所用的 uid (windows 无效)
 	UID int32 `json:"uid,omitempty"`
 	// uid 对应的用户名称
@@ -81,6 +81,7 @@ type Process struct {
 	Version string `json:"version,omitempty"`
 	// 是否自启动, 默认为 false
 	AutoRestart bool `json:"autoRestart,omitempty"`
+
 	// 创建时间
 	CreationTimestamp int64 `json:"creationTimestamp"`
 	// 修改时间
@@ -91,4 +92,18 @@ type Process struct {
 	Status ProcessStatus `json:"status,omitempty"`
 	// 进程状态为 failed 的错误信息
 	Msg string `json:"msg,omitempty"`
+
+	// point to os.Process
+	Pointer *os.Process `json:"-"`
+	// cpu, 内存信息
+	Stat *Stat `json:"stat,omitempty"`
+}
+
+type Stat struct {
+	// cpu 占用百分比
+	CPUPercent float32 `json:"cpuPercent"`
+	// 内存占用, rss
+	Memory uint64 `json:"memory"`
+	// 内存占用百分比
+	MemPercent float32 `json:"memPercent"`
 }
