@@ -15,5 +15,7 @@
 # vendor/
 vendor/
 
+testdata
+
 .idea
 .vscode
