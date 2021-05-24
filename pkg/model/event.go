@@ -21,3 +21,26 @@
 // SOFTWARE.
 
 package model
+
+// EventAction 事件执行类型
+type EventAction string
+
+const (
+	CreateProcess  EventAction = "create-process"  // 创建进程
+	DeleteProcess  EventAction = "delete-process"  // 删除进程
+	UpgradeProcess EventAction = "upgrade-process" // 升级进程
+)
+
+// Event 事件信息
+type Event struct {
+	// 时间 id
+	UUID string `json:"uuid,omitempty"`
+	// 事件类型
+	Action EventAction `json:"action,omitempty"`
+	// 开始时间
+	StartTimestamp int64 `json:"startTimestamp,omitempty"`
+	// 结束时间
+	EndTimestamp int64 `json:"endTimestamp,omitempty"`
+	// 详细信息
+	Msg string `json:"msg,omitempty"`
+}
