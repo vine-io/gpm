@@ -29,6 +29,9 @@ const (
 	CreateProcess  EventAction = "create-process"  // 创建进程
 	DeleteProcess  EventAction = "delete-process"  // 删除进程
 	UpgradeProcess EventAction = "upgrade-process" // 升级进程
+	StartProcess   EventAction = "start-process"   // 启动进程
+	StopProcess    EventAction = "stop-process"    // 停止进程
+	ReloadProcess  EventAction = "reload-process"  // 重启进程
 )
 
 // Event 事件信息
@@ -37,6 +40,8 @@ type Event struct {
 	UUID string `json:"uuid,omitempty"`
 	// 事件类型
 	Action EventAction `json:"action,omitempty"`
+	// Target 事件目标, 如 process id
+	Target string `json:"target,omitempty"`
 	// 开始时间
 	StartTimestamp int64 `json:"startTimestamp,omitempty"`
 	// 结束时间
