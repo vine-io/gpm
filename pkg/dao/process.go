@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2021 Lack
+// Copyright (c) 2021 gpm2
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,36 +20,5 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package model
+package dao
 
-// EventAction 事件执行类型
-type EventAction string
-
-const (
-	CreateProcess  EventAction = "create-process"  // 创建进程
-	DeleteProcess  EventAction = "delete-process"  // 删除进程
-	UpgradeProcess EventAction = "upgrade-process" // 升级进程
-	StartProcess   EventAction = "start-process"   // 启动进程
-	StopProcess    EventAction = "stop-process"    // 停止进程
-	ReloadProcess  EventAction = "reload-process"  // 重启进程
-)
-
-// Event 事件信息
-type Event struct {
-	// 时间 id
-	ID int64 `gorm:"primaryKey" json:"uuid,omitempty"`
-	// 事件类型
-	Action EventAction `json:"action,omitempty"`
-	// Target 事件目标, 如 process id
-	PID int64 `json:"pid,omitempty"`
-	// 开始时间
-	StartTimestamp int64 `gorm:"autoUpdateTime:nano" json:"startTimestamp,omitempty"`
-	// 结束时间
-	EndTimestamp int64 `json:"endTimestamp,omitempty"`
-	// 详细信息
-	Msg string `json:"msg,omitempty"`
-}
-
-func (e *Event) TableName() string {
-	return "event"
-}

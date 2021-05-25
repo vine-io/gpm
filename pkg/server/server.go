@@ -21,3 +21,7 @@
 // SOFTWARE.
 
 package server
+
+type Server struct {
+
+}
