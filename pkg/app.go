@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2021 gpm2
+// Copyright (c) 2021 Lack
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,36 +20,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package dao
+package pkg
 
 import (
-	"path/filepath"
-	"sync"
+	"github.com/lack-io/vine"
+	log "github.com/lack-io/vine/lib/logger"
 
-	"github.com/gpm2/gpm/pkg/model"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
+	"github.com/gpm2/gpm/pkg/runtime"
+	"github.com/gpm2/gpm/pkg/server"
 )
 
-var (
-	once = sync.Once{}
-	db   *gorm.DB
-)
+func Run() {
+	s := server.New(
+		vine.Name(runtime.GpmName),
+		vine.Id(runtime.GpmId),
+		vine.Version(runtime.GetVersion()),
+		vine.Metadata(map[string]string{
+			"namespace": runtime.Namespace,
+		}),
+	)
 
-func InitDao(root string) error {
-	var err error
-	once.Do(func() {
-		db, err = gorm.Open(sqlite.Open(filepath.Join(root, ".gpm.db")), &gorm.Config{})
-		if err != nil {
-			return
-		}
+	if err := s.Init(); err != nil {
+		log.Fatal(err)
+	}
 
-		if err = db.AutoMigrate(&model.Process{}); err != nil {
-			return
-		}
-		if err = db.AutoMigrate(&model.Event{}); err != nil {
-			return
-		}
-	})
-	return err
+	if err := s.Run(); err != nil {
+		log.Fatal(err)
+	}
 }

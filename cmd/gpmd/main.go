@@ -22,6 +22,10 @@
 
 package main
 
-func main() {
+import (
+	"github.com/gpm2/gpm/pkg"
+)
 
+func main() {
+	pkg.Run()
 }

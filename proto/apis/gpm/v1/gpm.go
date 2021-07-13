@@ -20,4 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package client
+package gpmv1
+
+const (
+	StatusInit      string = "init"      // 进程初始化, 还未启动过
+	StatusRunning   string = "running"   // 进程正在运行中
+	StatusStopped   string = "stopped"   // 进程停止
+	StatusFailed    string = "failed"    // 进程执行失败
+	StatusUpgrading string = "upgrading" // 进程升级中
+)

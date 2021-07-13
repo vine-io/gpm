@@ -1,0 +1,32 @@
+[package]
+kind = "single"
+namespace = "go.vine"
+
+[pkg]
+name = "gpm"
+alias = "go.vine.service.gpm"
+type = "service"
+version = "latest"
+main = "cmd/gpmd/main.go"
+dir = "github.com/gpm2/gpm"
+output = "_output/gpmd"
+flags = [
+	"-a", "-installsuffix", "cgo", "-ldflags \"-s -w\"", 
+]
+
+[[proto]]
+name = "gpm"
+pb = "github.com/gpm2/gpm/proto/apis/gpm/v1/gpm.proto"
+type = "api"
+group = "gpm"
+version = "v1"
+plugins = ["gogo", "validator", "dao", "deepcopy"]
+
+[[proto]]
+name = "gpm"
+pb = "github.com/gpm2/gpm/proto/service/gpm/v1/gpm.proto"
+type = "service"
+group = "gpm"
+version = "v1"
+plugins = ["gogo", "vine", "validator"]
+

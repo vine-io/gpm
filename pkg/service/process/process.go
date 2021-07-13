@@ -20,8 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package process
 
-func main() {
+import (
+	"os"
 
+	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+)
+
+type Process struct {
+	in *gpmv1.Service
+
+	pr *os.Process
 }
+

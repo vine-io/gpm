@@ -1,0 +1,68 @@
+// +dao:output=github.com/gpm2/gpm/pkg/dao;dao
+syntax = "proto3";
+package gpmv1;
+
+option go_package = "github.com/gpm2/gpm/proto/apis/gpm/v1;gpmv1";
+
+// +gen:dao
+message Service {
+  // 服务 id
+  // +gen:pk
+  int64 id = 1;
+  // 服务名称
+  // +gen:required
+  string name = 2;
+  // 执行器路径
+  // +gen:required
+  string bin = 3;
+  // 服务启动参数
+  repeated string args = 4;
+  // 服务进程 id
+  int64 pid = 5;
+  // 执行命令时所在的目录
+  string chroot = 6;
+  // 执行服务时所用的 uid (windows 无效)
+  int32 uid = 7;
+  // uid 对应的用户名称
+  string user = 8;
+  // 执行服务时所有的 gid (windows 无效)
+  int32 gid = 9;
+  // gid 对应的用户组
+  string group = 10;
+  // 服务版本
+  string version = 11;
+  // 是否自启动, 默认为 false
+  bool autoRestart = 12;
+  // 创建时间
+  int64 creationTimestamp = 13;
+  // 修改时间
+  int64 updateTimestamp = 14;
+  // 服务状态
+  // +gen:enum=[init,running,stopped,failed,upgrading]
+  string status = 15;
+  // 服务状态为 failed 的错误信息
+  string msg = 16;
+
+  // 服务资源占用情况
+  Stat stat = 21;
+}
+
+message Stat {
+  // cpu 占用百分比
+  float cpuPercent = 1;
+  // 内存占用, rss
+  uint64 memory = 2;
+  // 内存占用百分比
+  float memPercent = 3;
+}
+
+message PageMeta {
+  // 页码
+  // +gen:gt=0
+  // +gen:default=1
+  int32 page = 1;
+  // 每页数量
+  // +gen:gt=0
+  // +gen:default=10
+  int32 size = 2;
+}

@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+package gpmv1;
+
+option go_package = "github.com/gpm2/gpm/proto/service/gpm/v1;gpmv1";
+
+import "github.com/gpm2/gpm/proto/apis/gpm/v1/gpm.proto";
+
+// +gen:openapi
+service GpmService {
+  // +gne:summary=gpm 检测 gpm 服务状态
+  // +gen:get=/api/healthz
+  rpc Healthz(Empty) returns (Empty);
+  // +gen:summary=查询所有服务
+  // +gen:get=/api/v1/Service/
+  rpc ListService(ListServiceReq) returns (ListServiceRsp);
+  // +gen:summary=查询单个服务
+  // +gen:get=/api/v1/Service/{id}
+  rpc GetService(GetServiceReq) returns (GetServiceRsp);
+  // +gen:summary=通过名称查询单个服务
+  // +gen:get=/api/v1/Service/{name}
+  rpc GetServiceByName(GetServiceByNameReq) returns (GetServiceByNameRsp);
+  // +gen:summary=新建服务
+  // +gen:post=/api/v1/Service/
+  rpc CreateService(CreateServiceReq) returns (CreateServiceRsp);
+  // +gen:summary=启动服务
+  // +gen:patch=/api/v1/Service/{id}/action/start
+  rpc StartService(StartServiceReq) returns (StartServiceRsp);
+  // +gen:summary=停止服务
+  // +gen:patch=/api/v1/Service/{id}/action/stop
+  rpc StopService(StopServiceReq) returns (StopServiceRsp);
+  // +gen:summary=重启服务
+  // +gen:patch=/api/v1/Service/{id}/action/reboot
+  rpc RebootService(RebootServiceReq) returns (RebootServiceRsp);
+  // +gen:summary=删除服务
+  // +gen:delete=/api/v1/Service/{id}
+  rpc DeleteService(DeleteServiceReq) returns (DeleteServiceRsp);
+}
+
+message Empty {}
+
+message ListServiceReq {
+  // +gen:inline
+  gpmv1.PageMeta meta = 1;
+}
+
+message ListServiceRsp {
+  repeated gpmv1.Service servicees = 1;
+  int64 total = 2;
+}
+
+message GetServiceReq {
+  // 服务 id
+  // +gen:required
+  int64 id = 1;
+}
+
+message GetServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message GetServiceByNameReq {
+  // 服务 id
+  // +gen:required
+  string name = 1;
+}
+
+message GetServiceByNameRsp {
+  gpmv1.Service service = 1;
+}
+
+message CreateServiceReq {
+  // 服务名称
+  // +gen:required
+  string name = 1;
+  // 执行器路径
+  // +gen:required
+  string bin = 2;
+  // 服务启动参数
+  repeated string args = 3;
+  // 服务家目录
+  string dir = 4;
+  // uid 对应的用户名称
+  string user = 5;
+  // gid 对应的用户组
+  string group = 6;
+  // 服务版本
+  string version = 7;
+  // 是否自启动, 默认为 false
+  bool autoRestart = 8;
+}
+
+message CreateServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message StartServiceReq {
+  // +gen:required
+  int64 id = 1;
+}
+
+message StartServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message StopServiceReq {
+  // +gen:required
+  int64 id = 1;
+}
+
+message StopServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message RebootServiceReq {
+  // +gen:required
+  int64 id = 1;
+}
+
+message RebootServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message DeleteServiceReq {
+  // +gen:required
+  int64 id = 1;
+}
+
+message DeleteServiceRsp {
+  gpmv1.Service service = 1;
+}

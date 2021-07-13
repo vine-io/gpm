@@ -20,8 +20,39 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package server
+// +build !windows
 
-type Server struct {
+package service
 
+import (
+	"os/user"
+	"strconv"
+
+	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+)
+
+func fillService(service *gpmv1.Service) error {
+	if service.User == "" {
+		service.User = "root"
+	}
+	if service.Group == "" {
+		service.Group = "root"
+	}
+
+	u, err := user.Lookup(service.User)
+	if err != nil {
+		return err
+	}
+
+	group, err := user.LookupGroup(service.Group)
+	if err != nil {
+		return err
+	}
+
+	uid, _ := strconv.ParseInt(u.Uid, 10, 64)
+	gid, _ := strconv.ParseInt(group.Gid, 10, 64)
+	service.Uid = int32(uid)
+	service.Gid = int32(gid)
+
+	return nil
 }

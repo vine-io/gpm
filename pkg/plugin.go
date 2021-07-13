@@ -20,36 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package model
+package pkg
 
-// EventAction 事件执行类型
-type EventAction string
+import (
+	"time"
 
-const (
-	CreateProcess  EventAction = "create-process"  // 创建进程
-	DeleteProcess  EventAction = "delete-process"  // 删除进程
-	UpgradeProcess EventAction = "upgrade-process" // 升级进程
-	StartProcess   EventAction = "start-process"   // 启动进程
-	StopProcess    EventAction = "stop-process"    // 停止进程
-	ReloadProcess  EventAction = "reload-process"  // 重启进程
+	"github.com/lack-io/plugins/dao/sqlite"
+	"github.com/lack-io/vine/lib/cmd"
+	"github.com/lack-io/vine/lib/dao"
+	"github.com/lack-io/vine/lib/dao/logger"
 )
 
-// Event 事件信息
-type Event struct {
-	// 时间 id
-	ID int64 `gorm:"primaryKey" json:"uuid,omitempty"`
-	// 事件类型
-	Action EventAction `json:"action,omitempty"`
-	// Target 事件目标, 如 process id
-	PID int64 `json:"pid,omitempty"`
-	// 开始时间
-	StartTimestamp int64 `gorm:"autoUpdateTime:nano" json:"startTimestamp,omitempty"`
-	// 结束时间
-	EndTimestamp int64 `json:"endTimestamp,omitempty"`
-	// 详细信息
-	Msg string `json:"msg,omitempty"`
+func init() {
+	cmd.DefaultDialects["sqlite"] = func(opts ...dao.Option) dao.Dialect {
+		l := logger.New(logger.Options{
+			SlowThreshold: 200 * time.Millisecond,
+			LogLevel:      logger.Warn,
+		})
+		opts = append(opts, dao.Logger(l))
+		dialect := sqlite.NewDialect(opts...)
+		dao.DefaultDialect = dialect
+		return dialect
+	}
 }
 
-func (e *Event) TableName() string {
-	return "event"
-}
