@@ -25,6 +25,7 @@ package pkg
 import (
 	"time"
 
+	"github.com/lack-io/plugins/dao/postgres"
 	"github.com/lack-io/plugins/dao/sqlite"
 	"github.com/lack-io/vine/lib/cmd"
 	"github.com/lack-io/vine/lib/dao"
@@ -39,6 +40,17 @@ func init() {
 		})
 		opts = append(opts, dao.Logger(l))
 		dialect := sqlite.NewDialect(opts...)
+		dao.DefaultDialect = dialect
+		return dialect
+	}
+
+	cmd.DefaultDialects["postgres"] = func(opts ...dao.Option) dao.Dialect {
+		l := logger.New(logger.Options{
+			SlowThreshold: 200 * time.Millisecond,
+			LogLevel:      logger.Warn,
+		})
+		opts = append(opts, dao.Logger(l))
+		dialect := postgres.NewDialect(opts...)
 		dao.DefaultDialect = dialect
 		return dialect
 	}

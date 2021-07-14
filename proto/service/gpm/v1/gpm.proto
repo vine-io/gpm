@@ -45,7 +45,7 @@ message ListServiceReq {
 }
 
 message ListServiceRsp {
-  repeated gpmv1.Service servicees = 1;
+  repeated gpmv1.Service services = 1;
   int64 total = 2;
 }
 
@@ -80,14 +80,16 @@ message CreateServiceReq {
   repeated string args = 3;
   // 服务家目录
   string dir = 4;
-  // uid 对应的用户名称
-  string user = 5;
-  // gid 对应的用户组
-  string group = 6;
+  // 服务环境变量
+  map<string, string> env = 5;
+  // 服务系统参数
+  gpmv1.SysProcAttr sysProcAttr = 6;
+  // 服务日志配置
+  gpmv1.ProcLog log = 7;
   // 服务版本
-  string version = 7;
+  string version = 8;
   // 是否自启动, 默认为 false
-  bool autoRestart = 8;
+  bool autoRestart = 9;
 }
 
 message CreateServiceRsp {

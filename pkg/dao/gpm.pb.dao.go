@@ -60,6 +60,99 @@ func (m *ServiceArgs) DaoDataType() string {
 	return dao.DefaultDialect.JSONDataType()
 }
 
+// ServiceEnv the alias of map[string]string
+type ServiceEnv map[string]string
+
+// Value return json value, implement driver.Valuer interface
+func (m ServiceEnv) Value() (driver.Value, error) {
+	if m == nil {
+		return nil, nil
+	}
+	b, err := json.Marshal(m)
+	return string(b), err
+}
+
+// Scan scan value into Jsonb, implements sql.Scanner interface
+func (m *ServiceEnv) Scan(value interface{}) error {
+	var bytes []byte
+	switch v := value.(type) {
+	case []byte:
+		bytes = v
+	case string:
+		bytes = []byte(v)
+	default:
+		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", value))
+	}
+
+	return json.Unmarshal(bytes, &m)
+}
+
+func (m *ServiceEnv) DaoDataType() string {
+	return dao.DefaultDialect.JSONDataType()
+}
+
+// ServiceSysProcAttr the alias of v1.SysProcAttr
+type ServiceSysProcAttr v1.SysProcAttr
+
+// Value return json value, implement driver.Valuer interface
+func (m *ServiceSysProcAttr) Value() (driver.Value, error) {
+	if m == nil {
+		return nil, nil
+	}
+	b, err := json.Marshal(m)
+	return string(b), err
+}
+
+// Scan scan value into Jsonb, implements sql.Scanner interface
+func (m *ServiceSysProcAttr) Scan(value interface{}) error {
+	var bytes []byte
+	switch v := value.(type) {
+	case []byte:
+		bytes = v
+	case string:
+		bytes = []byte(v)
+	default:
+		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", value))
+	}
+
+	return json.Unmarshal(bytes, &m)
+}
+
+func (m *ServiceSysProcAttr) DaoDataType() string {
+	return dao.DefaultDialect.JSONDataType()
+}
+
+// ServiceLog the alias of v1.ProcLog
+type ServiceLog v1.ProcLog
+
+// Value return json value, implement driver.Valuer interface
+func (m *ServiceLog) Value() (driver.Value, error) {
+	if m == nil {
+		return nil, nil
+	}
+	b, err := json.Marshal(m)
+	return string(b), err
+}
+
+// Scan scan value into Jsonb, implements sql.Scanner interface
+func (m *ServiceLog) Scan(value interface{}) error {
+	var bytes []byte
+	switch v := value.(type) {
+	case []byte:
+		bytes = v
+	case string:
+		bytes = []byte(v)
+	default:
+		return errors.New(fmt.Sprint("Failed to unmarshal JSONB value:", value))
+	}
+
+	return json.Unmarshal(bytes, &m)
+}
+
+func (m *ServiceLog) DaoDataType() string {
+	return dao.DefaultDialect.JSONDataType()
+}
+
 // ServiceStat the alias of v1.Stat
 type ServiceStat v1.Stat
 
@@ -96,23 +189,23 @@ type ServiceS struct {
 	tx    *dao.DB             `json:"-" dao:"-"`
 	exprs []clause.Expression `json:"-" dao:"-"`
 
-	Id                int64        `json:"id,omitempty" dao:"column:id;autoIncrement;primaryKey"`
-	Name              string       `json:"name,omitempty" dao:"column:name"`
-	Bin               string       `json:"bin,omitempty" dao:"column:bin"`
-	Args              ServiceArgs  `json:"args,omitempty" dao:"column:args"`
-	Pid               int64        `json:"pid,omitempty" dao:"column:pid"`
-	Chroot            string       `json:"chroot,omitempty" dao:"column:chroot"`
-	Uid               int32        `json:"uid,omitempty" dao:"column:uid"`
-	User              string       `json:"user,omitempty" dao:"column:user"`
-	Gid               int32        `json:"gid,omitempty" dao:"column:gid"`
-	Group             string       `json:"group,omitempty" dao:"column:group"`
-	Version           string       `json:"version,omitempty" dao:"column:version"`
-	CreationTimestamp int64        `json:"creationTimestamp,omitempty" dao:"column:creation_timestamp"`
-	UpdateTimestamp   int64        `json:"updateTimestamp,omitempty" dao:"column:update_timestamp"`
-	Status            string       `json:"status,omitempty" dao:"column:status"`
-	Msg               string       `json:"msg,omitempty" dao:"column:msg"`
-	Stat              *ServiceStat `json:"stat,omitempty" dao:"column:stat"`
-	DeletionTimestamp int64        `json:"deletionTimestamp,omitempty" dao:"column:deletion_timestamp"`
+	Id                int64               `json:"id,omitempty" dao:"column:id;autoIncrement;primaryKey"`
+	Name              string              `json:"name,omitempty" dao:"column:name"`
+	Bin               string              `json:"bin,omitempty" dao:"column:bin"`
+	Args              ServiceArgs         `json:"args,omitempty" dao:"column:args"`
+	Pid               int64               `json:"pid,omitempty" dao:"column:pid"`
+	Dir               string              `json:"dir,omitempty" dao:"column:dir"`
+	Env               ServiceEnv          `json:"env,omitempty" dao:"column:env"`
+	SysProcAttr       *ServiceSysProcAttr `json:"sysProcAttr,omitempty" dao:"column:sys_proc_attr"`
+	Log               *ServiceLog         `json:"log,omitempty" dao:"column:log"`
+	Version           string              `json:"version,omitempty" dao:"column:version"`
+	CreationTimestamp int64               `json:"creationTimestamp,omitempty" dao:"column:creation_timestamp"`
+	UpdateTimestamp   int64               `json:"updateTimestamp,omitempty" dao:"column:update_timestamp"`
+	StartTimestamp    int64               `json:"startTimestamp,omitempty" dao:"column:start_timestamp"`
+	Status            string              `json:"status,omitempty" dao:"column:status"`
+	Msg               string              `json:"msg,omitempty" dao:"column:msg"`
+	Stat              *ServiceStat        `json:"stat,omitempty" dao:"column:stat"`
+	DeletionTimestamp int64               `json:"deletionTimestamp,omitempty" dao:"column:deletion_timestamp"`
 }
 
 func RegistryService() error {
@@ -179,28 +272,39 @@ func (m *ServiceS) SetPid(in int64) *ServiceS {
 	return m
 }
 
-func (m *ServiceS) SetChroot(in string) *ServiceS {
-	m.Chroot = in
+func (m *ServiceS) SetDir(in string) *ServiceS {
+	m.Dir = in
 	return m
 }
 
-func (m *ServiceS) SetUid(in int32) *ServiceS {
-	m.Uid = in
+func (m *ServiceS) SetEnv(in map[string]string) *ServiceS {
+	m.Env = in
 	return m
 }
 
-func (m *ServiceS) SetUser(in string) *ServiceS {
-	m.User = in
+func (m *ServiceS) PutEnv(k string, v string) *ServiceS {
+	if len(m.Env) == 0 {
+		m.Env = map[string]string{}
+	}
+	m.Env[k] = v
 	return m
 }
 
-func (m *ServiceS) SetGid(in int32) *ServiceS {
-	m.Gid = in
+func (m *ServiceS) RemoveEnv(k string) *ServiceS {
+	if len(m.Env) == 0 {
+		return m
+	}
+	delete(m.Env, k)
 	return m
 }
 
-func (m *ServiceS) SetGroup(in string) *ServiceS {
-	m.Group = in
+func (m *ServiceS) SetSysProcAttr(in *v1.SysProcAttr) *ServiceS {
+	m.SysProcAttr = (*ServiceSysProcAttr)(in)
+	return m
+}
+
+func (m *ServiceS) SetLog(in *v1.ProcLog) *ServiceS {
+	m.Log = (*ServiceLog)(in)
 	return m
 }
 
@@ -216,6 +320,11 @@ func (m *ServiceS) SetCreationTimestamp(in int64) *ServiceS {
 
 func (m *ServiceS) SetUpdateTimestamp(in int64) *ServiceS {
 	m.UpdateTimestamp = in
+	return m
+}
+
+func (m *ServiceS) SetStartTimestamp(in int64) *ServiceS {
+	m.StartTimestamp = in
 	return m
 }
 
@@ -252,20 +361,17 @@ func FromService(in *v1.Service) *ServiceS {
 	if in.Pid != 0 {
 		out.Pid = in.Pid
 	}
-	if in.Chroot != "" {
-		out.Chroot = in.Chroot
+	if in.Dir != "" {
+		out.Dir = in.Dir
 	}
-	if in.Uid != 0 {
-		out.Uid = in.Uid
+	if in.Env != nil {
+		out.Env = in.Env
 	}
-	if in.User != "" {
-		out.User = in.User
+	if in.SysProcAttr != nil {
+		out.SysProcAttr = (*ServiceSysProcAttr)(in.SysProcAttr)
 	}
-	if in.Gid != 0 {
-		out.Gid = in.Gid
-	}
-	if in.Group != "" {
-		out.Group = in.Group
+	if in.Log != nil {
+		out.Log = (*ServiceLog)(in.Log)
 	}
 	if in.Version != "" {
 		out.Version = in.Version
@@ -275,6 +381,9 @@ func FromService(in *v1.Service) *ServiceS {
 	}
 	if in.UpdateTimestamp != 0 {
 		out.UpdateTimestamp = in.UpdateTimestamp
+	}
+	if in.StartTimestamp != 0 {
+		out.StartTimestamp = in.StartTimestamp
 	}
 	if in.Status != "" {
 		out.Status = in.Status
@@ -295,14 +404,14 @@ func (m *ServiceS) ToService() *v1.Service {
 	out.Bin = m.Bin
 	out.Args = m.Args
 	out.Pid = m.Pid
-	out.Chroot = m.Chroot
-	out.Uid = m.Uid
-	out.User = m.User
-	out.Gid = m.Gid
-	out.Group = m.Group
+	out.Dir = m.Dir
+	out.Env = m.Env
+	out.SysProcAttr = (*v1.SysProcAttr)(m.SysProcAttr)
+	out.Log = (*v1.ProcLog)(m.Log)
 	out.Version = m.Version
 	out.CreationTimestamp = m.CreationTimestamp
 	out.UpdateTimestamp = m.UpdateTimestamp
+	out.StartTimestamp = m.StartTimestamp
 	out.Status = m.Status
 	out.Msg = m.Msg
 	out.Stat = (*v1.Stat)(m.Stat)
@@ -418,20 +527,31 @@ func (m *ServiceS) extractClauses(tx *dao.DB) []clause.Expression {
 	if m.Pid != 0 {
 		exprs = append(exprs, clause.Cond().Build("pid", m.Pid))
 	}
-	if m.Chroot != "" {
-		exprs = append(exprs, clause.Cond().Build("chroot", m.Chroot))
+	if m.Dir != "" {
+		exprs = append(exprs, clause.Cond().Build("dir", m.Dir))
 	}
-	if m.Uid != 0 {
-		exprs = append(exprs, clause.Cond().Build("uid", m.Uid))
+	if m.Env != nil {
+		for k, v := range m.Env {
+			exprs = append(exprs, dao.DefaultDialect.JSONBuild("env").Tx(tx).Op(dao.JSONEq, v, k))
+		}
 	}
-	if m.User != "" {
-		exprs = append(exprs, clause.Cond().Build("user", m.User))
+	if m.SysProcAttr != nil {
+		for k, v := range dao.FieldPatch(m.SysProcAttr) {
+			if v == nil {
+				exprs = append(exprs, dao.DefaultDialect.JSONBuild("sys_proc_attr").Tx(tx).Op(dao.JSONHasKey, "", strings.Split(k, ".")...))
+			} else {
+				exprs = append(exprs, dao.DefaultDialect.JSONBuild("sys_proc_attr").Tx(tx).Op(dao.JSONEq, v, strings.Split(k, ".")...))
+			}
+		}
 	}
-	if m.Gid != 0 {
-		exprs = append(exprs, clause.Cond().Build("gid", m.Gid))
-	}
-	if m.Group != "" {
-		exprs = append(exprs, clause.Cond().Build("group", m.Group))
+	if m.Log != nil {
+		for k, v := range dao.FieldPatch(m.Log) {
+			if v == nil {
+				exprs = append(exprs, dao.DefaultDialect.JSONBuild("log").Tx(tx).Op(dao.JSONHasKey, "", strings.Split(k, ".")...))
+			} else {
+				exprs = append(exprs, dao.DefaultDialect.JSONBuild("log").Tx(tx).Op(dao.JSONEq, v, strings.Split(k, ".")...))
+			}
+		}
 	}
 	if m.Version != "" {
 		exprs = append(exprs, clause.Cond().Build("version", m.Version))
@@ -441,6 +561,9 @@ func (m *ServiceS) extractClauses(tx *dao.DB) []clause.Expression {
 	}
 	if m.UpdateTimestamp != 0 {
 		exprs = append(exprs, clause.Cond().Build("update_timestamp", m.UpdateTimestamp))
+	}
+	if m.StartTimestamp != 0 {
+		exprs = append(exprs, clause.Cond().Build("start_timestamp", m.StartTimestamp))
 	}
 	if m.Status != "" {
 		exprs = append(exprs, clause.Cond().Build("status", m.Status))
@@ -491,20 +614,17 @@ func (m *ServiceS) BatchUpdates(ctx context.Context) error {
 	if m.Pid != 0 {
 		values["pid"] = m.Pid
 	}
-	if m.Chroot != "" {
-		values["chroot"] = m.Chroot
+	if m.Dir != "" {
+		values["dir"] = m.Dir
 	}
-	if m.Uid != 0 {
-		values["uid"] = m.Uid
+	if m.Env != nil {
+		values["env"] = m.Env
 	}
-	if m.User != "" {
-		values["user"] = m.User
+	if m.SysProcAttr != nil {
+		values["sys_proc_attr"] = m.SysProcAttr
 	}
-	if m.Gid != 0 {
-		values["gid"] = m.Gid
-	}
-	if m.Group != "" {
-		values["group"] = m.Group
+	if m.Log != nil {
+		values["log"] = m.Log
 	}
 	if m.Version != "" {
 		values["version"] = m.Version
@@ -514,6 +634,9 @@ func (m *ServiceS) BatchUpdates(ctx context.Context) error {
 	}
 	if m.UpdateTimestamp != 0 {
 		values["update_timestamp"] = m.UpdateTimestamp
+	}
+	if m.StartTimestamp != 0 {
+		values["start_timestamp"] = m.StartTimestamp
 	}
 	if m.Status != "" {
 		values["status"] = m.Status
@@ -549,20 +672,17 @@ func (m *ServiceS) Updates(ctx context.Context) (*v1.Service, error) {
 	if m.Pid != 0 {
 		values["pid"] = m.Pid
 	}
-	if m.Chroot != "" {
-		values["chroot"] = m.Chroot
+	if m.Dir != "" {
+		values["dir"] = m.Dir
 	}
-	if m.Uid != 0 {
-		values["uid"] = m.Uid
+	if m.Env != nil {
+		values["env"] = m.Env
 	}
-	if m.User != "" {
-		values["user"] = m.User
+	if m.SysProcAttr != nil {
+		values["sys_proc_attr"] = m.SysProcAttr
 	}
-	if m.Gid != 0 {
-		values["gid"] = m.Gid
-	}
-	if m.Group != "" {
-		values["group"] = m.Group
+	if m.Log != nil {
+		values["log"] = m.Log
 	}
 	if m.Version != "" {
 		values["version"] = m.Version
@@ -572,6 +692,9 @@ func (m *ServiceS) Updates(ctx context.Context) (*v1.Service, error) {
 	}
 	if m.UpdateTimestamp != 0 {
 		values["update_timestamp"] = m.UpdateTimestamp
+	}
+	if m.StartTimestamp != 0 {
+		values["start_timestamp"] = m.StartTimestamp
 	}
 	if m.Status != "" {
 		values["status"] = m.Status

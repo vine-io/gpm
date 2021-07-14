@@ -20,29 +20,52 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package process
+package main
 
 import (
-	"sync"
+	"context"
+	"fmt"
+	"log"
 
+	"github.com/gpm2/gpm/pkg/runtime"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+	"github.com/lack-io/vine"
 )
 
-type Manager struct {
-	sync.RWMutex
+func main() {
+	app := vine.NewService()
+	client := pb.NewGpmService(runtime.GpmName, app.Client())
 
-	ps map[int]*Process
-}
+	ctx := context.Background()
 
-func New() *Manager {
-	mg := &Manager{
-		ps: map[int]*Process{},
+	//in := &pb.CreateServiceReq{
+	//	Name: "test",
+	//	Bin:  "/tmp/web",
+	//	Args: nil,
+	//	Dir:  "/tmp",
+	//	Env:  nil,
+	//	//SysProcAttr: ,
+	//	//Log:         nil,
+	//	//Version:     "",
+	//	AutoRestart: false,
+	//}
+	//
+	//rsp, err := client.CreateService(ctx, in)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//fmt.Println(rsp.Service)
+
+	rsp, err := client.ListService(ctx, &pb.ListServiceReq{PageMeta: gpmv1.PageMeta{
+		Page: 1,
+		Size: 10,
+	}})
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	return mg
-}
-
-func (mg *Manager) Init(ss ...gpmv1.Service) error {
-
-	return nil
+	for _, item := range rsp.Services {
+		fmt.Println(item)
+	}
 }

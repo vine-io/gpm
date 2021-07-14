@@ -39,31 +39,31 @@ type Service struct {
 	Args []string `protobuf:"bytes,4,rep,name=args,proto3" json:"args,omitempty"`
 	// 服务进程 id
 	Pid int64 `protobuf:"varint,5,opt,name=pid,proto3" json:"pid,omitempty"`
-	// 执行命令时所在的目录
-	Chroot string `protobuf:"bytes,6,opt,name=chroot,proto3" json:"chroot,omitempty"`
-	// 执行服务时所用的 uid (windows 无效)
-	Uid int32 `protobuf:"varint,7,opt,name=uid,proto3" json:"uid,omitempty"`
-	// uid 对应的用户名称
-	User string `protobuf:"bytes,8,opt,name=user,proto3" json:"user,omitempty"`
-	// 执行服务时所有的 gid (windows 无效)
-	Gid int32 `protobuf:"varint,9,opt,name=gid,proto3" json:"gid,omitempty"`
-	// gid 对应的用户组
-	Group string `protobuf:"bytes,10,opt,name=group,proto3" json:"group,omitempty"`
+	// 服务目录
+	Dir string `protobuf:"bytes,6,opt,name=dir,proto3" json:"dir,omitempty"`
+	// 服务环境变量
+	Env map[string]string `protobuf:"bytes,7,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// 服务系统参数
+	SysProcAttr *SysProcAttr `protobuf:"bytes,8,opt,name=sysProcAttr,proto3" json:"sysProcAttr,omitempty"`
+	// 服务进程日志配置
+	Log *ProcLog `protobuf:"bytes,9,opt,name=log,proto3" json:"log,omitempty"`
 	// 服务版本
-	Version string `protobuf:"bytes,11,opt,name=version,proto3" json:"version,omitempty"`
+	Version string `protobuf:"bytes,10,opt,name=version,proto3" json:"version,omitempty"`
 	// 是否自启动, 默认为 false
-	AutoRestart bool `protobuf:"varint,12,opt,name=autoRestart,proto3" json:"autoRestart,omitempty"`
+	AutoRestart bool `protobuf:"varint,11,opt,name=autoRestart,proto3" json:"autoRestart,omitempty"`
 	// 创建时间
-	CreationTimestamp int64 `protobuf:"varint,13,opt,name=creationTimestamp,proto3" json:"creationTimestamp,omitempty"`
+	CreationTimestamp int64 `protobuf:"varint,21,opt,name=creationTimestamp,proto3" json:"creationTimestamp,omitempty"`
 	// 修改时间
-	UpdateTimestamp int64 `protobuf:"varint,14,opt,name=updateTimestamp,proto3" json:"updateTimestamp,omitempty"`
+	UpdateTimestamp int64 `protobuf:"varint,22,opt,name=updateTimestamp,proto3" json:"updateTimestamp,omitempty"`
+	// 启动时间
+	StartTimestamp int64 `protobuf:"varint,23,opt,name=startTimestamp,proto3" json:"startTimestamp,omitempty"`
 	// 服务状态
 	// +gen:enum=[init,running,stopped,failed,upgrading]
-	Status string `protobuf:"bytes,15,opt,name=status,proto3" json:"status,omitempty"`
+	Status string `protobuf:"bytes,24,opt,name=status,proto3" json:"status,omitempty"`
 	// 服务状态为 failed 的错误信息
-	Msg string `protobuf:"bytes,16,opt,name=msg,proto3" json:"msg,omitempty"`
+	Msg string `protobuf:"bytes,25,opt,name=msg,proto3" json:"msg,omitempty"`
 	// 服务资源占用情况
-	Stat *Stat `protobuf:"bytes,21,opt,name=stat,proto3" json:"stat,omitempty"`
+	Stat *Stat `protobuf:"bytes,26,opt,name=stat,proto3" json:"stat,omitempty"`
 }
 
 func (m *Service) Reset()         { *m = Service{} }
@@ -99,9 +99,91 @@ func (m *Service) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Service proto.InternalMessageInfo
 
+type SysProcAttr struct {
+	// 执行命令时所在的根目录
+	Chroot string `protobuf:"bytes,1,opt,name=chroot,proto3" json:"chroot,omitempty"`
+	// 执行服务时所用的 uid (windows 无效)
+	Uid int32 `protobuf:"varint,2,opt,name=uid,proto3" json:"uid,omitempty"`
+	// uid 对应的用户名称
+	User string `protobuf:"bytes,3,opt,name=user,proto3" json:"user,omitempty"`
+	// 执行服务时所有的 gid (windows 无效)
+	Gid int32 `protobuf:"varint,4,opt,name=gid,proto3" json:"gid,omitempty"`
+	// gid 对应的用户组
+	Group string `protobuf:"bytes,5,opt,name=group,proto3" json:"group,omitempty"`
+}
+
+func (m *SysProcAttr) Reset()         { *m = SysProcAttr{} }
+func (m *SysProcAttr) String() string { return proto.CompactTextString(m) }
+func (*SysProcAttr) ProtoMessage()    {}
+func (*SysProcAttr) Descriptor() ([]byte, []int) {
+	return fileDescriptor_660b025bf3ac492a, []int{1}
+}
+func (m *SysProcAttr) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *SysProcAttr) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_SysProcAttr.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *SysProcAttr) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SysProcAttr.Merge(m, src)
+}
+func (m *SysProcAttr) XXX_Size() int {
+	return m.XSize()
+}
+func (m *SysProcAttr) XXX_DiscardUnknown() {
+	xxx_messageInfo_SysProcAttr.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SysProcAttr proto.InternalMessageInfo
+
+type ProcLog struct {
+}
+
+func (m *ProcLog) Reset()         { *m = ProcLog{} }
+func (m *ProcLog) String() string { return proto.CompactTextString(m) }
+func (*ProcLog) ProtoMessage()    {}
+func (*ProcLog) Descriptor() ([]byte, []int) {
+	return fileDescriptor_660b025bf3ac492a, []int{2}
+}
+func (m *ProcLog) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ProcLog) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ProcLog.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ProcLog) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProcLog.Merge(m, src)
+}
+func (m *ProcLog) XXX_Size() int {
+	return m.XSize()
+}
+func (m *ProcLog) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProcLog.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProcLog proto.InternalMessageInfo
+
 type Stat struct {
 	// cpu 占用百分比
-	CpuPercent float32 `protobuf:"fixed32,1,opt,name=cpuPercent,proto3" json:"cpuPercent,omitempty"`
+	CpuPercent float64 `protobuf:"fixed64,1,opt,name=cpuPercent,proto3" json:"cpuPercent,omitempty"`
 	// 内存占用, rss
 	Memory uint64 `protobuf:"varint,2,opt,name=memory,proto3" json:"memory,omitempty"`
 	// 内存占用百分比
@@ -112,7 +194,7 @@ func (m *Stat) Reset()         { *m = Stat{} }
 func (m *Stat) String() string { return proto.CompactTextString(m) }
 func (*Stat) ProtoMessage()    {}
 func (*Stat) Descriptor() ([]byte, []int) {
-	return fileDescriptor_660b025bf3ac492a, []int{1}
+	return fileDescriptor_660b025bf3ac492a, []int{3}
 }
 func (m *Stat) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -156,7 +238,7 @@ func (m *PageMeta) Reset()         { *m = PageMeta{} }
 func (m *PageMeta) String() string { return proto.CompactTextString(m) }
 func (*PageMeta) ProtoMessage()    {}
 func (*PageMeta) Descriptor() ([]byte, []int) {
-	return fileDescriptor_660b025bf3ac492a, []int{2}
+	return fileDescriptor_660b025bf3ac492a, []int{4}
 }
 func (m *PageMeta) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -187,6 +269,9 @@ var xxx_messageInfo_PageMeta proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*Service)(nil), "gpmv1.Service")
+	proto.RegisterMapType((map[string]string)(nil), "gpmv1.Service.EnvEntry")
+	proto.RegisterType((*SysProcAttr)(nil), "gpmv1.SysProcAttr")
+	proto.RegisterType((*ProcLog)(nil), "gpmv1.ProcLog")
 	proto.RegisterType((*Stat)(nil), "gpmv1.Stat")
 	proto.RegisterType((*PageMeta)(nil), "gpmv1.PageMeta")
 }
@@ -196,35 +281,43 @@ func init() {
 }
 
 var fileDescriptor_660b025bf3ac492a = []byte{
-	// 440 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0xb1, 0x6e, 0x14, 0x31,
-	0x10, 0xbd, 0xbd, 0xdd, 0xbd, 0xbb, 0xf8, 0x20, 0x09, 0x16, 0xa0, 0xa9, 0x96, 0xd5, 0x55, 0x2b,
-	0x81, 0xee, 0x94, 0xa3, 0xa4, 0xa3, 0xa3, 0x40, 0x8a, 0x1c, 0x2a, 0x0a, 0x24, 0xdf, 0xae, 0xe5,
-	0xb8, 0xf0, 0xda, 0xb2, 0xbd, 0x27, 0xc1, 0x57, 0xf0, 0x1d, 0x7c, 0x49, 0xca, 0x94, 0x94, 0x70,
-	0xf7, 0x23, 0x68, 0x66, 0x13, 0x25, 0x82, 0x86, 0x66, 0xf7, 0xbd, 0x37, 0x6f, 0xc6, 0x7a, 0x1e,
-	0xb3, 0x8d, 0x36, 0xe9, 0x7a, 0xd8, 0xad, 0x5b, 0x67, 0x37, 0xda, 0xdb, 0x2d, 0x7e, 0x36, 0x3e,
-	0xb8, 0xe4, 0x36, 0xd2, 0x9b, 0x48, 0x74, 0x7f, 0x81, 0xbf, 0x35, 0xa9, 0xbc, 0xd4, 0xde, 0xee,
-	0x2f, 0x56, 0x3f, 0x72, 0x36, 0xbf, 0x52, 0x61, 0x6f, 0x5a, 0xc5, 0x4f, 0xd9, 0xd4, 0x74, 0x90,
-	0xd5, 0x59, 0x93, 0x8b, 0xa9, 0xe9, 0x38, 0x67, 0x45, 0x2f, 0xad, 0x82, 0x69, 0x9d, 0x35, 0x27,
-	0x82, 0x30, 0x3f, 0x67, 0xf9, 0xce, 0xf4, 0x90, 0x93, 0x84, 0x10, 0x5d, 0x32, 0xe8, 0x08, 0x45,
-	0x9d, 0xa3, 0x0b, 0x31, 0xba, 0xbc, 0xe9, 0xa0, 0xa4, 0x51, 0x08, 0xf9, 0x4b, 0x36, 0x6b, 0xaf,
-	0x83, 0x73, 0x09, 0x66, 0xd4, 0x7a, 0xc7, 0xd0, 0x39, 0x98, 0x0e, 0xe6, 0x75, 0xd6, 0x94, 0x02,
-	0x21, 0xce, 0x1b, 0xa2, 0x0a, 0xb0, 0x18, 0x4f, 0x45, 0x8c, 0x2e, 0x6d, 0x3a, 0x38, 0x19, 0x5d,
-	0xda, 0x74, 0xfc, 0x39, 0x2b, 0x75, 0x70, 0x83, 0x07, 0x46, 0xb6, 0x91, 0x70, 0x60, 0xf3, 0xbd,
-	0x0a, 0xd1, 0xb8, 0x1e, 0x96, 0xa4, 0xdf, 0x53, 0x5e, 0xb3, 0xa5, 0x1c, 0x92, 0x13, 0x2a, 0x26,
-	0x19, 0x12, 0x3c, 0xa9, 0xb3, 0x66, 0x21, 0x1e, 0x4b, 0xfc, 0x0d, 0x7b, 0xd6, 0x06, 0x25, 0x93,
-	0x71, 0xfd, 0x27, 0x63, 0x51, 0xb4, 0x1e, 0x9e, 0x52, 0x82, 0x7f, 0x0b, 0xbc, 0x61, 0x67, 0x83,
-	0xef, 0x64, 0x52, 0x0f, 0xde, 0x53, 0xf2, 0xfe, 0x2d, 0x63, 0xf2, 0x98, 0x64, 0x1a, 0x22, 0x9c,
-	0x8d, 0xc9, 0x47, 0x86, 0x99, 0x6c, 0xd4, 0x70, 0x3e, 0xde, 0xa4, 0x8d, 0x9a, 0xbf, 0x62, 0x05,
-	0xd6, 0xe0, 0x45, 0x9d, 0x35, 0xcb, 0xed, 0x72, 0x4d, 0x1b, 0x5a, 0x5f, 0x25, 0x99, 0x04, 0x15,
-	0x56, 0x5f, 0x58, 0x81, 0x8c, 0x57, 0x8c, 0xb5, 0x7e, 0xb8, 0x54, 0xa1, 0x55, 0x7d, 0xa2, 0x85,
-	0x4d, 0xc5, 0x23, 0x05, 0x8f, 0xb4, 0xca, 0xba, 0xf0, 0x95, 0x56, 0x57, 0x88, 0x3b, 0x86, 0x7d,
-	0x56, 0xd9, 0xfb, 0xbe, 0x7c, 0xec, 0x7b, 0x50, 0x56, 0x5b, 0xb6, 0xb8, 0x94, 0x5a, 0x7d, 0x54,
-	0x49, 0xe2, 0x1a, 0xbc, 0xd4, 0x8a, 0xa6, 0x97, 0x82, 0x30, 0x6a, 0xd1, 0x7c, 0x1b, 0x1f, 0x44,
-	0x29, 0x08, 0xbf, 0xff, 0x70, 0xf3, 0xbb, 0x9a, 0xdc, 0x1c, 0xaa, 0xec, 0xf6, 0x50, 0x65, 0xbf,
-	0x0e, 0x55, 0xf6, 0xfd, 0x58, 0x4d, 0x6e, 0x8f, 0xd5, 0xe4, 0xe7, 0xb1, 0x9a, 0x7c, 0x7e, 0xfd,
-	0x5f, 0xcf, 0xf2, 0x1d, 0x25, 0xdd, 0xcd, 0xa8, 0xf0, 0xf6, 0x4f, 0x00, 0x00, 0x00, 0xff, 0xff,
-	0xa6, 0x59, 0x31, 0xf5, 0xcc, 0x02, 0x00, 0x00,
+	// 564 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0xc1, 0x6e, 0x13, 0x31,
+	0x10, 0xcd, 0x66, 0x37, 0x4d, 0xe2, 0x95, 0x0a, 0x58, 0xd0, 0x9a, 0x1e, 0x96, 0x55, 0x0e, 0x28,
+	0x08, 0x94, 0xa8, 0x01, 0x21, 0x04, 0x27, 0x90, 0x7a, 0x40, 0x02, 0xa9, 0x32, 0x9c, 0x38, 0x20,
+	0xb9, 0xbb, 0x96, 0x6b, 0x51, 0xaf, 0x57, 0xb6, 0x77, 0xa5, 0xf0, 0x15, 0xfc, 0x0e, 0x7f, 0xd0,
+	0x63, 0x8f, 0x1c, 0xa1, 0xfd, 0x11, 0x34, 0x93, 0x5d, 0x25, 0x2a, 0x17, 0x2e, 0xc9, 0x9b, 0x37,
+	0x6f, 0xec, 0x37, 0xe3, 0x59, 0xb2, 0x54, 0x3a, 0x9c, 0x37, 0x67, 0x8b, 0xc2, 0x9a, 0xa5, 0xaa,
+	0xcd, 0x0a, 0x7e, 0x96, 0xb5, 0xb3, 0xc1, 0x2e, 0x45, 0xad, 0x3d, 0x86, 0xed, 0x31, 0xfc, 0x2d,
+	0x90, 0xa5, 0x23, 0x55, 0x9b, 0xf6, 0x78, 0xf6, 0x33, 0x21, 0xe3, 0x4f, 0xd2, 0xb5, 0xba, 0x90,
+	0x74, 0x9f, 0x0c, 0x75, 0xc9, 0xa2, 0x3c, 0x9a, 0xc7, 0x7c, 0xa8, 0x4b, 0x4a, 0x49, 0x52, 0x09,
+	0x23, 0xd9, 0x30, 0x8f, 0xe6, 0x53, 0x8e, 0x98, 0xde, 0x25, 0xf1, 0x99, 0xae, 0x58, 0x8c, 0x14,
+	0x40, 0x50, 0x09, 0xa7, 0x3c, 0x4b, 0xf2, 0x18, 0x54, 0x80, 0x41, 0x55, 0xeb, 0x92, 0x8d, 0xf0,
+	0x28, 0x80, 0xc0, 0x94, 0xda, 0xb1, 0xbd, 0x4d, 0x5d, 0xa9, 0x1d, 0x7d, 0x42, 0x62, 0x59, 0xb5,
+	0x6c, 0x9c, 0xc7, 0xf3, 0x74, 0x75, 0xb8, 0x40, 0x3b, 0x8b, 0xce, 0xca, 0xe2, 0xa4, 0x6a, 0x4f,
+	0xaa, 0xe0, 0xd6, 0x1c, 0x34, 0xf4, 0x05, 0x49, 0xfd, 0xda, 0x9f, 0x3a, 0x5b, 0xbc, 0x0d, 0xc1,
+	0xb1, 0x49, 0x1e, 0xcd, 0xd3, 0x15, 0xed, 0x4b, 0xb6, 0x19, 0xbe, 0x2b, 0xa3, 0x39, 0x89, 0x2f,
+	0xac, 0x62, 0x53, 0x54, 0xef, 0x77, 0x6a, 0xc8, 0x7e, 0xb0, 0x8a, 0x43, 0x8a, 0x32, 0x32, 0x6e,
+	0xa5, 0xf3, 0xda, 0x56, 0x8c, 0xa0, 0xb1, 0x3e, 0xa4, 0x39, 0x49, 0x45, 0x13, 0x2c, 0x97, 0x3e,
+	0x08, 0x17, 0x58, 0x9a, 0x47, 0xf3, 0x09, 0xdf, 0xa5, 0xe8, 0x33, 0x72, 0xaf, 0x70, 0x52, 0x04,
+	0x6d, 0xab, 0xcf, 0xda, 0x00, 0x69, 0x6a, 0xf6, 0x00, 0x1b, 0xfe, 0x37, 0x41, 0xe7, 0xe4, 0x4e,
+	0x53, 0x97, 0x22, 0xc8, 0xad, 0xf6, 0x00, 0xb5, 0xb7, 0x69, 0xfa, 0x98, 0xec, 0xe3, 0x05, 0x5b,
+	0xe1, 0x21, 0x0a, 0x6f, 0xb1, 0xf4, 0x80, 0xec, 0xf9, 0x20, 0x42, 0xe3, 0x19, 0x43, 0xeb, 0x5d,
+	0x04, 0x83, 0x36, 0x5e, 0xb1, 0x87, 0x9b, 0x41, 0x1b, 0xaf, 0xe8, 0x23, 0x92, 0x40, 0x8e, 0x1d,
+	0xe1, 0x20, 0xd2, 0x7e, 0x6c, 0x41, 0x04, 0x8e, 0x89, 0xa3, 0x97, 0x64, 0xd2, 0xcf, 0x1b, 0xca,
+	0xbf, 0xc9, 0x35, 0x2e, 0xc1, 0x94, 0x03, 0xa4, 0xf7, 0xc9, 0xa8, 0x15, 0x17, 0x4d, 0xbf, 0x06,
+	0x9b, 0xe0, 0xf5, 0xf0, 0x55, 0x34, 0xf3, 0x24, 0xdd, 0x19, 0x3e, 0x38, 0x2a, 0xce, 0x9d, 0xb5,
+	0xa1, 0xab, 0xee, 0x22, 0x38, 0xb2, 0xd1, 0x25, 0x96, 0x8f, 0x38, 0x40, 0x58, 0x99, 0xc6, 0x4b,
+	0xd7, 0x6d, 0x11, 0x62, 0x50, 0x29, 0x5d, 0xb2, 0x64, 0xa3, 0x52, 0xba, 0x84, 0x8b, 0x95, 0xb3,
+	0x4d, 0x8d, 0x6b, 0x34, 0xe5, 0x9b, 0x60, 0x36, 0x25, 0xe3, 0xee, 0x0d, 0x67, 0x5f, 0x49, 0x02,
+	0x5d, 0xd0, 0x8c, 0x90, 0xa2, 0x6e, 0x4e, 0xa5, 0x2b, 0x64, 0xb5, 0xb9, 0x3c, 0xe2, 0x3b, 0x0c,
+	0x18, 0x33, 0xd2, 0x58, 0xb7, 0x46, 0x0f, 0x09, 0xef, 0x22, 0xa8, 0x33, 0xd2, 0xf4, 0x75, 0x60,
+	0x66, 0xc8, 0x77, 0x98, 0xd9, 0x8a, 0x4c, 0x4e, 0x85, 0x92, 0x1f, 0x65, 0x10, 0x60, 0xb9, 0x16,
+	0x4a, 0xe2, 0xe9, 0x23, 0x8e, 0x18, 0x38, 0xaf, 0xbf, 0xcb, 0xae, 0x33, 0xc4, 0xef, 0xde, 0x5f,
+	0xfe, 0xc9, 0x06, 0x97, 0xd7, 0x59, 0x74, 0x75, 0x9d, 0x45, 0xbf, 0xaf, 0xb3, 0xe8, 0xc7, 0x4d,
+	0x36, 0xb8, 0xba, 0xc9, 0x06, 0xbf, 0x6e, 0xb2, 0xc1, 0x97, 0xa7, 0xff, 0xf5, 0x95, 0xbe, 0xc1,
+	0x17, 0x3a, 0xdb, 0xc3, 0xc4, 0xf3, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x70, 0x95, 0xc1, 0x37,
+	0xdb, 0x03, 0x00, 0x00,
 }
 
 func (m *Service) XSize() (n int) {
@@ -253,6 +346,63 @@ func (m *Service) XSize() (n int) {
 	if m.Pid != 0 {
 		n += 1 + sovGpm(uint64(m.Pid))
 	}
+	l = len(m.Dir)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	if len(m.Env) > 0 {
+		for k, v := range m.Env {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovGpm(uint64(len(k))) + 1 + len(v) + sovGpm(uint64(len(v)))
+			n += mapEntrySize + 1 + sovGpm(uint64(mapEntrySize))
+		}
+	}
+	if m.SysProcAttr != nil {
+		l = m.SysProcAttr.XSize()
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	if m.Log != nil {
+		l = m.Log.XSize()
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Version)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	if m.AutoRestart {
+		n += 2
+	}
+	if m.CreationTimestamp != 0 {
+		n += 2 + sovGpm(uint64(m.CreationTimestamp))
+	}
+	if m.UpdateTimestamp != 0 {
+		n += 2 + sovGpm(uint64(m.UpdateTimestamp))
+	}
+	if m.StartTimestamp != 0 {
+		n += 2 + sovGpm(uint64(m.StartTimestamp))
+	}
+	l = len(m.Status)
+	if l > 0 {
+		n += 2 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Msg)
+	if l > 0 {
+		n += 2 + l + sovGpm(uint64(l))
+	}
+	if m.Stat != nil {
+		l = m.Stat.XSize()
+		n += 2 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *SysProcAttr) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
 	l = len(m.Chroot)
 	if l > 0 {
 		n += 1 + l + sovGpm(uint64(l))
@@ -271,31 +421,15 @@ func (m *Service) XSize() (n int) {
 	if l > 0 {
 		n += 1 + l + sovGpm(uint64(l))
 	}
-	l = len(m.Version)
-	if l > 0 {
-		n += 1 + l + sovGpm(uint64(l))
+	return n
+}
+
+func (m *ProcLog) XSize() (n int) {
+	if m == nil {
+		return 0
 	}
-	if m.AutoRestart {
-		n += 2
-	}
-	if m.CreationTimestamp != 0 {
-		n += 1 + sovGpm(uint64(m.CreationTimestamp))
-	}
-	if m.UpdateTimestamp != 0 {
-		n += 1 + sovGpm(uint64(m.UpdateTimestamp))
-	}
-	l = len(m.Status)
-	if l > 0 {
-		n += 1 + l + sovGpm(uint64(l))
-	}
-	l = len(m.Msg)
-	if l > 0 {
-		n += 2 + l + sovGpm(uint64(l))
-	}
-	if m.Stat != nil {
-		l = m.Stat.XSize()
-		n += 2 + l + sovGpm(uint64(l))
-	}
+	var l int
+	_ = l
 	return n
 }
 
@@ -306,7 +440,7 @@ func (m *Stat) XSize() (n int) {
 	var l int
 	_ = l
 	if m.CpuPercent != 0 {
-		n += 5
+		n += 9
 	}
 	if m.Memory != 0 {
 		n += 1 + sovGpm(uint64(m.Memory))
@@ -370,7 +504,7 @@ func (m *Service) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1
 		i--
-		dAtA[i] = 0xaa
+		dAtA[i] = 0xd2
 	}
 	if len(m.Msg) > 0 {
 		i -= len(m.Msg)
@@ -379,24 +513,37 @@ func (m *Service) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1
 		i--
-		dAtA[i] = 0x82
+		dAtA[i] = 0xca
 	}
 	if len(m.Status) > 0 {
 		i -= len(m.Status)
 		copy(dAtA[i:], m.Status)
 		i = encodeVarintGpm(dAtA, i, uint64(len(m.Status)))
 		i--
-		dAtA[i] = 0x7a
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xc2
+	}
+	if m.StartTimestamp != 0 {
+		i = encodeVarintGpm(dAtA, i, uint64(m.StartTimestamp))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xb8
 	}
 	if m.UpdateTimestamp != 0 {
 		i = encodeVarintGpm(dAtA, i, uint64(m.UpdateTimestamp))
 		i--
-		dAtA[i] = 0x70
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xb0
 	}
 	if m.CreationTimestamp != 0 {
 		i = encodeVarintGpm(dAtA, i, uint64(m.CreationTimestamp))
 		i--
-		dAtA[i] = 0x68
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xa8
 	}
 	if m.AutoRestart {
 		i--
@@ -406,43 +553,62 @@ func (m *Service) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x60
+		dAtA[i] = 0x58
 	}
 	if len(m.Version) > 0 {
 		i -= len(m.Version)
 		copy(dAtA[i:], m.Version)
 		i = encodeVarintGpm(dAtA, i, uint64(len(m.Version)))
 		i--
-		dAtA[i] = 0x5a
-	}
-	if len(m.Group) > 0 {
-		i -= len(m.Group)
-		copy(dAtA[i:], m.Group)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Group)))
-		i--
 		dAtA[i] = 0x52
 	}
-	if m.Gid != 0 {
-		i = encodeVarintGpm(dAtA, i, uint64(m.Gid))
+	if m.Log != nil {
+		{
+			size, err := m.Log.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
+		}
 		i--
-		dAtA[i] = 0x48
+		dAtA[i] = 0x4a
 	}
-	if len(m.User) > 0 {
-		i -= len(m.User)
-		copy(dAtA[i:], m.User)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.User)))
+	if m.SysProcAttr != nil {
+		{
+			size, err := m.SysProcAttr.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0x42
 	}
-	if m.Uid != 0 {
-		i = encodeVarintGpm(dAtA, i, uint64(m.Uid))
-		i--
-		dAtA[i] = 0x38
+	if len(m.Env) > 0 {
+		for k := range m.Env {
+			v := m.Env[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintGpm(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintGpm(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintGpm(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x3a
+		}
 	}
-	if len(m.Chroot) > 0 {
-		i -= len(m.Chroot)
-		copy(dAtA[i:], m.Chroot)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Chroot)))
+	if len(m.Dir) > 0 {
+		i -= len(m.Dir)
+		copy(dAtA[i:], m.Dir)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Dir)))
 		i--
 		dAtA[i] = 0x32
 	}
@@ -482,6 +648,83 @@ func (m *Service) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *SysProcAttr) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *SysProcAttr) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *SysProcAttr) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Group) > 0 {
+		i -= len(m.Group)
+		copy(dAtA[i:], m.Group)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Group)))
+		i--
+		dAtA[i] = 0x2a
+	}
+	if m.Gid != 0 {
+		i = encodeVarintGpm(dAtA, i, uint64(m.Gid))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.User) > 0 {
+		i -= len(m.User)
+		copy(dAtA[i:], m.User)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.User)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Uid != 0 {
+		i = encodeVarintGpm(dAtA, i, uint64(m.Uid))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Chroot) > 0 {
+		i -= len(m.Chroot)
+		copy(dAtA[i:], m.Chroot)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Chroot)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ProcLog) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ProcLog) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProcLog) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func (m *Stat) Marshal() (dAtA []byte, err error) {
 	size := m.XSize()
 	dAtA = make([]byte, size)
@@ -514,10 +757,10 @@ func (m *Stat) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x10
 	}
 	if m.CpuPercent != 0 {
-		i -= 4
-		ebinary.LittleEndian.PutUint32(dAtA[i:], uint32(math.Float32bits(float32(m.CpuPercent))))
+		i -= 8
+		ebinary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.CpuPercent))))
 		i--
-		dAtA[i] = 0xd
+		dAtA[i] = 0x9
 	}
 	return len(dAtA) - i, nil
 }
@@ -731,7 +974,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 			}
 		case 6:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Chroot", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Dir", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -759,13 +1002,13 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Chroot = string(dAtA[iNdEx:postIndex])
+			m.Dir = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
 			}
-			m.Uid = 0
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -775,16 +1018,124 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Uid |= int32(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Env == nil {
+				m.Env = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowGpm
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGpm
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthGpm
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGpm
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthGpm
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipGpm(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Env[mapkey] = mapvalue
+			iNdEx = postIndex
 		case 8:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field User", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field SysProcAttr", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -794,48 +1145,33 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthGpm
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthGpm
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.User = string(dAtA[iNdEx:postIndex])
+			if m.SysProcAttr == nil {
+				m.SysProcAttr = &SysProcAttr{}
+			}
+			if err := m.SysProcAttr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 9:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Gid", wireType)
-			}
-			m.Gid = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Gid |= int32(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 10:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Group", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Log", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -845,25 +1181,29 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthGpm
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthGpm
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Group = string(dAtA[iNdEx:postIndex])
+			if m.Log == nil {
+				m.Log = &ProcLog{}
+			}
+			if err := m.Log.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
-		case 11:
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Version", wireType)
 			}
@@ -895,7 +1235,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 			}
 			m.Version = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 12:
+		case 11:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field AutoRestart", wireType)
 			}
@@ -915,7 +1255,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.AutoRestart = bool(v != 0)
-		case 13:
+		case 21:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CreationTimestamp", wireType)
 			}
@@ -934,7 +1274,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 14:
+		case 22:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UpdateTimestamp", wireType)
 			}
@@ -953,7 +1293,26 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 15:
+		case 23:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StartTimestamp", wireType)
+			}
+			m.StartTimestamp = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StartTimestamp |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 24:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Status", wireType)
 			}
@@ -985,7 +1344,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 			}
 			m.Status = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 16:
+		case 25:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Msg", wireType)
 			}
@@ -1017,7 +1376,7 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 			}
 			m.Msg = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 21:
+		case 26:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Stat", wireType)
 			}
@@ -1074,6 +1433,240 @@ func (m *Service) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *SysProcAttr) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: SysProcAttr: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: SysProcAttr: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Chroot", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Chroot = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			m.Uid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Uid |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field User", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.User = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Gid", wireType)
+			}
+			m.Gid = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Gid |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Group", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Group = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProcLog) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProcLog: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProcLog: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *Stat) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1104,16 +1697,16 @@ func (m *Stat) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 5 {
+			if wireType != 1 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CpuPercent", wireType)
 			}
-			var v uint32
-			if (iNdEx + 4) > l {
+			var v uint64
+			if (iNdEx + 8) > l {
 				return io.ErrUnexpectedEOF
 			}
-			v = uint32(ebinary.LittleEndian.Uint32(dAtA[iNdEx:]))
-			iNdEx += 4
-			m.CpuPercent = float32(math.Float32frombits(v))
+			v = uint64(ebinary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.CpuPercent = float64(math.Float64frombits(v))
 		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Memory", wireType)

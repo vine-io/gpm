@@ -20,19 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package dao
+package config
 
-import (
-	"github.com/gpm2/gpm/pkg/runtime/inject"
-	"github.com/lack-io/vine/util/runtime"
-)
-
-func Provide() error {
-	if err := RegistryService(); err != nil {
-		return err
-	}
-
-	return inject.Provide(sets)
+type Config struct {
+	Root string
 }
-
-var sets = runtime.NewSchemaSet()

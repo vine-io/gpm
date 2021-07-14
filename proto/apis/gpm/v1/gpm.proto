@@ -19,37 +19,52 @@ message Service {
   repeated string args = 4;
   // 服务进程 id
   int64 pid = 5;
-  // 执行命令时所在的目录
-  string chroot = 6;
-  // 执行服务时所用的 uid (windows 无效)
-  int32 uid = 7;
-  // uid 对应的用户名称
-  string user = 8;
-  // 执行服务时所有的 gid (windows 无效)
-  int32 gid = 9;
-  // gid 对应的用户组
-  string group = 10;
+  // 服务目录
+  string dir = 6;
+  // 服务环境变量
+  map<string, string> env = 7;
+  // 服务系统参数
+  SysProcAttr sysProcAttr = 8;
+  // 服务进程日志配置
+  ProcLog log = 9;
   // 服务版本
-  string version = 11;
+  string version = 10;
   // 是否自启动, 默认为 false
-  bool autoRestart = 12;
+  bool autoRestart = 11;
   // 创建时间
-  int64 creationTimestamp = 13;
+  int64 creationTimestamp = 21;
   // 修改时间
-  int64 updateTimestamp = 14;
+  int64 updateTimestamp = 22;
+  // 启动时间
+  int64 startTimestamp = 23;
   // 服务状态
   // +gen:enum=[init,running,stopped,failed,upgrading]
-  string status = 15;
+  string status = 24;
   // 服务状态为 failed 的错误信息
-  string msg = 16;
-
+  string msg = 25;
   // 服务资源占用情况
-  Stat stat = 21;
+  Stat stat = 26;
+}
+
+message SysProcAttr {
+  // 执行命令时所在的根目录
+  string chroot = 1;
+  // 执行服务时所用的 uid (windows 无效)
+  int32 uid = 2;
+  // uid 对应的用户名称
+  string user = 3;
+  // 执行服务时所有的 gid (windows 无效)
+  int32 gid = 4;
+  // gid 对应的用户组
+  string group = 5;
+}
+
+message ProcLog {
 }
 
 message Stat {
   // cpu 占用百分比
-  float cpuPercent = 1;
+  double cpuPercent = 1;
   // 内存占用, rss
   uint64 memory = 2;
   // 内存占用百分比

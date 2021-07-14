@@ -43,6 +43,24 @@ func (m *Service) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
+func (m *SysProcAttr) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *SysProcAttr) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *ProcLog) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ProcLog) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
 func (m *Stat) Validate() error {
 	return m.ValidateE("")
 }

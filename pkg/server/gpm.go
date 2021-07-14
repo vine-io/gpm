@@ -24,11 +24,15 @@ package server
 
 import (
 	"context"
+	"runtime"
 
+	"github.com/gpm2/gpm/pkg/dao"
+	"github.com/gpm2/gpm/pkg/runtime/config"
 	"github.com/gpm2/gpm/pkg/runtime/inject"
 	"github.com/gpm2/gpm/pkg/service"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+	"github.com/lack-io/cli"
 	"github.com/lack-io/vine"
 	verrs "github.com/lack-io/vine/proto/apis/errors"
 )
@@ -47,7 +51,7 @@ func (s *server) ListService(ctx context.Context, req *pb.ListServiceReq, rsp *p
 	if err = req.Validate(); err != nil {
 		return verrs.BadGateway(s.Name(), err.Error())
 	}
-	rsp.Servicees, rsp.Total, err = s.H.ListService(ctx, &req.PageMeta)
+	rsp.Services, rsp.Total, err = s.H.ListService(ctx, &req.PageMeta)
 	return
 }
 
@@ -75,10 +79,11 @@ func (s *server) CreateService(ctx context.Context, req *pb.CreateServiceReq, rs
 		Name:        req.Name,
 		Bin:         req.Bin,
 		Args:        req.Args,
-		Chroot:      req.Dir,
-		User:        req.User,
-		Group:       req.Group,
-		Version:     req.Group,
+		Dir:         req.Dir,
+		Env:         req.Env,
+		SysProcAttr: req.SysProcAttr,
+		Log:         req.Log,
+		Version:     req.Version,
 		AutoRestart: req.AutoRestart,
 	}
 	rsp.Service, err = s.H.CreateService(ctx, ss)
@@ -119,9 +124,35 @@ func (s *server) DeleteService(ctx context.Context, req *pb.DeleteServiceReq, rs
 
 func (s *server) Init(opts ...vine.Option) error {
 	var err error
+
+	opts = append(opts,
+		vine.Flags(&cli.StringFlag{
+			Name:    "root",
+			Usage:   "gpmd root directory",
+			EnvVars: []string{"GPMD_ROOT"},
+		}),
+		vine.Action(func(c *cli.Context) error {
+
+			cfg := &config.Config{}
+			cfg.Root = c.String("root")
+			if cfg.Root == "" {
+				if runtime.GOOS == "windows" {
+					cfg.Root = "C:\\opt\\lack\\gpmd"
+				} else {
+					cfg.Root = "/opt/lack/gpmd"
+				}
+			}
+
+			return inject.Provide(cfg)
+		}))
+
 	s.Service.Init(opts...)
 
 	if err = inject.Provide(s.Service, s.Client(), s); err != nil {
+		return err
+	}
+
+	if err = dao.Provide(); err != nil {
 		return err
 	}
 

@@ -20,17 +20,46 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package process
+package main
 
 import (
-	"os"
+	"context"
+	"fmt"
+	"log"
 
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	"github.com/gpm2/gpm/pkg/runtime"
+	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+	"github.com/lack-io/vine"
 )
 
-type Process struct {
-	in *gpmv1.Service
+func main() {
+	app := vine.NewService()
+	client := pb.NewGpmService(runtime.GpmName, app.Client())
 
-	pr *os.Process
+	ctx := context.Background()
+
+	//in := &pb.CreateServiceReq{
+	//	Name: "test",
+	//	Bin:  "/tmp/web",
+	//	Args: nil,
+	//	Dir:  "/tmp",
+	//	Env:  nil,
+	//	//SysProcAttr: ,
+	//	//Log:         nil,
+	//	//Version:     "",
+	//	AutoRestart: false,
+	//}
+	//
+	//rsp, err := client.CreateService(ctx, in)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//fmt.Println(rsp.Service)
+
+	rsp, err := client.RebootService(ctx, &pb.RebootServiceReq{Id: 1})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(rsp.Service)
 }
-
