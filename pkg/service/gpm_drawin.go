@@ -33,7 +33,7 @@ import (
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 )
 
-func fillService(service *gpmv1.Service) error {
+func fillService(s *gpmv1.Service) error {
 
 	fn := func(attr *gpmv1.SysProcAttr) {
 		u, err := user.Current()
@@ -49,7 +49,7 @@ func fillService(service *gpmv1.Service) error {
 		}
 	}
 
-	attr := service.SysProcAttr
+	attr := s.SysProcAttr
 	if attr == nil {
 		attr = &gpmv1.SysProcAttr{}
 		fn(attr)
@@ -76,6 +76,7 @@ func fillService(service *gpmv1.Service) error {
 		gid, _ := strconv.ParseInt(group.Gid, 10, 64)
 		attr.Gid = int32(gid)
 	}
+	s.SysProcAttr = attr
 
 	return nil
 }

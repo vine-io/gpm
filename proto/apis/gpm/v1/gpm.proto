@@ -30,7 +30,7 @@ message Service {
   // 服务版本
   string version = 10;
   // 是否自启动, 默认为 false
-  bool autoRestart = 11;
+  int32 autoRestart = 11;
   // 创建时间
   int64 creationTimestamp = 21;
   // 修改时间
@@ -80,4 +80,9 @@ message PageMeta {
   // +gen:gt=0
   // +gen:default=10
   int32 size = 2;
+}
+
+message Event {
+  string status = 1;
+  int64 timestamp = 2;
 }

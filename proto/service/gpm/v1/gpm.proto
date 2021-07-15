@@ -89,7 +89,7 @@ message CreateServiceReq {
   // 服务版本
   string version = 8;
   // 是否自启动, 默认为 false
-  bool autoRestart = 9;
+  int32 autoRestart = 9;
 }
 
 message CreateServiceRsp {

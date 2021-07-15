@@ -199,6 +199,7 @@ type ServiceS struct {
 	SysProcAttr       *ServiceSysProcAttr `json:"sysProcAttr,omitempty" dao:"column:sys_proc_attr"`
 	Log               *ServiceLog         `json:"log,omitempty" dao:"column:log"`
 	Version           string              `json:"version,omitempty" dao:"column:version"`
+	AutoRestart       int32               `json:"autoRestart,omitempty" dao:"column:auto_restart"`
 	CreationTimestamp int64               `json:"creationTimestamp,omitempty" dao:"column:creation_timestamp"`
 	UpdateTimestamp   int64               `json:"updateTimestamp,omitempty" dao:"column:update_timestamp"`
 	StartTimestamp    int64               `json:"startTimestamp,omitempty" dao:"column:start_timestamp"`
@@ -313,6 +314,11 @@ func (m *ServiceS) SetVersion(in string) *ServiceS {
 	return m
 }
 
+func (m *ServiceS) SetAutoRestart(in int32) *ServiceS {
+	m.AutoRestart = in
+	return m
+}
+
 func (m *ServiceS) SetCreationTimestamp(in int64) *ServiceS {
 	m.CreationTimestamp = in
 	return m
@@ -376,6 +382,9 @@ func FromService(in *v1.Service) *ServiceS {
 	if in.Version != "" {
 		out.Version = in.Version
 	}
+	if in.AutoRestart != 0 {
+		out.AutoRestart = in.AutoRestart
+	}
 	if in.CreationTimestamp != 0 {
 		out.CreationTimestamp = in.CreationTimestamp
 	}
@@ -409,6 +418,7 @@ func (m *ServiceS) ToService() *v1.Service {
 	out.SysProcAttr = (*v1.SysProcAttr)(m.SysProcAttr)
 	out.Log = (*v1.ProcLog)(m.Log)
 	out.Version = m.Version
+	out.AutoRestart = m.AutoRestart
 	out.CreationTimestamp = m.CreationTimestamp
 	out.UpdateTimestamp = m.UpdateTimestamp
 	out.StartTimestamp = m.StartTimestamp
@@ -556,6 +566,9 @@ func (m *ServiceS) extractClauses(tx *dao.DB) []clause.Expression {
 	if m.Version != "" {
 		exprs = append(exprs, clause.Cond().Build("version", m.Version))
 	}
+	if m.AutoRestart != 0 {
+		exprs = append(exprs, clause.Cond().Build("auto_restart", m.AutoRestart))
+	}
 	if m.CreationTimestamp != 0 {
 		exprs = append(exprs, clause.Cond().Build("creation_timestamp", m.CreationTimestamp))
 	}
@@ -629,6 +642,9 @@ func (m *ServiceS) BatchUpdates(ctx context.Context) error {
 	if m.Version != "" {
 		values["version"] = m.Version
 	}
+	if m.AutoRestart != 0 {
+		values["auto_restart"] = m.AutoRestart
+	}
 	if m.CreationTimestamp != 0 {
 		values["creation_timestamp"] = m.CreationTimestamp
 	}
@@ -686,6 +702,9 @@ func (m *ServiceS) Updates(ctx context.Context) (*v1.Service, error) {
 	}
 	if m.Version != "" {
 		values["version"] = m.Version
+	}
+	if m.AutoRestart != 0 {
+		values["auto_restart"] = m.AutoRestart
 	}
 	if m.CreationTimestamp != 0 {
 		values["creation_timestamp"] = m.CreationTimestamp

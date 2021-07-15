@@ -94,3 +94,12 @@ func (m *PageMeta) ValidateE(prefix string) error {
 	}
 	return is.MargeErr(errs...)
 }
+
+func (m *Event) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *Event) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}

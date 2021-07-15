@@ -25,6 +25,7 @@ package service
 import (
 	"context"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/gpm2/gpm/pkg/dao"
@@ -57,6 +58,9 @@ type gpm struct {
 	vine.Service `inject:""`
 
 	Cfg *config.Config `inject:""`
+
+	sync.RWMutex
+	ps map[int64]*Process
 }
 
 func (g *gpm) Init() error {
@@ -71,10 +75,11 @@ func (g *gpm) Init() error {
 		return err
 	}
 
+	g.ps = map[int64]*Process{}
 	for _, item := range list {
 		p := NewProcess(item)
-		if item.Status == gpmv1.StatusRunning && p.Pid == 0 {
-			_, _ = g.startService(ctx, p.Service)
+		if item.Status == gpmv1.StatusRunning {
+			_, _ = g.startService(ctx, p)
 		}
 	}
 
@@ -88,7 +93,7 @@ func (g *gpm) ListService(ctx context.Context, meta *gpmv1.PageMeta) ([]*gpmv1.S
 	}
 
 	for i := 0; i < len(outs); i++ {
-		NewProcess(outs[i]).Out().DeepCopyInto(outs[i])
+		statProcess(outs[i])
 	}
 
 	return outs, total, nil
@@ -100,7 +105,7 @@ func (g *gpm) GetService(ctx context.Context, id int64) (*gpmv1.Service, error) 
 		return nil, err
 	}
 
-	NewProcess(s).Out().DeepCopyInto(s)
+	statProcess(s)
 
 	return s, nil
 }
@@ -135,6 +140,10 @@ func (g *gpm) CreateService(ctx context.Context, service *gpmv1.Service) (*gpmv1
 		return nil, err
 	}
 
+	g.Lock()
+	g.ps[service.Id] = NewProcess(service)
+	g.Unlock()
+
 	return service, nil
 }
 
@@ -144,14 +153,22 @@ func (g *gpm) StartService(ctx context.Context, id int64) (*gpmv1.Service, error
 		return nil, err
 	}
 
-	return g.startService(ctx, s)
+	g.RLock()
+	p := g.ps[s.Id]
+	g.RUnlock()
+
+	s, err = g.startService(ctx, p)
+	if err != nil {
+		return nil, err
+	}
+
+	return s, nil
 }
 
-func (g *gpm) startService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Service, error) {
-	p := NewProcess(s)
-
+func (g *gpm) startService(ctx context.Context, p *Process) (*gpmv1.Service, error) {
 	pid, err := p.Start()
 
+	s := p.Service
 	now := time.Now()
 	s.UpdateTimestamp = now.Unix()
 	if err != nil {
@@ -172,6 +189,10 @@ func (g *gpm) startService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servic
 		return nil, e
 	}
 
+	g.Lock()
+	g.ps[s.Id] = p
+	g.Unlock()
+
 	return s, nil
 }
 
@@ -181,16 +202,21 @@ func (g *gpm) StopService(ctx context.Context, id int64) (*gpmv1.Service, error)
 		return nil, err
 	}
 
-	return g.stopService(ctx, s)
+	g.RLock()
+	p := g.ps[s.Id]
+	g.RUnlock()
+
+	return g.stopService(ctx, p)
 }
 
-func (g *gpm) stopService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Service, error) {
-	p := NewProcess(s)
+func (g *gpm) stopService(ctx context.Context, p *Process) (*gpmv1.Service, error) {
+
 	err := p.Stop()
 	if err != nil {
 		return nil, err
 	}
 
+	s := p.Service
 	s.Status = gpmv1.StatusStopped
 	now := time.Now()
 	s.UpdateTimestamp = now.Unix()
@@ -198,6 +224,10 @@ func (g *gpm) stopService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Service
 	if err != nil {
 		return nil, err
 	}
+
+	g.Lock()
+	g.ps[s.Id] = p
+	g.Unlock()
 
 	return s, nil
 }
@@ -208,9 +238,13 @@ func (g *gpm) RebootService(ctx context.Context, id int64) (*gpmv1.Service, erro
 		return nil, err
 	}
 
-	g.stopService(ctx, s)
+	g.RLock()
+	p := g.ps[s.Id]
+	g.RUnlock()
 
-	return g.startService(ctx, s)
+	g.stopService(ctx, p)
+
+	return g.startService(ctx, p)
 }
 
 func (g *gpm) DeleteService(ctx context.Context, id int64) (*gpmv1.Service, error) {
@@ -220,10 +254,19 @@ func (g *gpm) DeleteService(ctx context.Context, id int64) (*gpmv1.Service, erro
 	}
 
 	if s.Status == gpmv1.StatusRunning {
-		if _, err = g.stopService(ctx, s); err != nil {
+
+		g.RLock()
+		p := g.ps[s.Id]
+		g.RUnlock()
+
+		if _, err = g.stopService(ctx, p); err != nil {
 			return nil, err
 		}
 	}
+
+	g.Lock()
+	delete(g.ps, s.Id)
+	g.Unlock()
 
 	err = dao.ServiceSBuilder().SetId(id).Delete(ctx, false)
 	return s, err

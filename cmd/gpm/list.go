@@ -31,11 +31,12 @@ import (
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
 	"github.com/lack-io/vine"
+	"github.com/lack-io/vine/core/client"
 )
 
 func main() {
 	app := vine.NewService()
-	client := pb.NewGpmService(runtime.GpmName, app.Client())
+	cc := pb.NewGpmService(runtime.GpmName, app.Client())
 
 	ctx := context.Background()
 
@@ -58,10 +59,10 @@ func main() {
 	//
 	//fmt.Println(rsp.Service)
 
-	rsp, err := client.ListService(ctx, &pb.ListServiceReq{PageMeta: gpmv1.PageMeta{
+	rsp, err := cc.ListService(ctx, &pb.ListServiceReq{PageMeta: gpmv1.PageMeta{
 		Page: 1,
 		Size: 10,
-	}})
+	}}, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}

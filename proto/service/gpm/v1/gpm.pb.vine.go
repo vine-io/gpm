@@ -122,6 +122,48 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 			},
 		},
 		Paths: map[string]*openapi.OpenAPIPath{
+			"/api/v1/Service/{id}/action/start": &openapi.OpenAPIPath{
+				Patch: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "启动服务",
+					Description: "GpmService StartService",
+					OperationId: "GpmServiceStartService",
+					Parameters: []*openapi.PathParameters{
+						&openapi.PathParameters{
+							Name:        "id",
+							In:          "path",
+							Description: "StartServiceReq field id",
+							Required:    true,
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type:   "integer",
+								Format: "int64",
+							},
+						},
+					},
+					RequestBody: &openapi.PathRequestBody{
+						Description: "StartService StartServiceReq",
+						Content: &openapi.PathRequestBodyContent{
+							ApplicationJson: &openapi.ApplicationContent{
+								Schema: &openapi.Schema{
+									Ref: "#/components/schemas/v1.StartServiceReq",
+								},
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.StartServiceRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
 			"/api/v1/Service/{id}/action/stop": &openapi.OpenAPIPath{
 				Patch: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
@@ -394,52 +436,29 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 					Security: []*openapi.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{id}/action/start": &openapi.OpenAPIPath{
-				Patch: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "启动服务",
-					Description: "GpmService StartService",
-					OperationId: "GpmServiceStartService",
-					Parameters: []*openapi.PathParameters{
-						&openapi.PathParameters{
-							Name:        "id",
-							In:          "path",
-							Description: "StartServiceReq field id",
-							Required:    true,
-							Explode:     true,
-							Schema: &openapi.Schema{
-								Type:   "integer",
-								Format: "int64",
-							},
-						},
-					},
-					RequestBody: &openapi.PathRequestBody{
-						Description: "StartService StartServiceReq",
-						Content: &openapi.PathRequestBodyContent{
-							ApplicationJson: &openapi.ApplicationContent{
-								Schema: &openapi.Schema{
-									Ref: "#/components/schemas/v1.StartServiceReq",
-								},
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.StartServiceRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
 		},
 		Components: &openapi.OpenAPIComponents{
 			SecuritySchemes: &openapi.SecuritySchemes{},
 			Schemas: map[string]*openapi.Model{
+				"v1.StartServiceReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"id": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
+					},
+					Required: []string{"id"},
+				},
+				"v1.StartServiceRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"service": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.Service",
+						},
+					},
+				},
 				"v1.StopServiceReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -535,7 +554,8 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 							Type: "string",
 						},
 						"autoRestart": &openapi.Schema{
-							Type: "boolean",
+							Type:   "integer",
+							Format: "int32",
 						},
 					},
 					Required: []string{"name", "bin"},
@@ -605,25 +625,6 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
-				"v1.StartServiceReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"id": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
-						},
-					},
-					Required: []string{"id"},
-				},
-				"v1.StartServiceRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"service": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.Service",
-						},
-					},
-				},
 				"v1.Service": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -663,7 +664,8 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 							Type: "string",
 						},
 						"autoRestart": &openapi.Schema{
-							Type: "boolean",
+							Type:   "integer",
+							Format: "int32",
 						},
 						"creationTimestamp": &openapi.Schema{
 							Type:   "integer",
@@ -697,16 +699,16 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						"page": &openapi.Schema{
 							Type:             "integer",
 							Format:           "int32",
-							Default:          "1",
 							ExclusiveMinimum: true,
 							Minimum:          0,
+							Default:          "1",
 						},
 						"size": &openapi.Schema{
 							Type:             "integer",
 							Format:           "int32",
-							Default:          "10",
 							ExclusiveMinimum: true,
 							Minimum:          0,
+							Default:          "10",
 						},
 					},
 				},

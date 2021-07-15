@@ -71,3 +71,8 @@ func (in *Stat) DeepCopyInto(out *Stat) {
 func (in *PageMeta) DeepCopyInto(out *PageMeta) {
 	*out = *in
 }
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *Event) DeepCopyInto(out *Event) {
+	*out = *in
+}

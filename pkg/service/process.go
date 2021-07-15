@@ -23,6 +23,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -33,12 +34,13 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/shirou/gopsutil/mem"
-	proc "github.com/shirou/gopsutil/process"
-
+	"github.com/gpm2/gpm/pkg/dao"
 	"github.com/gpm2/gpm/pkg/runtime/config"
 	"github.com/gpm2/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	log "github.com/lack-io/vine/lib/logger"
+	"github.com/shirou/gopsutil/mem"
+	proc "github.com/shirou/gopsutil/process"
 )
 
 var (
@@ -53,12 +55,15 @@ type Process struct {
 	cfg *config.Config
 
 	lw io.WriteCloser
+
+	done chan struct{}
 }
 
 func NewProcess(in *gpmv1.Service) *Process {
 	process := &Process{
 		Service: in,
 		cfg:     &config.Config{},
+		done:    make(chan struct{}, 1),
 	}
 	if process.Pid != 0 {
 		p, err := proc.NewProcess(int32(process.Pid))
@@ -75,11 +80,23 @@ func NewProcess(in *gpmv1.Service) *Process {
 }
 
 func (p *Process) Start() (int32, error) {
-	if p.pr != nil && p.pr.Pid != 0 {
-		return p.pr.Pid, nil
+	var pid int32
+	var err error
+	if p.pr == nil || p.pr.Pid == 0 {
+		pid, err = p.run()
+		if err != nil {
+			return 0, err
+		}
 	}
 
-	return p.run()
+	p.done = make(chan struct{}, 1)
+	p.done <- struct{}{}
+
+	if p.AutoRestart > 0 {
+		go p.watching()
+	}
+
+	return pid, nil
 }
 
 func (p *Process) run() (int32, error) {
@@ -141,7 +158,37 @@ func (p *Process) run() (int32, error) {
 	}
 
 	p.pr, _ = proc.NewProcess(int32(pr.Pid))
+	p.Pid = int64(pr.Pid)
 	return p.pr.Pid, nil
+}
+
+func (p *Process) watching() {
+	timer := time.NewTicker(time.Second * 2)
+	defer timer.Stop()
+	for {
+		select {
+		case _, ok := <-p.done:
+			if !ok {
+				return
+			}
+		case <-timer.C:
+			pr, err := proc.NewProcess(int32(p.Pid))
+			if err != nil {
+				pid, _ := p.run()
+				log.Infof("reboot service(dead) %s at pid: %d", p.Name, pid)
+				dao.FromService(p.Service).Updates(context.TODO())
+			} else {
+				status, _ := pr.Status()
+				if status == "Z" {
+					log.Infof("watching service(pid=%d) %s status: %s", p.Pid, p.Name, status)
+					_ = p.kill()
+					pid, _ := p.run()
+					dao.FromService(p.Service).Updates(context.TODO())
+					log.Infof("reboot service(Z) %s at pid: %d", p.Name, pid)
+				}
+			}
+		}
+	}
 }
 
 func (p *Process) Kill() error {
@@ -149,6 +196,12 @@ func (p *Process) Kill() error {
 		return ErrProcessNotFound
 	}
 
+	close(p.done)
+
+	return p.kill()
+}
+
+func (p *Process) kill() error {
 	pr, err := os.FindProcess(int(p.pr.Pid))
 	if err != nil {
 		return err
@@ -165,11 +218,11 @@ func (p *Process) Kill() error {
 		return err
 	}
 	p.Pid = 0
+	p.pr = nil
 
 	if p.lw != nil {
 		return p.lw.Close()
 	}
-
 	return nil
 }
 
@@ -178,6 +231,12 @@ func (p *Process) Stop() error {
 		return ErrProcessNotFound
 	}
 
+	close(p.done)
+
+	return p.stop()
+}
+
+func (p *Process) stop() error {
 	pr, err := os.FindProcess(int(p.pr.Pid))
 	if err != nil {
 		return err
@@ -194,29 +253,28 @@ func (p *Process) Stop() error {
 		return err
 	}
 	p.Pid = 0
+	p.pr = nil
 
 	if p.lw != nil {
 		return p.lw.Close()
 	}
-
 	return nil
 }
 
-func (p *Process) Out() *gpmv1.Service {
-	out := new(gpmv1.Service)
-
+func statProcess(s *gpmv1.Service) {
+	pr, err := proc.NewProcess(int32(s.Pid))
+	if err != nil {
+		return
+	}
 	stat := &gpmv1.Stat{}
-	if p.pr != nil {
-		percent, _ := p.pr.MemoryPercent()
+	if pr != nil {
+		percent, _ := pr.MemoryPercent()
 		stat.MemPercent = percent
 		m, _ := mem.VirtualMemory()
 		if m != nil {
 			stat.Memory = uint64(float64(percent) / 100 * float64(m.Total))
 		}
-		stat.CpuPercent, _ = p.pr.CPUPercent()
+		stat.CpuPercent, _ = pr.CPUPercent()
 	}
-	p.Service.Stat = stat
-
-	p.Service.DeepCopyInto(out)
-	return out
+	s.Stat = stat
 }
