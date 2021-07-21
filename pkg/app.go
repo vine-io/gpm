@@ -23,22 +23,13 @@
 package pkg
 
 import (
-	"github.com/lack-io/vine"
 	log "github.com/lack-io/vine/lib/logger"
 
-	"github.com/gpm2/gpm/pkg/runtime"
 	"github.com/gpm2/gpm/pkg/server"
 )
 
 func Run() {
-	s := server.New(
-		vine.Name(runtime.GpmName),
-		vine.Id(runtime.GpmId),
-		vine.Version(runtime.GetVersion()),
-		vine.Metadata(map[string]string{
-			"namespace": runtime.Namespace,
-		}),
-	)
+	s := server.New()
 
 	if err := s.Init(); err != nil {
 		log.Fatal(err)

@@ -35,6 +35,26 @@ service GpmService {
   // +gen:summary=删除服务
   // +gen:delete=/api/v1/Service/{id}
   rpc DeleteService(DeleteServiceReq) returns (DeleteServiceRsp);
+
+  // +gen:summary=查看服务日志
+  // +gen:get=/api/v1/Service/{id}/logs
+  rpc CatServiceLog(CatServiceLogReq) returns (CatServiceLogRsp);
+  // +gen:summary=动态监听服务日志
+  // +gen:post=/api/v1/Service/{id}/watchLogs
+  rpc WatchServiceLog(WatchServiceLogReq) returns (stream WatchServiceLogRsp);
+
+  // +gen:summary=远程安装服务
+  // +gen:post=/api/v1/Service/install
+  rpc InstallService(stream InstallServiceReq) returns (stream InstallServiceRsp);
+  // +gen:summary=查看服务历史版本
+  // +gen:get=/api/v1/Service/{id}/versions
+  rpc ListServiceVersions(ListServiceVersionsReq) returns (ListServiceVersionsRsp);
+  // +gen:summary=升级服务
+  // +gen:post=/api/v1/Service/{id}/upgrade
+  rpc UpgradeService(stream UpgradeServiceReq) returns (stream UpgradeServiceRsp);
+  // +gen:summary=回滚服务
+  // +gen:post=/api/v1/Service/{id}/rollback
+  rpc RollBackService(RollbackServiceReq) returns (stream RollbackServiceRsp);
 }
 
 message Empty {}
@@ -130,4 +150,52 @@ message DeleteServiceReq {
 
 message DeleteServiceRsp {
   gpmv1.Service service = 1;
+}
+
+message CatServiceLogReq {
+
+}
+
+message CatServiceLogRsp {
+
+}
+
+message WatchServiceLogReq {
+
+}
+
+message WatchServiceLogRsp {
+
+}
+
+message InstallServiceReq {
+
+}
+
+message InstallServiceRsp {
+
+}
+
+message ListServiceVersionsReq {
+
+}
+
+message ListServiceVersionsRsp {
+
+}
+
+message UpgradeServiceReq {
+
+}
+
+message UpgradeServiceRsp {
+
+}
+
+message RollbackServiceReq {
+
+}
+
+message RollbackServiceRsp {
+
 }

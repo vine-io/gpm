@@ -24,9 +24,10 @@ package server
 
 import (
 	"context"
-	"runtime"
+	gruntime "runtime"
 
 	"github.com/gpm2/gpm/pkg/dao"
+	"github.com/gpm2/gpm/pkg/runtime"
 	"github.com/gpm2/gpm/pkg/runtime/config"
 	"github.com/gpm2/gpm/pkg/runtime/inject"
 	"github.com/gpm2/gpm/pkg/service"
@@ -122,10 +123,16 @@ func (s *server) DeleteService(ctx context.Context, req *pb.DeleteServiceReq, rs
 	return
 }
 
-func (s *server) Init(opts ...vine.Option) error {
+func (s *server) Init() error {
 	var err error
 
-	opts = append(opts,
+	opts := []vine.Option{
+		vine.Name(runtime.GpmName),
+		vine.Id(runtime.GpmId),
+		vine.Version(runtime.GetVersion()),
+		vine.Metadata(map[string]string{
+			"namespace": runtime.Namespace,
+		}),
 		vine.Flags(&cli.StringFlag{
 			Name:    "root",
 			Usage:   "gpmd root directory",
@@ -136,7 +143,7 @@ func (s *server) Init(opts ...vine.Option) error {
 			cfg := &config.Config{}
 			cfg.Root = c.String("root")
 			if cfg.Root == "" {
-				if runtime.GOOS == "windows" {
+				if gruntime.GOOS == "windows" {
 					cfg.Root = "C:\\opt\\lack\\gpmd"
 				} else {
 					cfg.Root = "/opt/lack/gpmd"
@@ -144,7 +151,8 @@ func (s *server) Init(opts ...vine.Option) error {
 			}
 
 			return inject.Provide(cfg)
-		}))
+		}),
+	}
 
 	s.Service.Init(opts...)
 

@@ -11,7 +11,7 @@ require (
 	github.com/lack-io/pkg/inject v0.2.0
 	github.com/lack-io/plugins/dao/postgres v0.20.0
 	github.com/lack-io/plugins/dao/sqlite v0.20.0
-	github.com/lack-io/vine v0.20.0
+	github.com/lack-io/vine v0.20.4
 	github.com/shirou/gopsutil v3.21.6+incompatible
 	github.com/tklauser/go-sysconf v0.3.7 // indirect
 	google.golang.org/grpc v1.38.0
