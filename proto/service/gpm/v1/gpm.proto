@@ -55,13 +55,27 @@ service GpmService {
   // +gen:summary=回滚服务
   // +gen:post=/api/v1/Service/{id}/rollback
   rpc RollBackService(RollbackServiceReq) returns (stream RollbackServiceRsp);
+
+  // +gen:summary=获取目录信息下文件列表
+  // +gen:get=/api/v1/Action/ls
+  rpc Ls(LsReq) returns (LsRsp);
+  // +gen:summary=拉取文件
+  // +gen:post=/api/v1/Action/pull
+  rpc Pull(PullReq) returns (stream PullRsp);
+  // +gen:summary=推送文件
+  // +gen:post=/api/v1/Action/push
+  rpc Push(stream PushReq) returns (PushRsp);
+  // +gen:summary=远程执行命令
+  // +gen:post=/api/v1/Action/exec
+  rpc Exec(ExecReq) returns (ExecRsp);
+  // +gen:summary=远程命令行交互
+  // +gen:post=/api/v1/Action/terminal
+  rpc Terminal(stream TerminalReq) returns (stream TerminalRsp);
 }
 
 message Empty {}
 
 message ListServiceReq {
-  // +gen:inline
-  gpmv1.PageMeta meta = 1;
 }
 
 message ListServiceRsp {
@@ -153,19 +167,21 @@ message DeleteServiceRsp {
 }
 
 message CatServiceLogReq {
-
+  // +gen:required
+  int64 id = 1;
 }
 
 message CatServiceLogRsp {
-
+  string text = 1;
 }
 
 message WatchServiceLogReq {
-
+  // +gen:required
+  int64 id = 1;
 }
 
 message WatchServiceLogRsp {
-
+  string text = 1;
 }
 
 message InstallServiceReq {
@@ -197,5 +213,45 @@ message RollbackServiceReq {
 }
 
 message RollbackServiceRsp {
+
+}
+
+message LsReq {
+
+}
+
+message LsRsp {
+
+}
+
+message PullReq {
+
+}
+
+message PullRsp {
+
+}
+
+message PushReq {
+
+}
+
+message PushRsp {
+
+}
+
+message ExecReq {
+
+}
+
+message ExecRsp {
+
+}
+
+message TerminalReq {
+
+}
+
+message TerminalRsp {
 
 }

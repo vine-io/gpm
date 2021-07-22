@@ -4,33 +4,29 @@ package gpmv1;
 
 option go_package = "github.com/gpm2/gpm/proto/apis/gpm/v1;gpmv1";
 
-// +gen:dao
 message Service {
-  // 服务 id
-  // +gen:pk
-  int64 id = 1;
   // 服务名称
   // +gen:required
-  string name = 2;
+  string name = 1;
   // 执行器路径
   // +gen:required
-  string bin = 3;
+  string bin = 2;
   // 服务启动参数
-  repeated string args = 4;
+  repeated string args = 3;
   // 服务进程 id
-  int64 pid = 5;
+  int64 pid = 4;
   // 服务目录
-  string dir = 6;
+  string dir = 5;
   // 服务环境变量
-  map<string, string> env = 7;
+  map<string, string> env = 6;
   // 服务系统参数
-  SysProcAttr sysProcAttr = 8;
+  SysProcAttr sysProcAttr = 7;
   // 服务进程日志配置
-  ProcLog log = 9;
+  ProcLog log = 8;
   // 服务版本
-  string version = 10;
+  string version = 9;
   // 是否自启动, 默认为 false
-  int32 autoRestart = 11;
+  int32 autoRestart = 10;
   // 创建时间
   int64 creationTimestamp = 21;
   // 修改时间
@@ -71,18 +67,6 @@ message Stat {
   float memPercent = 3;
 }
 
-message PageMeta {
-  // 页码
-  // +gen:gt=0
-  // +gen:default=1
-  int32 page = 1;
-  // 每页数量
-  // +gen:gt=0
-  // +gen:default=10
-  int32 size = 2;
-}
-
-// +gen:dao
 message Event {
   // 事件类型
   string kind = 1;
@@ -90,4 +74,8 @@ message Event {
   string desc = 2;
   // 触发时间
   int64 timestamp = 3;
+}
+
+message Package {
+
 }
