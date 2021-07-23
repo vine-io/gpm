@@ -25,6 +25,7 @@ package service
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -38,14 +39,13 @@ import (
 
 type Gpm interface {
 	Init() error
-	ListService(context.Context, *gpmv1.PageMeta) ([]*gpmv1.Service, int64, error)
-	GetService(context.Context, int64) (*gpmv1.Service, error)
-	GetServiceByName(context.Context, string) (*gpmv1.Service, error)
+	ListService(context.Context) ([]*gpmv1.Service, int64, error)
+	GetService(context.Context, string) (*gpmv1.Service, error)
 	CreateService(context.Context, *gpmv1.Service) (*gpmv1.Service, error)
-	StartService(context.Context, int64) (*gpmv1.Service, error)
-	StopService(context.Context, int64) (*gpmv1.Service, error)
-	RebootService(context.Context, int64) (*gpmv1.Service, error)
-	DeleteService(context.Context, int64) (*gpmv1.Service, error)
+	StartService(context.Context, string) (*gpmv1.Service, error)
+	StopService(context.Context, string) (*gpmv1.Service, error)
+	RebootService(context.Context, string) (*gpmv1.Service, error)
+	DeleteService(context.Context, string) (*gpmv1.Service, error)
 }
 
 func init() {
@@ -58,36 +58,38 @@ type gpm struct {
 	vine.Service `inject:""`
 
 	Cfg *config.Config `inject:""`
+	DB  *dao.DB        `inject:""`
 
 	sync.RWMutex
-	ps map[int64]*Process
+	ps map[string]*Process
 }
 
 func (g *gpm) Init() error {
 	var err error
 
-	if err = os.MkdirAll(g.Cfg.Root, os.ModePerm); err != nil {
+	if err = os.MkdirAll(filepath.Join(g.Cfg.Root, "services"), os.ModePerm); err != nil {
 		return err
 	}
 	ctx := context.Background()
-	list, err := dao.ServiceSBuilder().FindAll(ctx)
+	list, err := g.DB.FindAllServices(ctx)
 	if err != nil {
 		return err
 	}
 
-	g.ps = map[int64]*Process{}
+	g.ps = map[string]*Process{}
 	for _, item := range list {
 		p := NewProcess(item)
 		if item.Status == gpmv1.StatusRunning {
 			_, _ = g.startService(ctx, p)
 		}
+		g.ps[item.Name] = p
 	}
 
 	return nil
 }
 
-func (g *gpm) ListService(ctx context.Context, meta *gpmv1.PageMeta) ([]*gpmv1.Service, int64, error) {
-	outs, total, err := dao.ServiceSBuilder().FindPage(ctx, int(meta.Page), int(meta.Size))
+func (g *gpm) ListService(ctx context.Context) ([]*gpmv1.Service, int64, error) {
+	outs, err := g.DB.FindAllServices(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -96,11 +98,11 @@ func (g *gpm) ListService(ctx context.Context, meta *gpmv1.PageMeta) ([]*gpmv1.S
 		statProcess(outs[i])
 	}
 
-	return outs, total, nil
+	return outs, int64(len(outs)), nil
 }
 
-func (g *gpm) GetService(ctx context.Context, id int64) (*gpmv1.Service, error) {
-	s, err := dao.ServiceSBuilder().SetId(id).FindOne(ctx)
+func (g *gpm) GetService(ctx context.Context, name string) (*gpmv1.Service, error) {
+	s, err := g.DB.FindService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -110,17 +112,8 @@ func (g *gpm) GetService(ctx context.Context, id int64) (*gpmv1.Service, error) 
 	return s, nil
 }
 
-func (g *gpm) GetServiceByName(ctx context.Context, name string) (*gpmv1.Service, error) {
-	s, err := dao.ServiceSBuilder().SetName(name).FindOne(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return s, nil
-}
-
 func (g *gpm) CreateService(ctx context.Context, service *gpmv1.Service) (*gpmv1.Service, error) {
-	if v, _ := g.GetServiceByName(ctx, service.Name); v != nil {
+	if v, _ := g.GetService(ctx, service.Name); v != nil {
 		return nil, verrs.Conflict(g.Name(), "service %s already exists", service.Name)
 	}
 
@@ -135,26 +128,26 @@ func (g *gpm) CreateService(ctx context.Context, service *gpmv1.Service) (*gpmv1
 		service.Version = "v0.0.1"
 	}
 
-	service, err = dao.FromService(service).Create(ctx)
+	service, err = g.DB.CreateService(ctx, service)
 	if err != nil {
 		return nil, err
 	}
 
 	g.Lock()
-	g.ps[service.Id] = NewProcess(service)
+	g.ps[service.Name] = NewProcess(service)
 	g.Unlock()
 
 	return service, nil
 }
 
-func (g *gpm) StartService(ctx context.Context, id int64) (*gpmv1.Service, error) {
-	s, err := g.GetService(ctx, id)
+func (g *gpm) StartService(ctx context.Context, name string) (*gpmv1.Service, error) {
+	s, err := g.GetService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
 
 	g.RLock()
-	p := g.ps[s.Id]
+	p := g.ps[s.Name]
 	g.RUnlock()
 
 	s, err = g.startService(ctx, p)
@@ -181,7 +174,7 @@ func (g *gpm) startService(ctx context.Context, p *Process) (*gpmv1.Service, err
 	}
 
 	var e error
-	s, e = dao.FromService(s).Updates(ctx)
+	s, e = g.DB.UpdateService(ctx, s)
 	if err != nil {
 		return nil, err
 	}
@@ -190,20 +183,20 @@ func (g *gpm) startService(ctx context.Context, p *Process) (*gpmv1.Service, err
 	}
 
 	g.Lock()
-	g.ps[s.Id] = p
+	g.ps[s.Name] = p
 	g.Unlock()
 
 	return s, nil
 }
 
-func (g *gpm) StopService(ctx context.Context, id int64) (*gpmv1.Service, error) {
-	s, err := g.GetService(ctx, id)
+func (g *gpm) StopService(ctx context.Context, name string) (*gpmv1.Service, error) {
+	s, err := g.GetService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
 
 	g.RLock()
-	p := g.ps[s.Id]
+	p := g.ps[s.Name]
 	g.RUnlock()
 
 	return g.stopService(ctx, p)
@@ -220,26 +213,26 @@ func (g *gpm) stopService(ctx context.Context, p *Process) (*gpmv1.Service, erro
 	s.Status = gpmv1.StatusStopped
 	now := time.Now()
 	s.UpdateTimestamp = now.Unix()
-	s, err = dao.FromService(s).Updates(ctx)
+	s, err = g.DB.UpdateService(ctx, s)
 	if err != nil {
 		return nil, err
 	}
 
 	g.Lock()
-	g.ps[s.Id] = p
+	g.ps[s.Name] = p
 	g.Unlock()
 
 	return s, nil
 }
 
-func (g *gpm) RebootService(ctx context.Context, id int64) (*gpmv1.Service, error) {
-	s, err := g.GetService(ctx, id)
+func (g *gpm) RebootService(ctx context.Context, name string) (*gpmv1.Service, error) {
+	s, err := g.GetService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
 
 	g.RLock()
-	p := g.ps[s.Id]
+	p := g.ps[s.Name]
 	g.RUnlock()
 
 	g.stopService(ctx, p)
@@ -247,8 +240,8 @@ func (g *gpm) RebootService(ctx context.Context, id int64) (*gpmv1.Service, erro
 	return g.startService(ctx, p)
 }
 
-func (g *gpm) DeleteService(ctx context.Context, id int64) (*gpmv1.Service, error) {
-	s, err := g.GetService(ctx, id)
+func (g *gpm) DeleteService(ctx context.Context, name string) (*gpmv1.Service, error) {
+	s, err := g.GetService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -256,7 +249,7 @@ func (g *gpm) DeleteService(ctx context.Context, id int64) (*gpmv1.Service, erro
 	if s.Status == gpmv1.StatusRunning {
 
 		g.RLock()
-		p := g.ps[s.Id]
+		p := g.ps[s.Name]
 		g.RUnlock()
 
 		if _, err = g.stopService(ctx, p); err != nil {
@@ -265,9 +258,9 @@ func (g *gpm) DeleteService(ctx context.Context, id int64) (*gpmv1.Service, erro
 	}
 
 	g.Lock()
-	delete(g.ps, s.Id)
+	delete(g.ps, s.Name)
 	g.Unlock()
 
-	err = dao.ServiceSBuilder().SetId(id).Delete(ctx, false)
+	err = g.DB.DeleteService(ctx, s.Name)
 	return s, err
 }

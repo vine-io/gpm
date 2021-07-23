@@ -52,7 +52,7 @@ func (s *server) ListService(ctx context.Context, req *pb.ListServiceReq, rsp *p
 	if err = req.Validate(); err != nil {
 		return verrs.BadGateway(s.Name(), err.Error())
 	}
-	rsp.Services, rsp.Total, err = s.H.ListService(ctx, &req.PageMeta)
+	rsp.Services, rsp.Total, err = s.H.ListService(ctx)
 	return
 }
 
@@ -60,15 +60,7 @@ func (s *server) GetService(ctx context.Context, req *pb.GetServiceReq, rsp *pb.
 	if err = req.Validate(); err != nil {
 		return verrs.BadGateway(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.GetService(ctx, req.Id)
-	return
-}
-
-func (s *server) GetServiceByName(ctx context.Context, req *pb.GetServiceByNameReq, rsp *pb.GetServiceByNameRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	rsp.Service, err = s.H.GetServiceByName(ctx, req.Name)
+	rsp.Service, err = s.H.GetService(ctx, req.Name)
 	return
 }
 
@@ -95,7 +87,7 @@ func (s *server) StartService(ctx context.Context, req *pb.StartServiceReq, rsp 
 	if err = req.Validate(); err != nil {
 		return verrs.BadGateway(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.StartService(ctx, req.Id)
+	rsp.Service, err = s.H.StartService(ctx, req.Name)
 	return
 }
 
@@ -103,7 +95,7 @@ func (s *server) StopService(ctx context.Context, req *pb.StopServiceReq, rsp *p
 	if err = req.Validate(); err != nil {
 		return verrs.BadGateway(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.StopService(ctx, req.Id)
+	rsp.Service, err = s.H.StopService(ctx, req.Name)
 	return
 }
 
@@ -111,7 +103,7 @@ func (s *server) RebootService(ctx context.Context, req *pb.RebootServiceReq, rs
 	if err = req.Validate(); err != nil {
 		return verrs.BadGateway(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.RebootService(ctx, req.Id)
+	rsp.Service, err = s.H.RebootService(ctx, req.Name)
 	return
 }
 
@@ -119,8 +111,52 @@ func (s *server) DeleteService(ctx context.Context, req *pb.DeleteServiceReq, rs
 	if err = req.Validate(); err != nil {
 		return verrs.BadGateway(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.DeleteService(ctx, req.Id)
+	rsp.Service, err = s.H.DeleteService(ctx, req.Name)
 	return
+}
+
+func (s *server) CatServiceLog(ctx context.Context, req *pb.CatServiceLogReq, rsp *pb.CatServiceLogRsp) error {
+	panic("implement me")
+}
+
+func (s *server) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq, stream pb.GpmService_WatchServiceLogStream) error {
+	panic("implement me")
+}
+
+func (s *server) InstallService(ctx context.Context, stream pb.GpmService_InstallServiceStream) error {
+	panic("implement me")
+}
+
+func (s *server) ListServiceVersions(ctx context.Context, req *pb.ListServiceVersionsReq, rsp *pb.ListServiceVersionsRsp) error {
+	panic("implement me")
+}
+
+func (s *server) UpgradeService(ctx context.Context, stream pb.GpmService_UpgradeServiceStream) error {
+	panic("implement me")
+}
+
+func (s *server) RollBackService(ctx context.Context, req *pb.RollbackServiceReq, stream pb.GpmService_RollBackServiceStream) error {
+	panic("implement me")
+}
+
+func (s *server) Ls(ctx context.Context, req *pb.LsReq, rsp *pb.LsRsp) error {
+	panic("implement me")
+}
+
+func (s *server) Pull(ctx context.Context, req *pb.PullReq, stream pb.GpmService_PullStream) error {
+	panic("implement me")
+}
+
+func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) error {
+	panic("implement me")
+}
+
+func (s *server) Exec(ctx context.Context, req *pb.ExecReq, rsp *pb.ExecRsp) error {
+	panic("implement me")
+}
+
+func (s *server) Terminal(ctx context.Context, stream pb.GpmService_TerminalStream) error {
+	panic("implement me")
 }
 
 func (s *server) Init() error {
@@ -156,11 +192,8 @@ func (s *server) Init() error {
 
 	s.Service.Init(opts...)
 
-	if err = inject.Provide(s.Service, s.Client(), s); err != nil {
-		return err
-	}
-
-	if err = dao.Provide(); err != nil {
+	db := new(dao.DB)
+	if err = inject.Provide(s.Service, s.Client(), s, db); err != nil {
 		return err
 	}
 

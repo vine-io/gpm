@@ -68,11 +68,16 @@ func (in *Stat) DeepCopyInto(out *Stat) {
 }
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
-func (in *PageMeta) DeepCopyInto(out *PageMeta) {
+func (in *GpmInfo) DeepCopyInto(out *GpmInfo) {
 	*out = *in
 }
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
-func (in *Event) DeepCopyInto(out *Event) {
+func (in *ServiceVersion) DeepCopyInto(out *ServiceVersion) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *FileInfo) DeepCopyInto(out *FileInfo) {
 	*out = *in
 }

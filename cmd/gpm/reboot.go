@@ -58,7 +58,7 @@ func main() {
 	//
 	//fmt.Println(rsp.Service)
 
-	rsp, err := cc.RebootService(ctx, &pb.RebootServiceReq{Id: 1}, client.WithRetries(0))
+	rsp, err := cc.RebootService(ctx, &pb.RebootServiceReq{Name: "test"}, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}

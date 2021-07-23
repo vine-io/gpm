@@ -23,7 +23,6 @@
 package service
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -34,7 +33,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gpm2/gpm/pkg/dao"
 	"github.com/gpm2/gpm/pkg/runtime/config"
 	"github.com/gpm2/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
@@ -119,7 +117,7 @@ func (p *Process) run() (int32, error) {
 	}
 
 	now := time.Now()
-	root := filepath.Join(p.cfg.Root, "service", p.Name)
+	root := filepath.Join(p.cfg.Root, "logs", p.Name)
 	_ = os.MkdirAll(root, os.ModePerm)
 	flog := filepath.Join(root, fmt.Sprintf("%s.log-%s", p.Name, now.Format("20060102150405")))
 
@@ -176,14 +174,14 @@ func (p *Process) watching() {
 			if err != nil {
 				pid, _ := p.run()
 				log.Infof("reboot service(dead) %s at pid: %d", p.Name, pid)
-				dao.FromService(p.Service).Updates(context.TODO())
+				//dao.FromService(p.Service).Updates(context.TODO())
 			} else {
 				status, _ := pr.Status()
 				if status == "Z" {
 					log.Infof("watching service(pid=%d) %s status: %s", p.Pid, p.Name, status)
 					_ = p.kill()
 					pid, _ := p.run()
-					dao.FromService(p.Service).Updates(context.TODO())
+					//dao.FromService(p.Service).Updates(context.TODO())
 					log.Infof("reboot service(Z) %s at pid: %d", p.Name, pid)
 				}
 			}

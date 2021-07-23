@@ -65,8 +65,6 @@ func (m *Empty) XXX_DiscardUnknown() {
 var xxx_messageInfo_Empty proto.InternalMessageInfo
 
 type ListServiceReq struct {
-	// +gen:inline
-	v1.PageMeta `protobuf:"bytes,1,opt,name=meta,proto3" json:",inline"`
 }
 
 func (m *ListServiceReq) Reset()         { *m = ListServiceReq{} }
@@ -141,9 +139,9 @@ func (m *ListServiceRsp) XXX_DiscardUnknown() {
 var xxx_messageInfo_ListServiceRsp proto.InternalMessageInfo
 
 type GetServiceReq struct {
-	// 服务 id
+	// 服务名称
 	// +gen:required
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *GetServiceReq) Reset()         { *m = GetServiceReq{} }
@@ -216,82 +214,6 @@ func (m *GetServiceRsp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GetServiceRsp proto.InternalMessageInfo
 
-type GetServiceByNameReq struct {
-	// 服务 id
-	// +gen:required
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-}
-
-func (m *GetServiceByNameReq) Reset()         { *m = GetServiceByNameReq{} }
-func (m *GetServiceByNameReq) String() string { return proto.CompactTextString(m) }
-func (*GetServiceByNameReq) ProtoMessage()    {}
-func (*GetServiceByNameReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{5}
-}
-func (m *GetServiceByNameReq) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *GetServiceByNameReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_GetServiceByNameReq.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *GetServiceByNameReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetServiceByNameReq.Merge(m, src)
-}
-func (m *GetServiceByNameReq) XXX_Size() int {
-	return m.XSize()
-}
-func (m *GetServiceByNameReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetServiceByNameReq.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetServiceByNameReq proto.InternalMessageInfo
-
-type GetServiceByNameRsp struct {
-	Service *v1.Service `protobuf:"bytes,1,opt,name=service,proto3" json:"service,omitempty"`
-}
-
-func (m *GetServiceByNameRsp) Reset()         { *m = GetServiceByNameRsp{} }
-func (m *GetServiceByNameRsp) String() string { return proto.CompactTextString(m) }
-func (*GetServiceByNameRsp) ProtoMessage()    {}
-func (*GetServiceByNameRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{6}
-}
-func (m *GetServiceByNameRsp) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *GetServiceByNameRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_GetServiceByNameRsp.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *GetServiceByNameRsp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetServiceByNameRsp.Merge(m, src)
-}
-func (m *GetServiceByNameRsp) XXX_Size() int {
-	return m.XSize()
-}
-func (m *GetServiceByNameRsp) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetServiceByNameRsp.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetServiceByNameRsp proto.InternalMessageInfo
-
 type CreateServiceReq struct {
 	// 服务名称
 	// +gen:required
@@ -319,7 +241,7 @@ func (m *CreateServiceReq) Reset()         { *m = CreateServiceReq{} }
 func (m *CreateServiceReq) String() string { return proto.CompactTextString(m) }
 func (*CreateServiceReq) ProtoMessage()    {}
 func (*CreateServiceReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{7}
+	return fileDescriptor_9386d4f8a96ae2d2, []int{5}
 }
 func (m *CreateServiceReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -356,7 +278,7 @@ func (m *CreateServiceRsp) Reset()         { *m = CreateServiceRsp{} }
 func (m *CreateServiceRsp) String() string { return proto.CompactTextString(m) }
 func (*CreateServiceRsp) ProtoMessage()    {}
 func (*CreateServiceRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{8}
+	return fileDescriptor_9386d4f8a96ae2d2, []int{6}
 }
 func (m *CreateServiceRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -387,14 +309,14 @@ var xxx_messageInfo_CreateServiceRsp proto.InternalMessageInfo
 
 type StartServiceReq struct {
 	// +gen:required
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *StartServiceReq) Reset()         { *m = StartServiceReq{} }
 func (m *StartServiceReq) String() string { return proto.CompactTextString(m) }
 func (*StartServiceReq) ProtoMessage()    {}
 func (*StartServiceReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{9}
+	return fileDescriptor_9386d4f8a96ae2d2, []int{7}
 }
 func (m *StartServiceReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -431,7 +353,7 @@ func (m *StartServiceRsp) Reset()         { *m = StartServiceRsp{} }
 func (m *StartServiceRsp) String() string { return proto.CompactTextString(m) }
 func (*StartServiceRsp) ProtoMessage()    {}
 func (*StartServiceRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{10}
+	return fileDescriptor_9386d4f8a96ae2d2, []int{8}
 }
 func (m *StartServiceRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -462,14 +384,14 @@ var xxx_messageInfo_StartServiceRsp proto.InternalMessageInfo
 
 type StopServiceReq struct {
 	// +gen:required
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *StopServiceReq) Reset()         { *m = StopServiceReq{} }
 func (m *StopServiceReq) String() string { return proto.CompactTextString(m) }
 func (*StopServiceReq) ProtoMessage()    {}
 func (*StopServiceReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{11}
+	return fileDescriptor_9386d4f8a96ae2d2, []int{9}
 }
 func (m *StopServiceReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -506,7 +428,7 @@ func (m *StopServiceRsp) Reset()         { *m = StopServiceRsp{} }
 func (m *StopServiceRsp) String() string { return proto.CompactTextString(m) }
 func (*StopServiceRsp) ProtoMessage()    {}
 func (*StopServiceRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{12}
+	return fileDescriptor_9386d4f8a96ae2d2, []int{10}
 }
 func (m *StopServiceRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -537,14 +459,14 @@ var xxx_messageInfo_StopServiceRsp proto.InternalMessageInfo
 
 type RebootServiceReq struct {
 	// +gen:required
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *RebootServiceReq) Reset()         { *m = RebootServiceReq{} }
 func (m *RebootServiceReq) String() string { return proto.CompactTextString(m) }
 func (*RebootServiceReq) ProtoMessage()    {}
 func (*RebootServiceReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{13}
+	return fileDescriptor_9386d4f8a96ae2d2, []int{11}
 }
 func (m *RebootServiceReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -581,7 +503,7 @@ func (m *RebootServiceRsp) Reset()         { *m = RebootServiceRsp{} }
 func (m *RebootServiceRsp) String() string { return proto.CompactTextString(m) }
 func (*RebootServiceRsp) ProtoMessage()    {}
 func (*RebootServiceRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{14}
+	return fileDescriptor_9386d4f8a96ae2d2, []int{12}
 }
 func (m *RebootServiceRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -612,14 +534,14 @@ var xxx_messageInfo_RebootServiceRsp proto.InternalMessageInfo
 
 type DeleteServiceReq struct {
 	// +gen:required
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *DeleteServiceReq) Reset()         { *m = DeleteServiceReq{} }
 func (m *DeleteServiceReq) String() string { return proto.CompactTextString(m) }
 func (*DeleteServiceReq) ProtoMessage()    {}
 func (*DeleteServiceReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{15}
+	return fileDescriptor_9386d4f8a96ae2d2, []int{13}
 }
 func (m *DeleteServiceReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -656,7 +578,7 @@ func (m *DeleteServiceRsp) Reset()         { *m = DeleteServiceRsp{} }
 func (m *DeleteServiceRsp) String() string { return proto.CompactTextString(m) }
 func (*DeleteServiceRsp) ProtoMessage()    {}
 func (*DeleteServiceRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_9386d4f8a96ae2d2, []int{16}
+	return fileDescriptor_9386d4f8a96ae2d2, []int{14}
 }
 func (m *DeleteServiceRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -685,14 +607,877 @@ func (m *DeleteServiceRsp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeleteServiceRsp proto.InternalMessageInfo
 
+type CatServiceLogReq struct {
+	// +gen:required
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (m *CatServiceLogReq) Reset()         { *m = CatServiceLogReq{} }
+func (m *CatServiceLogReq) String() string { return proto.CompactTextString(m) }
+func (*CatServiceLogReq) ProtoMessage()    {}
+func (*CatServiceLogReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{15}
+}
+func (m *CatServiceLogReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CatServiceLogReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CatServiceLogReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CatServiceLogReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CatServiceLogReq.Merge(m, src)
+}
+func (m *CatServiceLogReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *CatServiceLogReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_CatServiceLogReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CatServiceLogReq proto.InternalMessageInfo
+
+type CatServiceLogRsp struct {
+	Text string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+}
+
+func (m *CatServiceLogRsp) Reset()         { *m = CatServiceLogRsp{} }
+func (m *CatServiceLogRsp) String() string { return proto.CompactTextString(m) }
+func (*CatServiceLogRsp) ProtoMessage()    {}
+func (*CatServiceLogRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{16}
+}
+func (m *CatServiceLogRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *CatServiceLogRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_CatServiceLogRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *CatServiceLogRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CatServiceLogRsp.Merge(m, src)
+}
+func (m *CatServiceLogRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *CatServiceLogRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_CatServiceLogRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CatServiceLogRsp proto.InternalMessageInfo
+
+type WatchServiceLogReq struct {
+	// +gen:required
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (m *WatchServiceLogReq) Reset()         { *m = WatchServiceLogReq{} }
+func (m *WatchServiceLogReq) String() string { return proto.CompactTextString(m) }
+func (*WatchServiceLogReq) ProtoMessage()    {}
+func (*WatchServiceLogReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{17}
+}
+func (m *WatchServiceLogReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *WatchServiceLogReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_WatchServiceLogReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *WatchServiceLogReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WatchServiceLogReq.Merge(m, src)
+}
+func (m *WatchServiceLogReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *WatchServiceLogReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_WatchServiceLogReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WatchServiceLogReq proto.InternalMessageInfo
+
+type WatchServiceLogRsp struct {
+	Text string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+}
+
+func (m *WatchServiceLogRsp) Reset()         { *m = WatchServiceLogRsp{} }
+func (m *WatchServiceLogRsp) String() string { return proto.CompactTextString(m) }
+func (*WatchServiceLogRsp) ProtoMessage()    {}
+func (*WatchServiceLogRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{18}
+}
+func (m *WatchServiceLogRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *WatchServiceLogRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_WatchServiceLogRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *WatchServiceLogRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WatchServiceLogRsp.Merge(m, src)
+}
+func (m *WatchServiceLogRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *WatchServiceLogRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_WatchServiceLogRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WatchServiceLogRsp proto.InternalMessageInfo
+
+type InstallServiceReq struct {
+	// 服务名称
+	// +gen:required
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// 执行器路径
+	// +gen:required
+	Bin string `protobuf:"bytes,2,opt,name=bin,proto3" json:"bin,omitempty"`
+	// 服务启动参数
+	Args []string `protobuf:"bytes,3,rep,name=args,proto3" json:"args,omitempty"`
+	// 服务家目录
+	Dir string `protobuf:"bytes,4,opt,name=dir,proto3" json:"dir,omitempty"`
+	// 服务环境变量
+	Env map[string]string `protobuf:"bytes,5,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// 服务系统参数
+	SysProcAttr *v1.SysProcAttr `protobuf:"bytes,6,opt,name=sysProcAttr,proto3" json:"sysProcAttr,omitempty"`
+	// 服务日志配置
+	Log *v1.ProcLog `protobuf:"bytes,7,opt,name=log,proto3" json:"log,omitempty"`
+	// 服务版本
+	Version string `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
+	// 是否自启动, 默认为 false
+	AutoRestart int32 `protobuf:"varint,9,opt,name=autoRestart,proto3" json:"autoRestart,omitempty"`
+	// +gen:required
+	Package string `protobuf:"bytes,21,opt,name=package,proto3" json:"package,omitempty"`
+	// +gen:required
+	Total int64  `protobuf:"varint,22,opt,name=total,proto3" json:"total,omitempty"`
+	Chunk []byte `protobuf:"bytes,23,opt,name=chunk,proto3" json:"chunk,omitempty"`
+}
+
+func (m *InstallServiceReq) Reset()         { *m = InstallServiceReq{} }
+func (m *InstallServiceReq) String() string { return proto.CompactTextString(m) }
+func (*InstallServiceReq) ProtoMessage()    {}
+func (*InstallServiceReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{19}
+}
+func (m *InstallServiceReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *InstallServiceReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_InstallServiceReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *InstallServiceReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InstallServiceReq.Merge(m, src)
+}
+func (m *InstallServiceReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *InstallServiceReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_InstallServiceReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InstallServiceReq proto.InternalMessageInfo
+
+type InstallServiceRsp struct {
+	Chunked int64  `protobuf:"varint,1,opt,name=chunked,proto3" json:"chunked,omitempty"`
+	Speed   int64  `protobuf:"varint,2,opt,name=speed,proto3" json:"speed,omitempty"`
+	Msg     string `protobuf:"bytes,3,opt,name=msg,proto3" json:"msg,omitempty"`
+}
+
+func (m *InstallServiceRsp) Reset()         { *m = InstallServiceRsp{} }
+func (m *InstallServiceRsp) String() string { return proto.CompactTextString(m) }
+func (*InstallServiceRsp) ProtoMessage()    {}
+func (*InstallServiceRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{20}
+}
+func (m *InstallServiceRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *InstallServiceRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_InstallServiceRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *InstallServiceRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_InstallServiceRsp.Merge(m, src)
+}
+func (m *InstallServiceRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *InstallServiceRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_InstallServiceRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_InstallServiceRsp proto.InternalMessageInfo
+
+type ListServiceVersionsReq struct {
+	// +gen:required
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+}
+
+func (m *ListServiceVersionsReq) Reset()         { *m = ListServiceVersionsReq{} }
+func (m *ListServiceVersionsReq) String() string { return proto.CompactTextString(m) }
+func (*ListServiceVersionsReq) ProtoMessage()    {}
+func (*ListServiceVersionsReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{21}
+}
+func (m *ListServiceVersionsReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListServiceVersionsReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListServiceVersionsReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListServiceVersionsReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListServiceVersionsReq.Merge(m, src)
+}
+func (m *ListServiceVersionsReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *ListServiceVersionsReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListServiceVersionsReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListServiceVersionsReq proto.InternalMessageInfo
+
+type ListServiceVersionsRsp struct {
+	Versions []*v1.ServiceVersion `protobuf:"bytes,1,rep,name=versions,proto3" json:"versions,omitempty"`
+}
+
+func (m *ListServiceVersionsRsp) Reset()         { *m = ListServiceVersionsRsp{} }
+func (m *ListServiceVersionsRsp) String() string { return proto.CompactTextString(m) }
+func (*ListServiceVersionsRsp) ProtoMessage()    {}
+func (*ListServiceVersionsRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{22}
+}
+func (m *ListServiceVersionsRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ListServiceVersionsRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ListServiceVersionsRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ListServiceVersionsRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListServiceVersionsRsp.Merge(m, src)
+}
+func (m *ListServiceVersionsRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *ListServiceVersionsRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListServiceVersionsRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListServiceVersionsRsp proto.InternalMessageInfo
+
+type UpgradeServiceReq struct {
+	// 服务名称
+	// +gen:required
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// +gen:required
+	Package string `protobuf:"bytes,11,opt,name=package,proto3" json:"package,omitempty"`
+	// +gen:required
+	Total int64  `protobuf:"varint,12,opt,name=total,proto3" json:"total,omitempty"`
+	Chunk []byte `protobuf:"bytes,13,opt,name=chunk,proto3" json:"chunk,omitempty"`
+}
+
+func (m *UpgradeServiceReq) Reset()         { *m = UpgradeServiceReq{} }
+func (m *UpgradeServiceReq) String() string { return proto.CompactTextString(m) }
+func (*UpgradeServiceReq) ProtoMessage()    {}
+func (*UpgradeServiceReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{23}
+}
+func (m *UpgradeServiceReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *UpgradeServiceReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_UpgradeServiceReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *UpgradeServiceReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpgradeServiceReq.Merge(m, src)
+}
+func (m *UpgradeServiceReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *UpgradeServiceReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpgradeServiceReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpgradeServiceReq proto.InternalMessageInfo
+
+type UpgradeServiceRsp struct {
+	Chunked int64  `protobuf:"varint,1,opt,name=chunked,proto3" json:"chunked,omitempty"`
+	Speed   int64  `protobuf:"varint,2,opt,name=speed,proto3" json:"speed,omitempty"`
+	Msg     string `protobuf:"bytes,3,opt,name=msg,proto3" json:"msg,omitempty"`
+}
+
+func (m *UpgradeServiceRsp) Reset()         { *m = UpgradeServiceRsp{} }
+func (m *UpgradeServiceRsp) String() string { return proto.CompactTextString(m) }
+func (*UpgradeServiceRsp) ProtoMessage()    {}
+func (*UpgradeServiceRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{24}
+}
+func (m *UpgradeServiceRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *UpgradeServiceRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_UpgradeServiceRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *UpgradeServiceRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpgradeServiceRsp.Merge(m, src)
+}
+func (m *UpgradeServiceRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *UpgradeServiceRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpgradeServiceRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_UpgradeServiceRsp proto.InternalMessageInfo
+
+type RollbackServiceReq struct {
+	// +gen:required
+	Name     string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Revision string `protobuf:"bytes,2,opt,name=revision,proto3" json:"revision,omitempty"`
+}
+
+func (m *RollbackServiceReq) Reset()         { *m = RollbackServiceReq{} }
+func (m *RollbackServiceReq) String() string { return proto.CompactTextString(m) }
+func (*RollbackServiceReq) ProtoMessage()    {}
+func (*RollbackServiceReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{25}
+}
+func (m *RollbackServiceReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RollbackServiceReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_RollbackServiceReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *RollbackServiceReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RollbackServiceReq.Merge(m, src)
+}
+func (m *RollbackServiceReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *RollbackServiceReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_RollbackServiceReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RollbackServiceReq proto.InternalMessageInfo
+
+type RollbackServiceRsp struct {
+}
+
+func (m *RollbackServiceRsp) Reset()         { *m = RollbackServiceRsp{} }
+func (m *RollbackServiceRsp) String() string { return proto.CompactTextString(m) }
+func (*RollbackServiceRsp) ProtoMessage()    {}
+func (*RollbackServiceRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{26}
+}
+func (m *RollbackServiceRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *RollbackServiceRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_RollbackServiceRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *RollbackServiceRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RollbackServiceRsp.Merge(m, src)
+}
+func (m *RollbackServiceRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *RollbackServiceRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_RollbackServiceRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RollbackServiceRsp proto.InternalMessageInfo
+
+type LsReq struct {
+	// +gen:required
+	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+}
+
+func (m *LsReq) Reset()         { *m = LsReq{} }
+func (m *LsReq) String() string { return proto.CompactTextString(m) }
+func (*LsReq) ProtoMessage()    {}
+func (*LsReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{27}
+}
+func (m *LsReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *LsReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_LsReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *LsReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LsReq.Merge(m, src)
+}
+func (m *LsReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *LsReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_LsReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_LsReq proto.InternalMessageInfo
+
+type LsRsp struct {
+	Files *v1.FileInfo `protobuf:"bytes,1,opt,name=files,proto3" json:"files,omitempty"`
+}
+
+func (m *LsRsp) Reset()         { *m = LsRsp{} }
+func (m *LsRsp) String() string { return proto.CompactTextString(m) }
+func (*LsRsp) ProtoMessage()    {}
+func (*LsRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{28}
+}
+func (m *LsRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *LsRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_LsRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *LsRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_LsRsp.Merge(m, src)
+}
+func (m *LsRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *LsRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_LsRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_LsRsp proto.InternalMessageInfo
+
+type PullReq struct {
+	Src string `protobuf:"bytes,1,opt,name=src,proto3" json:"src,omitempty"`
+	Dst string `protobuf:"bytes,2,opt,name=dst,proto3" json:"dst,omitempty"`
+}
+
+func (m *PullReq) Reset()         { *m = PullReq{} }
+func (m *PullReq) String() string { return proto.CompactTextString(m) }
+func (*PullReq) ProtoMessage()    {}
+func (*PullReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{29}
+}
+func (m *PullReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PullReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PullReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PullReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PullReq.Merge(m, src)
+}
+func (m *PullReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *PullReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_PullReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PullReq proto.InternalMessageInfo
+
+type PullRsp struct {
+	Chunk []byte `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk,omitempty"`
+}
+
+func (m *PullRsp) Reset()         { *m = PullRsp{} }
+func (m *PullRsp) String() string { return proto.CompactTextString(m) }
+func (*PullRsp) ProtoMessage()    {}
+func (*PullRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{30}
+}
+func (m *PullRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PullRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PullRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PullRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PullRsp.Merge(m, src)
+}
+func (m *PullRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *PullRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_PullRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PullRsp proto.InternalMessageInfo
+
+type PushReq struct {
+	Src   string `protobuf:"bytes,1,opt,name=src,proto3" json:"src,omitempty"`
+	Dst   string `protobuf:"bytes,2,opt,name=dst,proto3" json:"dst,omitempty"`
+	Chunk []byte `protobuf:"bytes,3,opt,name=chunk,proto3" json:"chunk,omitempty"`
+}
+
+func (m *PushReq) Reset()         { *m = PushReq{} }
+func (m *PushReq) String() string { return proto.CompactTextString(m) }
+func (*PushReq) ProtoMessage()    {}
+func (*PushReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{31}
+}
+func (m *PushReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PushReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PushReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PushReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PushReq.Merge(m, src)
+}
+func (m *PushReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *PushReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_PushReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PushReq proto.InternalMessageInfo
+
+type PushRsp struct {
+}
+
+func (m *PushRsp) Reset()         { *m = PushRsp{} }
+func (m *PushRsp) String() string { return proto.CompactTextString(m) }
+func (*PushRsp) ProtoMessage()    {}
+func (*PushRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{32}
+}
+func (m *PushRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PushRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PushRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PushRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PushRsp.Merge(m, src)
+}
+func (m *PushRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *PushRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_PushRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PushRsp proto.InternalMessageInfo
+
+type ExecReq struct {
+	// +gen:required
+	Cmd string            `protobuf:"bytes,1,opt,name=cmd,proto3" json:"cmd,omitempty"`
+	Env map[string]string `protobuf:"bytes,2,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	Uid string            `protobuf:"bytes,3,opt,name=uid,proto3" json:"uid,omitempty"`
+	Gid string            `protobuf:"bytes,4,opt,name=gid,proto3" json:"gid,omitempty"`
+}
+
+func (m *ExecReq) Reset()         { *m = ExecReq{} }
+func (m *ExecReq) String() string { return proto.CompactTextString(m) }
+func (*ExecReq) ProtoMessage()    {}
+func (*ExecReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{33}
+}
+func (m *ExecReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ExecReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ExecReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ExecReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExecReq.Merge(m, src)
+}
+func (m *ExecReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *ExecReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_ExecReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ExecReq proto.InternalMessageInfo
+
+type ExecRsp struct {
+	Out string `protobuf:"bytes,1,opt,name=out,proto3" json:"out,omitempty"`
+}
+
+func (m *ExecRsp) Reset()         { *m = ExecRsp{} }
+func (m *ExecRsp) String() string { return proto.CompactTextString(m) }
+func (*ExecRsp) ProtoMessage()    {}
+func (*ExecRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{34}
+}
+func (m *ExecRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ExecRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ExecRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ExecRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ExecRsp.Merge(m, src)
+}
+func (m *ExecRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *ExecRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_ExecRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ExecRsp proto.InternalMessageInfo
+
+type TerminalReq struct {
+	// +gen:required
+	Cmd string            `protobuf:"bytes,1,opt,name=cmd,proto3" json:"cmd,omitempty"`
+	Env map[string]string `protobuf:"bytes,2,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// +gen:required
+	// +gen:enum=[sh,bash,zsh]
+	Exec string `protobuf:"bytes,3,opt,name=exec,proto3" json:"exec,omitempty"`
+}
+
+func (m *TerminalReq) Reset()         { *m = TerminalReq{} }
+func (m *TerminalReq) String() string { return proto.CompactTextString(m) }
+func (*TerminalReq) ProtoMessage()    {}
+func (*TerminalReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{35}
+}
+func (m *TerminalReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *TerminalReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_TerminalReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *TerminalReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TerminalReq.Merge(m, src)
+}
+func (m *TerminalReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *TerminalReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_TerminalReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_TerminalReq proto.InternalMessageInfo
+
+type TerminalRsp struct {
+	Out string `protobuf:"bytes,1,opt,name=out,proto3" json:"out,omitempty"`
+}
+
+func (m *TerminalRsp) Reset()         { *m = TerminalRsp{} }
+func (m *TerminalRsp) String() string { return proto.CompactTextString(m) }
+func (*TerminalRsp) ProtoMessage()    {}
+func (*TerminalRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_9386d4f8a96ae2d2, []int{36}
+}
+func (m *TerminalRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *TerminalRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_TerminalRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *TerminalRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_TerminalRsp.Merge(m, src)
+}
+func (m *TerminalRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *TerminalRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_TerminalRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_TerminalRsp proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*Empty)(nil), "gpmv1.Empty")
 	proto.RegisterType((*ListServiceReq)(nil), "gpmv1.ListServiceReq")
 	proto.RegisterType((*ListServiceRsp)(nil), "gpmv1.ListServiceRsp")
 	proto.RegisterType((*GetServiceReq)(nil), "gpmv1.GetServiceReq")
 	proto.RegisterType((*GetServiceRsp)(nil), "gpmv1.GetServiceRsp")
-	proto.RegisterType((*GetServiceByNameReq)(nil), "gpmv1.GetServiceByNameReq")
-	proto.RegisterType((*GetServiceByNameRsp)(nil), "gpmv1.GetServiceByNameRsp")
 	proto.RegisterType((*CreateServiceReq)(nil), "gpmv1.CreateServiceReq")
 	proto.RegisterMapType((map[string]string)(nil), "gpmv1.CreateServiceReq.EnvEntry")
 	proto.RegisterType((*CreateServiceRsp)(nil), "gpmv1.CreateServiceRsp")
@@ -704,6 +1489,31 @@ func init() {
 	proto.RegisterType((*RebootServiceRsp)(nil), "gpmv1.RebootServiceRsp")
 	proto.RegisterType((*DeleteServiceReq)(nil), "gpmv1.DeleteServiceReq")
 	proto.RegisterType((*DeleteServiceRsp)(nil), "gpmv1.DeleteServiceRsp")
+	proto.RegisterType((*CatServiceLogReq)(nil), "gpmv1.CatServiceLogReq")
+	proto.RegisterType((*CatServiceLogRsp)(nil), "gpmv1.CatServiceLogRsp")
+	proto.RegisterType((*WatchServiceLogReq)(nil), "gpmv1.WatchServiceLogReq")
+	proto.RegisterType((*WatchServiceLogRsp)(nil), "gpmv1.WatchServiceLogRsp")
+	proto.RegisterType((*InstallServiceReq)(nil), "gpmv1.InstallServiceReq")
+	proto.RegisterMapType((map[string]string)(nil), "gpmv1.InstallServiceReq.EnvEntry")
+	proto.RegisterType((*InstallServiceRsp)(nil), "gpmv1.InstallServiceRsp")
+	proto.RegisterType((*ListServiceVersionsReq)(nil), "gpmv1.ListServiceVersionsReq")
+	proto.RegisterType((*ListServiceVersionsRsp)(nil), "gpmv1.ListServiceVersionsRsp")
+	proto.RegisterType((*UpgradeServiceReq)(nil), "gpmv1.UpgradeServiceReq")
+	proto.RegisterType((*UpgradeServiceRsp)(nil), "gpmv1.UpgradeServiceRsp")
+	proto.RegisterType((*RollbackServiceReq)(nil), "gpmv1.RollbackServiceReq")
+	proto.RegisterType((*RollbackServiceRsp)(nil), "gpmv1.RollbackServiceRsp")
+	proto.RegisterType((*LsReq)(nil), "gpmv1.LsReq")
+	proto.RegisterType((*LsRsp)(nil), "gpmv1.LsRsp")
+	proto.RegisterType((*PullReq)(nil), "gpmv1.PullReq")
+	proto.RegisterType((*PullRsp)(nil), "gpmv1.PullRsp")
+	proto.RegisterType((*PushReq)(nil), "gpmv1.PushReq")
+	proto.RegisterType((*PushRsp)(nil), "gpmv1.PushRsp")
+	proto.RegisterType((*ExecReq)(nil), "gpmv1.ExecReq")
+	proto.RegisterMapType((map[string]string)(nil), "gpmv1.ExecReq.EnvEntry")
+	proto.RegisterType((*ExecRsp)(nil), "gpmv1.ExecRsp")
+	proto.RegisterType((*TerminalReq)(nil), "gpmv1.TerminalReq")
+	proto.RegisterMapType((map[string]string)(nil), "gpmv1.TerminalReq.EnvEntry")
+	proto.RegisterType((*TerminalRsp)(nil), "gpmv1.TerminalRsp")
 }
 
 func init() {
@@ -711,50 +1521,83 @@ func init() {
 }
 
 var fileDescriptor_9386d4f8a96ae2d2 = []byte{
-	// 677 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x55, 0xcf, 0x4e, 0xdb, 0x4e,
-	0x10, 0x8e, 0xe3, 0x84, 0xc0, 0x04, 0x42, 0xb4, 0x3f, 0x7e, 0xad, 0xe5, 0x83, 0xeb, 0xba, 0xaa,
-	0x94, 0xf6, 0x90, 0x88, 0xf4, 0x8f, 0x28, 0xa0, 0x56, 0xd0, 0x22, 0xaa, 0x8a, 0x56, 0x68, 0xb9,
-	0xf5, 0xb6, 0x21, 0x2b, 0x63, 0x35, 0x8e, 0xb7, 0xde, 0xc5, 0x52, 0xfa, 0x14, 0x7d, 0xa0, 0x3e,
-	0x00, 0x47, 0x8e, 0x3d, 0x55, 0x2d, 0xbc, 0x48, 0xb5, 0x6b, 0x27, 0x78, 0x8d, 0x89, 0x9a, 0x0b,
-	0xec, 0xce, 0xf7, 0xcd, 0x7c, 0xb3, 0xc3, 0xe7, 0x01, 0xfa, 0x7e, 0x20, 0xce, 0xce, 0x07, 0xdd,
-	0xd3, 0x28, 0xec, 0xf9, 0x2c, 0xec, 0xcb, 0x1f, 0x3d, 0x16, 0x47, 0x22, 0xea, 0x71, 0x1a, 0x27,
-	0xc1, 0x29, 0x55, 0x91, 0x64, 0x53, 0xfe, 0xea, 0x2a, 0x00, 0xd5, 0x7d, 0x16, 0x26, 0x9b, 0x76,
-	0xef, 0xee, 0x54, 0xc2, 0x02, 0x7e, 0x2b, 0xcf, 0x6b, 0x40, 0xfd, 0x20, 0x64, 0x62, 0xe2, 0xbd,
-	0x80, 0xd6, 0x51, 0xc0, 0xc5, 0x49, 0x2a, 0x80, 0xe9, 0x57, 0xf4, 0x08, 0x6a, 0x21, 0x15, 0xc4,
-	0x32, 0x5c, 0xa3, 0xd3, 0xec, 0xaf, 0x77, 0x95, 0x42, 0xf7, 0x98, 0xf8, 0xf4, 0x23, 0x15, 0x04,
-	0x2b, 0xd0, 0xc3, 0x7a, 0x1a, 0x67, 0xe8, 0x29, 0x2c, 0x67, 0x5d, 0x72, 0xcb, 0x70, 0xcd, 0x4e,
-	0xb3, 0xdf, 0xca, 0x52, 0xa7, 0xa4, 0x19, 0x8e, 0x36, 0xa0, 0x2e, 0x22, 0x41, 0x46, 0x56, 0xd5,
-	0x35, 0x3a, 0x26, 0x4e, 0x2f, 0xde, 0x03, 0x58, 0x3b, 0xa4, 0xf9, 0x4e, 0x5a, 0x50, 0x0d, 0x86,
-	0xaa, 0x0f, 0x13, 0x57, 0x83, 0xa1, 0xf7, 0x4a, 0x23, 0x70, 0x86, 0x3a, 0xd0, 0xc8, 0x6a, 0x66,
-	0xdd, 0x16, 0x25, 0xa7, 0xb0, 0xf7, 0x04, 0xfe, 0xbb, 0x49, 0xdd, 0x9f, 0x7c, 0x22, 0xa1, 0x52,
-	0x40, 0x50, 0x1b, 0x93, 0x30, 0xcd, 0x5e, 0xc1, 0xea, 0xec, 0xbd, 0x29, 0xa1, 0x2e, 0xa4, 0xf5,
-	0xab, 0x0a, 0xed, 0xb7, 0x31, 0x25, 0x82, 0xe6, 0xde, 0x52, 0xa2, 0x84, 0xda, 0x60, 0x0e, 0x82,
-	0xb1, 0x1a, 0xc2, 0x0a, 0x96, 0x47, 0xc9, 0x22, 0xb1, 0xcf, 0x2d, 0xd3, 0x35, 0x25, 0x4b, 0x9e,
-	0x25, 0x6b, 0x18, 0xc4, 0x56, 0x2d, 0x65, 0x0d, 0x83, 0x18, 0xf5, 0xc1, 0xa4, 0xe3, 0xc4, 0xaa,
-	0xab, 0x29, 0xbb, 0x59, 0x1b, 0x45, 0xc5, 0xee, 0xc1, 0x38, 0x39, 0x18, 0x8b, 0x78, 0x82, 0x25,
-	0x19, 0x3d, 0x87, 0x26, 0x9f, 0xf0, 0xe3, 0x38, 0x3a, 0xdd, 0x13, 0x22, 0xb6, 0x96, 0xd4, 0x13,
-	0xd0, 0xf4, 0x09, 0x37, 0x08, 0xce, 0xd3, 0x90, 0x0b, 0xe6, 0x28, 0xf2, 0xad, 0x86, 0xf6, 0x60,
-	0x89, 0x1e, 0x45, 0x3e, 0x96, 0x10, 0xb2, 0xa0, 0x91, 0xd0, 0x98, 0x07, 0xd1, 0xd8, 0x5a, 0x56,
-	0x1d, 0x4e, 0xaf, 0xc8, 0x85, 0x26, 0x39, 0x17, 0x11, 0xa6, 0x5c, 0x90, 0x58, 0x58, 0x2b, 0xae,
-	0xd1, 0xa9, 0xe3, 0x7c, 0xc8, 0x7e, 0x09, 0xcb, 0xd3, 0x26, 0xe5, 0x2b, 0xbf, 0xd0, 0x49, 0x36,
-	0x1e, 0x79, 0x94, 0x26, 0x49, 0xc8, 0xe8, 0x9c, 0x66, 0xf3, 0x49, 0x2f, 0xdb, 0xd5, 0x2d, 0xc3,
-	0xdb, 0x2d, 0xce, 0x77, 0xa1, 0x3f, 0xcf, 0x43, 0x58, 0x3f, 0x91, 0xf2, 0x73, 0x8c, 0xb6, 0x53,
-	0xa0, 0x2c, 0x54, 0xdf, 0x85, 0xd6, 0x89, 0x88, 0xd8, 0x9c, 0xf2, 0xdb, 0x3a, 0x63, 0xa1, 0xea,
-	0x1e, 0xb4, 0x31, 0x1d, 0x44, 0xd1, 0xbc, 0xf6, 0x77, 0x8b, 0x9c, 0x45, 0x15, 0xde, 0xd1, 0x11,
-	0xd5, 0xdc, 0x5b, 0xa2, 0xa0, 0x73, 0x16, 0x51, 0xe8, 0xff, 0xa8, 0x01, 0x1c, 0xb2, 0x30, 0x8b,
-	0xa3, 0xc7, 0xd0, 0x78, 0x4f, 0xc9, 0x48, 0x9c, 0x7d, 0x43, 0xab, 0x59, 0x8a, 0xda, 0x4d, 0xb6,
-	0x76, 0x43, 0x3b, 0xd0, 0xcc, 0xad, 0x1c, 0xf4, 0x7f, 0x06, 0xea, 0xdb, 0xcb, 0x2e, 0x0b, 0x73,
-	0x86, 0xb6, 0x00, 0x6e, 0x3e, 0x6a, 0xb4, 0x91, 0x91, 0xb4, 0x75, 0x63, 0x97, 0x44, 0x39, 0x43,
-	0x1f, 0xa0, 0x5d, 0x5c, 0x07, 0xc8, 0xbe, 0xc5, 0x9c, 0xad, 0x14, 0xfb, 0x4e, 0x8c, 0x33, 0xb4,
-	0x07, 0x6b, 0x9a, 0x71, 0xd1, 0xfd, 0x3b, 0x3e, 0x5e, 0xbb, 0x1c, 0xe0, 0x0c, 0xbd, 0x86, 0xd5,
-	0xbc, 0x35, 0xd1, 0xbd, 0xe9, 0x90, 0x75, 0x4b, 0xdb, 0xa5, 0x71, 0xce, 0xe4, 0x14, 0x73, 0xde,
-	0x9b, 0x4d, 0x51, 0x77, 0xac, 0x5d, 0x16, 0x4e, 0xfb, 0xd7, 0x8c, 0x35, 0xeb, 0xbf, 0x68, 0x49,
-	0xbb, 0x1c, 0x48, 0x4b, 0x68, 0xce, 0x99, 0x95, 0x28, 0x7a, 0xce, 0x2e, 0x07, 0x38, 0xdb, 0x3f,
-	0xba, 0xf8, 0xe3, 0x54, 0x2e, 0xae, 0x1c, 0xe3, 0xf2, 0xca, 0x31, 0x7e, 0x5f, 0x39, 0xc6, 0xf7,
-	0x6b, 0xa7, 0x72, 0x79, 0xed, 0x54, 0x7e, 0x5e, 0x3b, 0x95, 0xcf, 0xdd, 0x7f, 0xfd, 0x2f, 0xba,
-	0xa3, 0xca, 0x0f, 0x96, 0x14, 0xf6, 0xec, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x19, 0x43, 0xae,
-	0x14, 0x7e, 0x07, 0x00, 0x00,
+	// 1203 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x57, 0xcf, 0x6f, 0xdb, 0xb6,
+	0x17, 0x8f, 0xa2, 0xb8, 0x76, 0x9e, 0xf3, 0xc3, 0xe5, 0x37, 0x4d, 0xf4, 0x65, 0x30, 0xd7, 0xd3,
+	0x96, 0xc2, 0x1b, 0x56, 0xa7, 0x49, 0x87, 0xa2, 0x6b, 0x8a, 0x01, 0x6d, 0x9a, 0xb5, 0xc1, 0x72,
+	0x28, 0x94, 0x75, 0x03, 0x76, 0x53, 0x64, 0x56, 0x16, 0x22, 0x59, 0x9c, 0x48, 0x1b, 0xc9, 0xfe,
+	0x82, 0x1d, 0x77, 0xde, 0x71, 0x87, 0xfd, 0x2d, 0x3d, 0xf6, 0xb8, 0xd3, 0xb0, 0x25, 0xff, 0xc8,
+	0x40, 0x8a, 0xb4, 0x25, 0x4b, 0xae, 0x9b, 0x60, 0x03, 0x76, 0x49, 0xf8, 0xf8, 0x3e, 0x7a, 0xbf,
+	0x48, 0xbe, 0xf7, 0x31, 0xec, 0xfa, 0x01, 0xef, 0x0d, 0x4e, 0x3a, 0x5e, 0x1c, 0x6d, 0xfb, 0x34,
+	0xda, 0x15, 0x7f, 0xb6, 0x69, 0x12, 0xf3, 0x78, 0x9b, 0x91, 0x64, 0x18, 0x78, 0x44, 0xee, 0x0c,
+	0x77, 0xc4, 0xbf, 0x8e, 0x54, 0xa0, 0x8a, 0x4f, 0xa3, 0xe1, 0x0e, 0xde, 0x9e, 0xfe, 0xa9, 0x4b,
+	0x03, 0x56, 0xf8, 0xce, 0xae, 0x42, 0xe5, 0x20, 0xa2, 0xfc, 0xdc, 0x6e, 0xc0, 0xca, 0x51, 0xc0,
+	0xf8, 0x71, 0xea, 0xc0, 0x21, 0x3f, 0xd8, 0x4e, 0x7e, 0x87, 0x51, 0xf4, 0x29, 0xd4, 0x54, 0x00,
+	0xcc, 0x32, 0x5a, 0x66, 0xbb, 0xbe, 0xbb, 0xd2, 0x91, 0x7e, 0x3b, 0x1a, 0x34, 0xd2, 0xa3, 0x35,
+	0xa8, 0xf0, 0x98, 0xbb, 0xa1, 0x35, 0xdf, 0x32, 0xda, 0xa6, 0x93, 0x0a, 0xf6, 0x47, 0xb0, 0xfc,
+	0x9c, 0x64, 0x9c, 0x20, 0x04, 0x0b, 0x7d, 0x37, 0x22, 0x96, 0xd1, 0x32, 0xda, 0x8b, 0x8e, 0x5c,
+	0xdb, 0x5f, 0xe4, 0x40, 0x8c, 0xa2, 0x36, 0x54, 0x95, 0x5d, 0x89, 0x2b, 0xba, 0xd5, 0x6a, 0xfb,
+	0x8f, 0x79, 0x68, 0xec, 0x27, 0xc4, 0xe5, 0xe4, 0xdd, 0x3e, 0x50, 0x03, 0xcc, 0x93, 0xa0, 0x2f,
+	0x83, 0x5b, 0x74, 0xc4, 0x52, 0xa0, 0xdc, 0xc4, 0x67, 0x96, 0xd9, 0x32, 0x05, 0x4a, 0xac, 0x05,
+	0xaa, 0x1b, 0x24, 0xd6, 0x42, 0x8a, 0xea, 0x06, 0x09, 0xda, 0x05, 0x93, 0xf4, 0x87, 0x56, 0x45,
+	0x66, 0xdf, 0x52, 0x61, 0x4c, 0x7a, 0xec, 0x1c, 0xf4, 0x87, 0x07, 0x7d, 0x9e, 0x9c, 0x3b, 0x02,
+	0x8c, 0x3e, 0x87, 0x3a, 0x3b, 0x67, 0x2f, 0x93, 0xd8, 0x7b, 0xc2, 0x79, 0x62, 0xdd, 0x90, 0x29,
+	0x20, 0x9d, 0xc2, 0x58, 0xe3, 0x64, 0x61, 0xa8, 0x05, 0x66, 0x18, 0xfb, 0x56, 0x35, 0x97, 0xb0,
+	0xd0, 0x1e, 0xc5, 0xbe, 0x23, 0x54, 0xc8, 0x82, 0xea, 0x90, 0x24, 0x2c, 0x88, 0xfb, 0x56, 0x4d,
+	0x46, 0xa8, 0x45, 0xd4, 0x82, 0xba, 0x3b, 0xe0, 0xb1, 0x43, 0x18, 0x77, 0x13, 0x6e, 0x2d, 0xb6,
+	0x8c, 0x76, 0xc5, 0xc9, 0x6e, 0xe1, 0x07, 0x50, 0xd3, 0x41, 0x8a, 0x2c, 0x4f, 0xc9, 0xb9, 0x2a,
+	0x8f, 0x58, 0x8a, 0xc3, 0x1b, 0xba, 0xe1, 0x80, 0xa8, 0xfa, 0xa4, 0xc2, 0xa3, 0xf9, 0x87, 0x86,
+	0xfd, 0x78, 0xb2, 0xbe, 0x57, 0x3a, 0x9e, 0x2d, 0x58, 0x3d, 0x16, 0xee, 0x67, 0x5c, 0x80, 0xbd,
+	0x09, 0xd8, 0x95, 0x7c, 0x7c, 0x0c, 0x2b, 0xc7, 0x3c, 0xa6, 0x33, 0x5c, 0x3c, 0xca, 0xa3, 0xae,
+	0xe4, 0xe1, 0x0e, 0x34, 0x1c, 0x72, 0x12, 0xc7, 0xb3, 0xd2, 0x78, 0x3c, 0x89, 0xbb, 0xaa, 0x97,
+	0x67, 0x24, 0x24, 0xb3, 0x6e, 0xb2, 0xf0, 0x92, 0xc7, 0x5d, 0xd5, 0xcb, 0xbe, 0xab, 0x03, 0x14,
+	0x37, 0x6b, 0x8a, 0x97, 0x02, 0x8e, 0x51, 0x81, 0xe3, 0xe4, 0x8c, 0x6b, 0x9c, 0x58, 0xdb, 0x6d,
+	0x40, 0xdf, 0xb9, 0xdc, 0xeb, 0xcd, 0xb6, 0x58, 0x82, 0x9c, 0x62, 0xf3, 0x37, 0x13, 0x6e, 0x1e,
+	0xf6, 0x19, 0x77, 0xc3, 0xf0, 0x5f, 0x7a, 0xd5, 0xf7, 0xb3, 0xaf, 0xfa, 0x43, 0x55, 0xab, 0x82,
+	0xcb, 0xff, 0xfe, 0xb3, 0x16, 0xdf, 0x52, 0xd7, 0x3b, 0x75, 0x7d, 0x62, 0xdd, 0x4a, 0xbf, 0x55,
+	0xe2, 0xb8, 0x1f, 0xaf, 0x67, 0xfa, 0xb1, 0xd8, 0xf5, 0x7a, 0x83, 0xfe, 0xa9, 0xb5, 0xd1, 0x32,
+	0xda, 0x4b, 0x4e, 0x2a, 0x5c, 0xbb, 0x39, 0xbc, 0x2a, 0x9c, 0x13, 0xa3, 0x22, 0x24, 0x69, 0x95,
+	0x74, 0xa5, 0x11, 0xd3, 0xd1, 0xa2, 0x30, 0xc4, 0x28, 0x21, 0x5d, 0x3d, 0x22, 0xa4, 0x20, 0x1c,
+	0x46, 0xcc, 0xb7, 0xcc, 0xd4, 0x61, 0xc4, 0x7c, 0xfb, 0x33, 0x58, 0xcf, 0x0c, 0xa2, 0x6f, 0xd3,
+	0x62, 0xb0, 0x69, 0xf7, 0xea, 0xeb, 0x72, 0x34, 0xa3, 0x68, 0x07, 0x6a, 0xaa, 0x92, 0x7a, 0x7c,
+	0xdd, 0xca, 0x3f, 0x0b, 0x05, 0x76, 0x46, 0x30, 0x3b, 0x82, 0x9b, 0xaf, 0xa8, 0x9f, 0xb8, 0xdd,
+	0x59, 0xf3, 0x24, 0x53, 0xf8, 0xfa, 0x94, 0xc2, 0x2f, 0x95, 0x16, 0x7e, 0x39, 0x53, 0x78, 0x51,
+	0xc0, 0x09, 0x77, 0xff, 0x48, 0x01, 0x9f, 0x01, 0x72, 0xe2, 0x30, 0x3c, 0x71, 0xbd, 0xd3, 0x19,
+	0x69, 0x60, 0xa8, 0x25, 0x64, 0x18, 0xc8, 0xcb, 0x97, 0x1e, 0xef, 0x48, 0xb6, 0xd7, 0x8a, 0x56,
+	0x18, 0xb5, 0x37, 0xa1, 0x72, 0xa4, 0xcf, 0x82, 0xba, 0xbc, 0xa7, 0xcd, 0x89, 0xb5, 0xdd, 0x91,
+	0x4a, 0x46, 0xd1, 0x16, 0x54, 0x5e, 0x07, 0xa1, 0xa4, 0x0d, 0xe2, 0xde, 0xaf, 0xaa, 0xba, 0x7f,
+	0x15, 0x84, 0xe4, 0xb0, 0xff, 0x3a, 0x76, 0x52, 0xad, 0x7d, 0x17, 0xaa, 0x2f, 0x07, 0x61, 0x28,
+	0xcc, 0x35, 0xc0, 0x64, 0x89, 0xa7, 0xef, 0x1d, 0x4b, 0x3c, 0xf9, 0x6c, 0x19, 0xd7, 0x8f, 0xbb,
+	0xcb, 0xb8, 0x7d, 0x5b, 0xc1, 0x19, 0x1d, 0xd7, 0xd3, 0xc8, 0xd6, 0x73, 0x5f, 0x00, 0x58, 0xef,
+	0x3d, 0xed, 0x8d, 0x8d, 0x98, 0x59, 0x23, 0x8b, 0xca, 0x08, 0xa3, 0xf6, 0xaf, 0x06, 0x54, 0x0f,
+	0xce, 0x88, 0xa7, 0x0c, 0x7a, 0x51, 0x57, 0x1b, 0xf4, 0xa2, 0x2e, 0xfa, 0x24, 0xed, 0x22, 0xf3,
+	0xf2, 0x6a, 0x6d, 0xa8, 0x14, 0x15, 0x7c, 0xa2, 0x77, 0x34, 0xc0, 0x1c, 0x04, 0x5d, 0x7d, 0x46,
+	0x83, 0x40, 0x9e, 0x9a, 0x1f, 0x74, 0x75, 0x53, 0xf2, 0x83, 0xee, 0xb5, 0x5f, 0xe1, 0xa6, 0x8a,
+	0x91, 0x51, 0xf1, 0x59, 0x3c, 0xd0, 0xcd, 0x54, 0x2c, 0xed, 0x5f, 0x0c, 0xa8, 0x7f, 0x43, 0x92,
+	0x28, 0xe8, 0xbb, 0x61, 0x79, 0x16, 0x77, 0xb3, 0x59, 0x6c, 0xaa, 0x2c, 0x32, 0x9f, 0x4c, 0x64,
+	0x82, 0x60, 0x81, 0x9c, 0x11, 0x4f, 0xa5, 0x22, 0xd7, 0xd7, 0x8e, 0xfc, 0x76, 0x26, 0xb6, 0xb2,
+	0xe8, 0x77, 0x7f, 0x5a, 0x04, 0x78, 0x4e, 0x23, 0x75, 0xfd, 0xd0, 0x16, 0x54, 0x5f, 0x10, 0x37,
+	0xe4, 0xbd, 0x1f, 0xd1, 0x92, 0x2e, 0xb7, 0x20, 0xb3, 0x38, 0x27, 0xa1, 0x3d, 0xa8, 0x67, 0x3a,
+	0x02, 0xd2, 0x8f, 0x3e, 0x4f, 0x77, 0x71, 0xd9, 0x36, 0xa3, 0xe8, 0x21, 0xc0, 0x98, 0x8c, 0xa2,
+	0x35, 0x05, 0xca, 0x91, 0x58, 0x5c, 0xb2, 0xcb, 0x28, 0x7a, 0x02, 0xcb, 0x39, 0xaa, 0x84, 0x36,
+	0xa6, 0xd0, 0x45, 0x5c, 0xae, 0x60, 0x14, 0x7d, 0x09, 0x4b, 0x59, 0x22, 0x84, 0xd6, 0x75, 0xbf,
+	0xca, 0x93, 0x28, 0x5c, 0xba, 0xcf, 0xa8, 0xc8, 0x3c, 0xc3, 0x72, 0x46, 0x99, 0xe7, 0xf9, 0x11,
+	0x2e, 0xdb, 0x4e, 0xe3, 0xcf, 0xd1, 0x97, 0x51, 0xfc, 0x93, 0xe4, 0x07, 0x97, 0x2b, 0x52, 0x13,
+	0x39, 0x6e, 0x32, 0x32, 0x31, 0xc9, 0x6c, 0x70, 0xb9, 0x42, 0x55, 0x31, 0x4b, 0x3c, 0xc6, 0x55,
+	0x9c, 0xa0, 0x2d, 0xb8, 0x5c, 0xc1, 0x28, 0x3a, 0x84, 0xd5, 0x09, 0xa6, 0x81, 0xfe, 0xaf, 0xb0,
+	0x45, 0xae, 0x82, 0xa7, 0xa9, 0x18, 0xbd, 0x67, 0xa0, 0x17, 0xb0, 0x92, 0x9f, 0x70, 0xc8, 0x9a,
+	0xc6, 0x16, 0xf0, 0x14, 0x0d, 0xa3, 0x6d, 0xe3, 0x9e, 0x81, 0x8e, 0xe1, 0x7f, 0x25, 0x63, 0x0a,
+	0x7d, 0x50, 0xbc, 0x85, 0x99, 0x81, 0x87, 0xdf, 0xa5, 0x66, 0x54, 0x84, 0x97, 0x9f, 0x1f, 0xa3,
+	0xf0, 0x0a, 0x53, 0x0c, 0x4f, 0xd1, 0xa8, 0xf0, 0x0e, 0x61, 0x55, 0x34, 0xfb, 0xa7, 0xe3, 0x66,
+	0x3f, 0xaa, 0x59, 0x71, 0x94, 0xe0, 0x69, 0x2a, 0x59, 0xb3, 0x16, 0xcc, 0x1f, 0xb1, 0xd1, 0x03,
+	0x95, 0xc3, 0x02, 0x67, 0x24, 0x49, 0x57, 0x17, 0x44, 0x1f, 0x47, 0x23, 0x3a, 0x94, 0xce, 0x00,
+	0x9c, 0x93, 0xa5, 0x2d, 0x89, 0x64, 0xbd, 0x0c, 0x52, 0x76, 0x77, 0x9c, 0x93, 0x45, 0x0a, 0xe8,
+	0x0e, 0x2c, 0x88, 0x2e, 0x38, 0x42, 0xaa, 0x3e, 0x8c, 0x73, 0x32, 0xa3, 0xe8, 0x01, 0xd4, 0x74,
+	0xcf, 0x41, 0xa8, 0xd8, 0xed, 0x70, 0x61, 0x2f, 0x2d, 0xd0, 0xd3, 0xa3, 0x37, 0x7f, 0x35, 0xe7,
+	0xde, 0x5c, 0x34, 0x8d, 0xb7, 0x17, 0x4d, 0xe3, 0xcf, 0x8b, 0xa6, 0xf1, 0xf3, 0x65, 0x73, 0xee,
+	0xed, 0x65, 0x73, 0xee, 0xf7, 0xcb, 0xe6, 0xdc, 0xf7, 0x9d, 0xf7, 0xfd, 0x09, 0xbf, 0x27, 0xad,
+	0x9f, 0xdc, 0x90, 0xba, 0xfb, 0x7f, 0x07, 0x00, 0x00, 0xff, 0xff, 0xab, 0xfb, 0x2c, 0x0e, 0xfb,
+	0x0f, 0x00, 0x00,
 }
 
 func (m *Empty) XSize() (n int) {
@@ -772,10 +1615,6 @@ func (m *ListServiceReq) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	{
-		l = m.PageMeta.XSize()
-		n += 1 + l + sovGpm(uint64(l))
-	}
 	return n
 }
 
@@ -803,31 +1642,6 @@ func (m *GetServiceReq) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovGpm(uint64(m.Id))
-	}
-	return n
-}
-
-func (m *GetServiceRsp) XSize() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Service != nil {
-		l = m.Service.XSize()
-		n += 1 + l + sovGpm(uint64(l))
-	}
-	return n
-}
-
-func (m *GetServiceByNameReq) XSize() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
 	l = len(m.Name)
 	if l > 0 {
 		n += 1 + l + sovGpm(uint64(l))
@@ -835,7 +1649,7 @@ func (m *GetServiceByNameReq) XSize() (n int) {
 	return n
 }
 
-func (m *GetServiceByNameRsp) XSize() (n int) {
+func (m *GetServiceRsp) XSize() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -917,8 +1731,9 @@ func (m *StartServiceReq) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovGpm(uint64(m.Id))
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
 }
@@ -942,8 +1757,9 @@ func (m *StopServiceReq) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovGpm(uint64(m.Id))
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
 }
@@ -967,8 +1783,9 @@ func (m *RebootServiceReq) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovGpm(uint64(m.Id))
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
 }
@@ -992,8 +1809,9 @@ func (m *DeleteServiceReq) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Id != 0 {
-		n += 1 + sovGpm(uint64(m.Id))
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
 }
@@ -1006,6 +1824,401 @@ func (m *DeleteServiceRsp) XSize() (n int) {
 	_ = l
 	if m.Service != nil {
 		l = m.Service.XSize()
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *CatServiceLogReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *CatServiceLogRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Text)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *WatchServiceLogReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *WatchServiceLogRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Text)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *InstallServiceReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Bin)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	if len(m.Args) > 0 {
+		for _, s := range m.Args {
+			l = len(s)
+			n += 1 + l + sovGpm(uint64(l))
+		}
+	}
+	l = len(m.Dir)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	if len(m.Env) > 0 {
+		for k, v := range m.Env {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovGpm(uint64(len(k))) + 1 + len(v) + sovGpm(uint64(len(v)))
+			n += mapEntrySize + 1 + sovGpm(uint64(mapEntrySize))
+		}
+	}
+	if m.SysProcAttr != nil {
+		l = m.SysProcAttr.XSize()
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	if m.Log != nil {
+		l = m.Log.XSize()
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Version)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	if m.AutoRestart != 0 {
+		n += 1 + sovGpm(uint64(m.AutoRestart))
+	}
+	l = len(m.Package)
+	if l > 0 {
+		n += 2 + l + sovGpm(uint64(l))
+	}
+	if m.Total != 0 {
+		n += 2 + sovGpm(uint64(m.Total))
+	}
+	l = len(m.Chunk)
+	if l > 0 {
+		n += 2 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *InstallServiceRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Chunked != 0 {
+		n += 1 + sovGpm(uint64(m.Chunked))
+	}
+	if m.Speed != 0 {
+		n += 1 + sovGpm(uint64(m.Speed))
+	}
+	l = len(m.Msg)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *ListServiceVersionsReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *ListServiceVersionsRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if len(m.Versions) > 0 {
+		for _, e := range m.Versions {
+			l = e.XSize()
+			n += 1 + l + sovGpm(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *UpgradeServiceReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Package)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	if m.Total != 0 {
+		n += 1 + sovGpm(uint64(m.Total))
+	}
+	l = len(m.Chunk)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *UpgradeServiceRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Chunked != 0 {
+		n += 1 + sovGpm(uint64(m.Chunked))
+	}
+	if m.Speed != 0 {
+		n += 1 + sovGpm(uint64(m.Speed))
+	}
+	l = len(m.Msg)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *RollbackServiceReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Revision)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *RollbackServiceRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *LsReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Path)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *LsRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Files != nil {
+		l = m.Files.XSize()
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *PullReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Src)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Dst)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *PullRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Chunk)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *PushReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Src)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Dst)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Chunk)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *PushRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *ExecReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Cmd)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	if len(m.Env) > 0 {
+		for k, v := range m.Env {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovGpm(uint64(len(k))) + 1 + len(v) + sovGpm(uint64(len(v)))
+			n += mapEntrySize + 1 + sovGpm(uint64(mapEntrySize))
+		}
+	}
+	l = len(m.Uid)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Gid)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *ExecRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Out)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *TerminalReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Cmd)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	if len(m.Env) > 0 {
+		for k, v := range m.Env {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovGpm(uint64(len(k))) + 1 + len(v) + sovGpm(uint64(len(v)))
+			n += mapEntrySize + 1 + sovGpm(uint64(mapEntrySize))
+		}
+	}
+	l = len(m.Exec)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *TerminalRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Out)
+	if l > 0 {
 		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
@@ -1060,18 +2273,6 @@ func (m *ListServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	{
-		{
-			size, err := m.PageMeta.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintGpm(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
 	return len(dAtA) - i, nil
 }
 
@@ -1137,10 +2338,12 @@ func (m *GetServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		i = encodeVarintGpm(dAtA, i, uint64(m.Id))
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -1161,71 +2364,6 @@ func (m *GetServiceRsp) MarshalTo(dAtA []byte) (int, error) {
 }
 
 func (m *GetServiceRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Service != nil {
-		{
-			size, err := m.Service.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintGpm(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *GetServiceByNameReq) Marshal() (dAtA []byte, err error) {
-	size := m.XSize()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GetServiceByNameReq) MarshalTo(dAtA []byte) (int, error) {
-	size := m.XSize()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *GetServiceByNameReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Name) > 0 {
-		i -= len(m.Name)
-		copy(dAtA[i:], m.Name)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *GetServiceByNameRsp) Marshal() (dAtA []byte, err error) {
-	size := m.XSize()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *GetServiceByNameRsp) MarshalTo(dAtA []byte) (int, error) {
-	size := m.XSize()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *GetServiceByNameRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -1408,10 +2546,12 @@ func (m *StartServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		i = encodeVarintGpm(dAtA, i, uint64(m.Id))
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -1471,10 +2611,12 @@ func (m *StopServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		i = encodeVarintGpm(dAtA, i, uint64(m.Id))
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -1534,10 +2676,12 @@ func (m *RebootServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		i = encodeVarintGpm(dAtA, i, uint64(m.Id))
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -1597,10 +2741,12 @@ func (m *DeleteServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Id != 0 {
-		i = encodeVarintGpm(dAtA, i, uint64(m.Id))
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -1634,6 +2780,893 @@ func (m *DeleteServiceRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			i -= size
 			i = encodeVarintGpm(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *CatServiceLogReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CatServiceLogReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CatServiceLogReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *CatServiceLogRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CatServiceLogRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *CatServiceLogRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Text) > 0 {
+		i -= len(m.Text)
+		copy(dAtA[i:], m.Text)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Text)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *WatchServiceLogReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *WatchServiceLogReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *WatchServiceLogReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *WatchServiceLogRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *WatchServiceLogRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *WatchServiceLogRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Text) > 0 {
+		i -= len(m.Text)
+		copy(dAtA[i:], m.Text)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Text)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *InstallServiceReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *InstallServiceReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *InstallServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Chunk) > 0 {
+		i -= len(m.Chunk)
+		copy(dAtA[i:], m.Chunk)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Chunk)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xba
+	}
+	if m.Total != 0 {
+		i = encodeVarintGpm(dAtA, i, uint64(m.Total))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xb0
+	}
+	if len(m.Package) > 0 {
+		i -= len(m.Package)
+		copy(dAtA[i:], m.Package)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Package)))
+		i--
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0xaa
+	}
+	if m.AutoRestart != 0 {
+		i = encodeVarintGpm(dAtA, i, uint64(m.AutoRestart))
+		i--
+		dAtA[i] = 0x48
+	}
+	if len(m.Version) > 0 {
+		i -= len(m.Version)
+		copy(dAtA[i:], m.Version)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Version)))
+		i--
+		dAtA[i] = 0x42
+	}
+	if m.Log != nil {
+		{
+			size, err := m.Log.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x3a
+	}
+	if m.SysProcAttr != nil {
+		{
+			size, err := m.SysProcAttr.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x32
+	}
+	if len(m.Env) > 0 {
+		for k := range m.Env {
+			v := m.Env[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintGpm(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintGpm(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintGpm(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if len(m.Dir) > 0 {
+		i -= len(m.Dir)
+		copy(dAtA[i:], m.Dir)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Dir)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Args) > 0 {
+		for iNdEx := len(m.Args) - 1; iNdEx >= 0; iNdEx-- {
+			i -= len(m.Args[iNdEx])
+			copy(dAtA[i:], m.Args[iNdEx])
+			i = encodeVarintGpm(dAtA, i, uint64(len(m.Args[iNdEx])))
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.Bin) > 0 {
+		i -= len(m.Bin)
+		copy(dAtA[i:], m.Bin)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Bin)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *InstallServiceRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *InstallServiceRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *InstallServiceRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Msg) > 0 {
+		i -= len(m.Msg)
+		copy(dAtA[i:], m.Msg)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Msg)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Speed != 0 {
+		i = encodeVarintGpm(dAtA, i, uint64(m.Speed))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Chunked != 0 {
+		i = encodeVarintGpm(dAtA, i, uint64(m.Chunked))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ListServiceVersionsReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListServiceVersionsReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListServiceVersionsReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ListServiceVersionsRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ListServiceVersionsRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ListServiceVersionsRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Versions) > 0 {
+		for iNdEx := len(m.Versions) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Versions[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGpm(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0xa
+		}
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *UpgradeServiceReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpgradeServiceReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpgradeServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Chunk) > 0 {
+		i -= len(m.Chunk)
+		copy(dAtA[i:], m.Chunk)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Chunk)))
+		i--
+		dAtA[i] = 0x6a
+	}
+	if m.Total != 0 {
+		i = encodeVarintGpm(dAtA, i, uint64(m.Total))
+		i--
+		dAtA[i] = 0x60
+	}
+	if len(m.Package) > 0 {
+		i -= len(m.Package)
+		copy(dAtA[i:], m.Package)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Package)))
+		i--
+		dAtA[i] = 0x5a
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *UpgradeServiceRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *UpgradeServiceRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *UpgradeServiceRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Msg) > 0 {
+		i -= len(m.Msg)
+		copy(dAtA[i:], m.Msg)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Msg)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Speed != 0 {
+		i = encodeVarintGpm(dAtA, i, uint64(m.Speed))
+		i--
+		dAtA[i] = 0x10
+	}
+	if m.Chunked != 0 {
+		i = encodeVarintGpm(dAtA, i, uint64(m.Chunked))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RollbackServiceReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RollbackServiceReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RollbackServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Revision) > 0 {
+		i -= len(m.Revision)
+		copy(dAtA[i:], m.Revision)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Revision)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *RollbackServiceRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *RollbackServiceRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *RollbackServiceRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *LsReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *LsReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *LsReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Path) > 0 {
+		i -= len(m.Path)
+		copy(dAtA[i:], m.Path)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Path)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *LsRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *LsRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *LsRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Files != nil {
+		{
+			size, err := m.Files.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PullReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PullReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PullReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Dst) > 0 {
+		i -= len(m.Dst)
+		copy(dAtA[i:], m.Dst)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Dst)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Src) > 0 {
+		i -= len(m.Src)
+		copy(dAtA[i:], m.Src)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Src)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PullRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PullRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PullRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Chunk) > 0 {
+		i -= len(m.Chunk)
+		copy(dAtA[i:], m.Chunk)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Chunk)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PushReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PushReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PushReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Chunk) > 0 {
+		i -= len(m.Chunk)
+		copy(dAtA[i:], m.Chunk)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Chunk)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Dst) > 0 {
+		i -= len(m.Dst)
+		copy(dAtA[i:], m.Dst)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Dst)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Src) > 0 {
+		i -= len(m.Src)
+		copy(dAtA[i:], m.Src)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Src)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PushRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PushRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PushRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *ExecReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ExecReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ExecReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Gid) > 0 {
+		i -= len(m.Gid)
+		copy(dAtA[i:], m.Gid)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Gid)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if len(m.Uid) > 0 {
+		i -= len(m.Uid)
+		copy(dAtA[i:], m.Uid)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Uid)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Env) > 0 {
+		for k := range m.Env {
+			v := m.Env[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintGpm(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintGpm(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintGpm(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Cmd) > 0 {
+		i -= len(m.Cmd)
+		copy(dAtA[i:], m.Cmd)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Cmd)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ExecRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ExecRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ExecRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Out) > 0 {
+		i -= len(m.Out)
+		copy(dAtA[i:], m.Out)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Out)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *TerminalReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *TerminalReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TerminalReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Exec) > 0 {
+		i -= len(m.Exec)
+		copy(dAtA[i:], m.Exec)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Exec)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.Env) > 0 {
+		for k := range m.Env {
+			v := m.Env[k]
+			baseI := i
+			i -= len(v)
+			copy(dAtA[i:], v)
+			i = encodeVarintGpm(dAtA, i, uint64(len(v)))
+			i--
+			dAtA[i] = 0x12
+			i -= len(k)
+			copy(dAtA[i:], k)
+			i = encodeVarintGpm(dAtA, i, uint64(len(k)))
+			i--
+			dAtA[i] = 0xa
+			i = encodeVarintGpm(dAtA, i, uint64(baseI-i))
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	if len(m.Cmd) > 0 {
+		i -= len(m.Cmd)
+		copy(dAtA[i:], m.Cmd)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Cmd)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *TerminalRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *TerminalRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *TerminalRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Out) > 0 {
+		i -= len(m.Out)
+		copy(dAtA[i:], m.Out)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Out)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -1730,39 +3763,6 @@ func (m *ListServiceReq) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: ListServiceReq: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field PageMeta", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGpm
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.PageMeta.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGpm(dAtA[iNdEx:])
@@ -1917,161 +3917,6 @@ func (m *GetServiceReq) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
-			}
-			m.Id = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Id |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGpm(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GetServiceRsp) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGpm
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GetServiceRsp: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetServiceRsp: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Service", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthGpm
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Service == nil {
-				m.Service = &v1.Service{}
-			}
-			if err := m.Service.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipGpm(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *GetServiceByNameReq) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowGpm
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: GetServiceByNameReq: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetServiceByNameReq: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
@@ -2124,7 +3969,7 @@ func (m *GetServiceByNameReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *GetServiceByNameRsp) Unmarshal(dAtA []byte) error {
+func (m *GetServiceRsp) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -2147,10 +3992,10 @@ func (m *GetServiceByNameRsp) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: GetServiceByNameRsp: wiretype end group for non-group")
+			return fmt.Errorf("proto: GetServiceRsp: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: GetServiceByNameRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: GetServiceRsp: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -2754,10 +4599,10 @@ func (m *StartServiceReq) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
-			m.Id = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -2767,11 +4612,24 @@ func (m *StartServiceReq) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= int64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGpm(dAtA[iNdEx:])
@@ -2909,10 +4767,10 @@ func (m *StopServiceReq) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
-			m.Id = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -2922,11 +4780,24 @@ func (m *StopServiceReq) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= int64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGpm(dAtA[iNdEx:])
@@ -3064,10 +4935,10 @@ func (m *RebootServiceReq) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
-			m.Id = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -3077,11 +4948,24 @@ func (m *RebootServiceReq) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= int64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGpm(dAtA[iNdEx:])
@@ -3219,10 +5103,10 @@ func (m *DeleteServiceReq) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Id", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
-			m.Id = 0
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -3232,11 +5116,24 @@ func (m *DeleteServiceReq) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Id |= int64(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipGpm(dAtA[iNdEx:])
@@ -3322,6 +5219,2826 @@ func (m *DeleteServiceRsp) Unmarshal(dAtA []byte) error {
 			if err := m.Service.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CatServiceLogReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CatServiceLogReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CatServiceLogReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CatServiceLogRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CatServiceLogRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CatServiceLogRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Text", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Text = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *WatchServiceLogReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: WatchServiceLogReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WatchServiceLogReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *WatchServiceLogRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: WatchServiceLogRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: WatchServiceLogRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Text", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Text = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *InstallServiceReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: InstallServiceReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: InstallServiceReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Bin", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Bin = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Args", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Args = append(m.Args, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Dir", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Dir = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Env == nil {
+				m.Env = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowGpm
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGpm
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthGpm
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGpm
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthGpm
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipGpm(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Env[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SysProcAttr", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.SysProcAttr == nil {
+				m.SysProcAttr = &v1.SysProcAttr{}
+			}
+			if err := m.SysProcAttr.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Log", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Log == nil {
+				m.Log = &v1.ProcLog{}
+			}
+			if err := m.Log.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Version", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Version = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AutoRestart", wireType)
+			}
+			m.AutoRestart = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.AutoRestart |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 21:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Package", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Package = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 22:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Total", wireType)
+			}
+			m.Total = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Total |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 23:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Chunk", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Chunk = append(m.Chunk[:0], dAtA[iNdEx:postIndex]...)
+			if m.Chunk == nil {
+				m.Chunk = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *InstallServiceRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: InstallServiceRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: InstallServiceRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Chunked", wireType)
+			}
+			m.Chunked = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Chunked |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Speed", wireType)
+			}
+			m.Speed = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Speed |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Msg", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Msg = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListServiceVersionsReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListServiceVersionsReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListServiceVersionsReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ListServiceVersionsRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ListServiceVersionsRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ListServiceVersionsRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Versions", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Versions = append(m.Versions, &v1.ServiceVersion{})
+			if err := m.Versions[len(m.Versions)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpgradeServiceReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpgradeServiceReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpgradeServiceReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Package", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Package = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 12:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Total", wireType)
+			}
+			m.Total = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Total |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Chunk", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Chunk = append(m.Chunk[:0], dAtA[iNdEx:postIndex]...)
+			if m.Chunk == nil {
+				m.Chunk = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *UpgradeServiceRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: UpgradeServiceRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: UpgradeServiceRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Chunked", wireType)
+			}
+			m.Chunked = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Chunked |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Speed", wireType)
+			}
+			m.Speed = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Speed |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Msg", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Msg = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RollbackServiceReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RollbackServiceReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RollbackServiceReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Revision", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Revision = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *RollbackServiceRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: RollbackServiceRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: RollbackServiceRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *LsReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: LsReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: LsReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Path", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Path = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *LsRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: LsRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: LsRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Files", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Files == nil {
+				m.Files = &v1.FileInfo{}
+			}
+			if err := m.Files.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PullReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PullReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PullReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Src", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Src = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Dst", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Dst = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PullRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PullRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PullRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Chunk", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Chunk = append(m.Chunk[:0], dAtA[iNdEx:postIndex]...)
+			if m.Chunk == nil {
+				m.Chunk = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PushReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PushReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PushReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Src", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Src = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Dst", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Dst = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Chunk", wireType)
+			}
+			var byteLen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				byteLen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if byteLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + byteLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Chunk = append(m.Chunk[:0], dAtA[iNdEx:postIndex]...)
+			if m.Chunk == nil {
+				m.Chunk = []byte{}
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PushRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PushRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PushRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ExecReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ExecReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ExecReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cmd", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Cmd = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Env == nil {
+				m.Env = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowGpm
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGpm
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthGpm
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGpm
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthGpm
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipGpm(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Env[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Uid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Gid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Gid = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ExecRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ExecRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ExecRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Out", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Out = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *TerminalReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: TerminalReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: TerminalReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cmd", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Cmd = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Env == nil {
+				m.Env = make(map[string]string)
+			}
+			var mapkey string
+			var mapvalue string
+			for iNdEx < postIndex {
+				entryPreIndex := iNdEx
+				var wire uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowGpm
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					wire |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				fieldNum := int32(wire >> 3)
+				if fieldNum == 1 {
+					var stringLenmapkey uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGpm
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapkey |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapkey := int(stringLenmapkey)
+					if intStringLenmapkey < 0 {
+						return ErrInvalidLengthGpm
+					}
+					postStringIndexmapkey := iNdEx + intStringLenmapkey
+					if postStringIndexmapkey < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if postStringIndexmapkey > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
+					iNdEx = postStringIndexmapkey
+				} else if fieldNum == 2 {
+					var stringLenmapvalue uint64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowGpm
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						stringLenmapvalue |= uint64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					intStringLenmapvalue := int(stringLenmapvalue)
+					if intStringLenmapvalue < 0 {
+						return ErrInvalidLengthGpm
+					}
+					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+					if postStringIndexmapvalue < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if postStringIndexmapvalue > l {
+						return io.ErrUnexpectedEOF
+					}
+					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
+					iNdEx = postStringIndexmapvalue
+				} else {
+					iNdEx = entryPreIndex
+					skippy, err := skipGpm(dAtA[iNdEx:])
+					if err != nil {
+						return err
+					}
+					if (skippy < 0) || (iNdEx+skippy) < 0 {
+						return ErrInvalidLengthGpm
+					}
+					if (iNdEx + skippy) > postIndex {
+						return io.ErrUnexpectedEOF
+					}
+					iNdEx += skippy
+				}
+			}
+			m.Env[mapkey] = mapvalue
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Exec", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Exec = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *TerminalRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: TerminalRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: TerminalRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Out", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Out = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3440,26 +8157,56 @@ type GpmServiceClient interface {
 	// +gen:get=/api/v1/Service/
 	ListService(ctx context.Context, in *ListServiceReq, opts ...grpc.CallOption) (*ListServiceRsp, error)
 	// +gen:summary=查询单个服务
-	// +gen:get=/api/v1/Service/{id}
-	GetService(ctx context.Context, in *GetServiceReq, opts ...grpc.CallOption) (*GetServiceRsp, error)
-	// +gen:summary=通过名称查询单个服务
 	// +gen:get=/api/v1/Service/{name}
-	GetServiceByName(ctx context.Context, in *GetServiceByNameReq, opts ...grpc.CallOption) (*GetServiceByNameRsp, error)
+	GetService(ctx context.Context, in *GetServiceReq, opts ...grpc.CallOption) (*GetServiceRsp, error)
 	// +gen:summary=新建服务
 	// +gen:post=/api/v1/Service/
 	CreateService(ctx context.Context, in *CreateServiceReq, opts ...grpc.CallOption) (*CreateServiceRsp, error)
 	// +gen:summary=启动服务
-	// +gen:patch=/api/v1/Service/{id}/action/start
+	// +gen:patch=/api/v1/Service/{name}/action/start
 	StartService(ctx context.Context, in *StartServiceReq, opts ...grpc.CallOption) (*StartServiceRsp, error)
 	// +gen:summary=停止服务
-	// +gen:patch=/api/v1/Service/{id}/action/stop
+	// +gen:patch=/api/v1/Service/{name}/action/stop
 	StopService(ctx context.Context, in *StopServiceReq, opts ...grpc.CallOption) (*StopServiceRsp, error)
 	// +gen:summary=重启服务
-	// +gen:patch=/api/v1/Service/{id}/action/reboot
+	// +gen:patch=/api/v1/Service/{name}/action/reboot
 	RebootService(ctx context.Context, in *RebootServiceReq, opts ...grpc.CallOption) (*RebootServiceRsp, error)
 	// +gen:summary=删除服务
-	// +gen:delete=/api/v1/Service/{id}
+	// +gen:delete=/api/v1/Service/{name}
 	DeleteService(ctx context.Context, in *DeleteServiceReq, opts ...grpc.CallOption) (*DeleteServiceRsp, error)
+	// +gen:summary=查看服务日志
+	// +gen:get=/api/v1/Service/{name}/logs
+	CatServiceLog(ctx context.Context, in *CatServiceLogReq, opts ...grpc.CallOption) (*CatServiceLogRsp, error)
+	// +gen:summary=动态监听服务日志
+	// +gen:post=/api/v1/Service/{name}/watchLogs
+	WatchServiceLog(ctx context.Context, in *WatchServiceLogReq, opts ...grpc.CallOption) (GpmService_WatchServiceLogClient, error)
+	// +gen:summary=远程安装服务
+	// +gen:post=/api/v1/Service/install
+	InstallService(ctx context.Context, opts ...grpc.CallOption) (GpmService_InstallServiceClient, error)
+	// +gen:summary=查看服务历史版本
+	// +gen:get=/api/v1/Service/{name}/versions
+	ListServiceVersions(ctx context.Context, in *ListServiceVersionsReq, opts ...grpc.CallOption) (*ListServiceVersionsRsp, error)
+	// +gen:summary=升级服务
+	// +gen:post=/api/v1/Service/{name}/upgrade
+	UpgradeService(ctx context.Context, opts ...grpc.CallOption) (GpmService_UpgradeServiceClient, error)
+	// +gen:summary=回滚服务
+	// +gen:post=/api/v1/Service/{name}/rollback
+	RollBackService(ctx context.Context, in *RollbackServiceReq, opts ...grpc.CallOption) (GpmService_RollBackServiceClient, error)
+	// +gen:summary=获取目录信息下文件列表
+	// +gen:get=/api/v1/Action/ls
+	Ls(ctx context.Context, in *LsReq, opts ...grpc.CallOption) (*LsRsp, error)
+	// +gen:summary=拉取文件
+	// +gen:post=/api/v1/Action/pull
+	Pull(ctx context.Context, in *PullReq, opts ...grpc.CallOption) (GpmService_PullClient, error)
+	// +gen:summary=推送文件
+	// +gen:post=/api/v1/Action/push
+	Push(ctx context.Context, opts ...grpc.CallOption) (GpmService_PushClient, error)
+	// +gen:summary=远程执行命令
+	// +gen:post=/api/v1/Action/exec
+	Exec(ctx context.Context, in *ExecReq, opts ...grpc.CallOption) (*ExecRsp, error)
+	// +gen:summary=远程命令行交互
+	// +gen:post=/api/v1/Action/terminal
+	Terminal(ctx context.Context, opts ...grpc.CallOption) (GpmService_TerminalClient, error)
 }
 
 type gpmServiceClient struct {
@@ -3491,15 +8238,6 @@ func (c *gpmServiceClient) ListService(ctx context.Context, in *ListServiceReq, 
 func (c *gpmServiceClient) GetService(ctx context.Context, in *GetServiceReq, opts ...grpc.CallOption) (*GetServiceRsp, error) {
 	out := new(GetServiceRsp)
 	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/GetService", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gpmServiceClient) GetServiceByName(ctx context.Context, in *GetServiceByNameReq, opts ...grpc.CallOption) (*GetServiceByNameRsp, error) {
-	out := new(GetServiceByNameRsp)
-	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/GetServiceByName", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -3551,6 +8289,265 @@ func (c *gpmServiceClient) DeleteService(ctx context.Context, in *DeleteServiceR
 	return out, nil
 }
 
+func (c *gpmServiceClient) CatServiceLog(ctx context.Context, in *CatServiceLogReq, opts ...grpc.CallOption) (*CatServiceLogRsp, error) {
+	out := new(CatServiceLogRsp)
+	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/CatServiceLog", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gpmServiceClient) WatchServiceLog(ctx context.Context, in *WatchServiceLogReq, opts ...grpc.CallOption) (GpmService_WatchServiceLogClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_GpmService_serviceDesc.Streams[0], "/gpmv1.GpmService/WatchServiceLog", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &gpmServiceWatchServiceLogClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type GpmService_WatchServiceLogClient interface {
+	Recv() (*WatchServiceLogRsp, error)
+	grpc.ClientStream
+}
+
+type gpmServiceWatchServiceLogClient struct {
+	grpc.ClientStream
+}
+
+func (x *gpmServiceWatchServiceLogClient) Recv() (*WatchServiceLogRsp, error) {
+	m := new(WatchServiceLogRsp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *gpmServiceClient) InstallService(ctx context.Context, opts ...grpc.CallOption) (GpmService_InstallServiceClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_GpmService_serviceDesc.Streams[1], "/gpmv1.GpmService/InstallService", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &gpmServiceInstallServiceClient{stream}
+	return x, nil
+}
+
+type GpmService_InstallServiceClient interface {
+	Send(*InstallServiceReq) error
+	Recv() (*InstallServiceRsp, error)
+	grpc.ClientStream
+}
+
+type gpmServiceInstallServiceClient struct {
+	grpc.ClientStream
+}
+
+func (x *gpmServiceInstallServiceClient) Send(m *InstallServiceReq) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *gpmServiceInstallServiceClient) Recv() (*InstallServiceRsp, error) {
+	m := new(InstallServiceRsp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *gpmServiceClient) ListServiceVersions(ctx context.Context, in *ListServiceVersionsReq, opts ...grpc.CallOption) (*ListServiceVersionsRsp, error) {
+	out := new(ListServiceVersionsRsp)
+	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/ListServiceVersions", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gpmServiceClient) UpgradeService(ctx context.Context, opts ...grpc.CallOption) (GpmService_UpgradeServiceClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_GpmService_serviceDesc.Streams[2], "/gpmv1.GpmService/UpgradeService", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &gpmServiceUpgradeServiceClient{stream}
+	return x, nil
+}
+
+type GpmService_UpgradeServiceClient interface {
+	Send(*UpgradeServiceReq) error
+	Recv() (*UpgradeServiceRsp, error)
+	grpc.ClientStream
+}
+
+type gpmServiceUpgradeServiceClient struct {
+	grpc.ClientStream
+}
+
+func (x *gpmServiceUpgradeServiceClient) Send(m *UpgradeServiceReq) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *gpmServiceUpgradeServiceClient) Recv() (*UpgradeServiceRsp, error) {
+	m := new(UpgradeServiceRsp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *gpmServiceClient) RollBackService(ctx context.Context, in *RollbackServiceReq, opts ...grpc.CallOption) (GpmService_RollBackServiceClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_GpmService_serviceDesc.Streams[3], "/gpmv1.GpmService/RollBackService", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &gpmServiceRollBackServiceClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type GpmService_RollBackServiceClient interface {
+	Recv() (*RollbackServiceRsp, error)
+	grpc.ClientStream
+}
+
+type gpmServiceRollBackServiceClient struct {
+	grpc.ClientStream
+}
+
+func (x *gpmServiceRollBackServiceClient) Recv() (*RollbackServiceRsp, error) {
+	m := new(RollbackServiceRsp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *gpmServiceClient) Ls(ctx context.Context, in *LsReq, opts ...grpc.CallOption) (*LsRsp, error) {
+	out := new(LsRsp)
+	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/Ls", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gpmServiceClient) Pull(ctx context.Context, in *PullReq, opts ...grpc.CallOption) (GpmService_PullClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_GpmService_serviceDesc.Streams[4], "/gpmv1.GpmService/Pull", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &gpmServicePullClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type GpmService_PullClient interface {
+	Recv() (*PullRsp, error)
+	grpc.ClientStream
+}
+
+type gpmServicePullClient struct {
+	grpc.ClientStream
+}
+
+func (x *gpmServicePullClient) Recv() (*PullRsp, error) {
+	m := new(PullRsp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *gpmServiceClient) Push(ctx context.Context, opts ...grpc.CallOption) (GpmService_PushClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_GpmService_serviceDesc.Streams[5], "/gpmv1.GpmService/Push", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &gpmServicePushClient{stream}
+	return x, nil
+}
+
+type GpmService_PushClient interface {
+	Send(*PushReq) error
+	CloseAndRecv() (*PushRsp, error)
+	grpc.ClientStream
+}
+
+type gpmServicePushClient struct {
+	grpc.ClientStream
+}
+
+func (x *gpmServicePushClient) Send(m *PushReq) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *gpmServicePushClient) CloseAndRecv() (*PushRsp, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(PushRsp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *gpmServiceClient) Exec(ctx context.Context, in *ExecReq, opts ...grpc.CallOption) (*ExecRsp, error) {
+	out := new(ExecRsp)
+	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/Exec", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gpmServiceClient) Terminal(ctx context.Context, opts ...grpc.CallOption) (GpmService_TerminalClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_GpmService_serviceDesc.Streams[6], "/gpmv1.GpmService/Terminal", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &gpmServiceTerminalClient{stream}
+	return x, nil
+}
+
+type GpmService_TerminalClient interface {
+	Send(*TerminalReq) error
+	Recv() (*TerminalRsp, error)
+	grpc.ClientStream
+}
+
+type gpmServiceTerminalClient struct {
+	grpc.ClientStream
+}
+
+func (x *gpmServiceTerminalClient) Send(m *TerminalReq) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *gpmServiceTerminalClient) Recv() (*TerminalRsp, error) {
+	m := new(TerminalRsp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // GpmServiceServer is the server API for GpmService service.
 type GpmServiceServer interface {
 	// +gne:summary=gpm 检测 gpm 服务状态
@@ -3560,26 +8557,56 @@ type GpmServiceServer interface {
 	// +gen:get=/api/v1/Service/
 	ListService(context.Context, *ListServiceReq) (*ListServiceRsp, error)
 	// +gen:summary=查询单个服务
-	// +gen:get=/api/v1/Service/{id}
-	GetService(context.Context, *GetServiceReq) (*GetServiceRsp, error)
-	// +gen:summary=通过名称查询单个服务
 	// +gen:get=/api/v1/Service/{name}
-	GetServiceByName(context.Context, *GetServiceByNameReq) (*GetServiceByNameRsp, error)
+	GetService(context.Context, *GetServiceReq) (*GetServiceRsp, error)
 	// +gen:summary=新建服务
 	// +gen:post=/api/v1/Service/
 	CreateService(context.Context, *CreateServiceReq) (*CreateServiceRsp, error)
 	// +gen:summary=启动服务
-	// +gen:patch=/api/v1/Service/{id}/action/start
+	// +gen:patch=/api/v1/Service/{name}/action/start
 	StartService(context.Context, *StartServiceReq) (*StartServiceRsp, error)
 	// +gen:summary=停止服务
-	// +gen:patch=/api/v1/Service/{id}/action/stop
+	// +gen:patch=/api/v1/Service/{name}/action/stop
 	StopService(context.Context, *StopServiceReq) (*StopServiceRsp, error)
 	// +gen:summary=重启服务
-	// +gen:patch=/api/v1/Service/{id}/action/reboot
+	// +gen:patch=/api/v1/Service/{name}/action/reboot
 	RebootService(context.Context, *RebootServiceReq) (*RebootServiceRsp, error)
 	// +gen:summary=删除服务
-	// +gen:delete=/api/v1/Service/{id}
+	// +gen:delete=/api/v1/Service/{name}
 	DeleteService(context.Context, *DeleteServiceReq) (*DeleteServiceRsp, error)
+	// +gen:summary=查看服务日志
+	// +gen:get=/api/v1/Service/{name}/logs
+	CatServiceLog(context.Context, *CatServiceLogReq) (*CatServiceLogRsp, error)
+	// +gen:summary=动态监听服务日志
+	// +gen:post=/api/v1/Service/{name}/watchLogs
+	WatchServiceLog(*WatchServiceLogReq, GpmService_WatchServiceLogServer) error
+	// +gen:summary=远程安装服务
+	// +gen:post=/api/v1/Service/install
+	InstallService(GpmService_InstallServiceServer) error
+	// +gen:summary=查看服务历史版本
+	// +gen:get=/api/v1/Service/{name}/versions
+	ListServiceVersions(context.Context, *ListServiceVersionsReq) (*ListServiceVersionsRsp, error)
+	// +gen:summary=升级服务
+	// +gen:post=/api/v1/Service/{name}/upgrade
+	UpgradeService(GpmService_UpgradeServiceServer) error
+	// +gen:summary=回滚服务
+	// +gen:post=/api/v1/Service/{name}/rollback
+	RollBackService(*RollbackServiceReq, GpmService_RollBackServiceServer) error
+	// +gen:summary=获取目录信息下文件列表
+	// +gen:get=/api/v1/Action/ls
+	Ls(context.Context, *LsReq) (*LsRsp, error)
+	// +gen:summary=拉取文件
+	// +gen:post=/api/v1/Action/pull
+	Pull(*PullReq, GpmService_PullServer) error
+	// +gen:summary=推送文件
+	// +gen:post=/api/v1/Action/push
+	Push(GpmService_PushServer) error
+	// +gen:summary=远程执行命令
+	// +gen:post=/api/v1/Action/exec
+	Exec(context.Context, *ExecReq) (*ExecRsp, error)
+	// +gen:summary=远程命令行交互
+	// +gen:post=/api/v1/Action/terminal
+	Terminal(GpmService_TerminalServer) error
 }
 
 // UnimplementedGpmServiceServer can be embedded to have forward compatible implementations.
@@ -3595,9 +8622,6 @@ func (*UnimplementedGpmServiceServer) ListService(ctx context.Context, req *List
 func (*UnimplementedGpmServiceServer) GetService(ctx context.Context, req *GetServiceReq) (*GetServiceRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetService not implemented")
 }
-func (*UnimplementedGpmServiceServer) GetServiceByName(ctx context.Context, req *GetServiceByNameReq) (*GetServiceByNameRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetServiceByName not implemented")
-}
 func (*UnimplementedGpmServiceServer) CreateService(ctx context.Context, req *CreateServiceReq) (*CreateServiceRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateService not implemented")
 }
@@ -3612,6 +8636,39 @@ func (*UnimplementedGpmServiceServer) RebootService(ctx context.Context, req *Re
 }
 func (*UnimplementedGpmServiceServer) DeleteService(ctx context.Context, req *DeleteServiceReq) (*DeleteServiceRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteService not implemented")
+}
+func (*UnimplementedGpmServiceServer) CatServiceLog(ctx context.Context, req *CatServiceLogReq) (*CatServiceLogRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CatServiceLog not implemented")
+}
+func (*UnimplementedGpmServiceServer) WatchServiceLog(req *WatchServiceLogReq, srv GpmService_WatchServiceLogServer) error {
+	return status.Errorf(codes.Unimplemented, "method WatchServiceLog not implemented")
+}
+func (*UnimplementedGpmServiceServer) InstallService(srv GpmService_InstallServiceServer) error {
+	return status.Errorf(codes.Unimplemented, "method InstallService not implemented")
+}
+func (*UnimplementedGpmServiceServer) ListServiceVersions(ctx context.Context, req *ListServiceVersionsReq) (*ListServiceVersionsRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListServiceVersions not implemented")
+}
+func (*UnimplementedGpmServiceServer) UpgradeService(srv GpmService_UpgradeServiceServer) error {
+	return status.Errorf(codes.Unimplemented, "method UpgradeService not implemented")
+}
+func (*UnimplementedGpmServiceServer) RollBackService(req *RollbackServiceReq, srv GpmService_RollBackServiceServer) error {
+	return status.Errorf(codes.Unimplemented, "method RollBackService not implemented")
+}
+func (*UnimplementedGpmServiceServer) Ls(ctx context.Context, req *LsReq) (*LsRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Ls not implemented")
+}
+func (*UnimplementedGpmServiceServer) Pull(req *PullReq, srv GpmService_PullServer) error {
+	return status.Errorf(codes.Unimplemented, "method Pull not implemented")
+}
+func (*UnimplementedGpmServiceServer) Push(srv GpmService_PushServer) error {
+	return status.Errorf(codes.Unimplemented, "method Push not implemented")
+}
+func (*UnimplementedGpmServiceServer) Exec(ctx context.Context, req *ExecReq) (*ExecRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Exec not implemented")
+}
+func (*UnimplementedGpmServiceServer) Terminal(srv GpmService_TerminalServer) error {
+	return status.Errorf(codes.Unimplemented, "method Terminal not implemented")
 }
 
 func RegisterGpmServiceServer(s *grpc.Server, srv GpmServiceServer) {
@@ -3668,24 +8725,6 @@ func _GpmService_GetService_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GpmServiceServer).GetService(ctx, req.(*GetServiceReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _GpmService_GetServiceByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetServiceByNameReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GpmServiceServer).GetServiceByName(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gpmv1.GpmService/GetServiceByName",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GpmServiceServer).GetServiceByName(ctx, req.(*GetServiceByNameReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -3780,6 +8819,245 @@ func _GpmService_DeleteService_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GpmService_CatServiceLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CatServiceLogReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GpmServiceServer).CatServiceLog(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gpmv1.GpmService/CatServiceLog",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GpmServiceServer).CatServiceLog(ctx, req.(*CatServiceLogReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GpmService_WatchServiceLog_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(WatchServiceLogReq)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GpmServiceServer).WatchServiceLog(m, &gpmServiceWatchServiceLogServer{stream})
+}
+
+type GpmService_WatchServiceLogServer interface {
+	Send(*WatchServiceLogRsp) error
+	grpc.ServerStream
+}
+
+type gpmServiceWatchServiceLogServer struct {
+	grpc.ServerStream
+}
+
+func (x *gpmServiceWatchServiceLogServer) Send(m *WatchServiceLogRsp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _GpmService_InstallService_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GpmServiceServer).InstallService(&gpmServiceInstallServiceServer{stream})
+}
+
+type GpmService_InstallServiceServer interface {
+	Send(*InstallServiceRsp) error
+	Recv() (*InstallServiceReq, error)
+	grpc.ServerStream
+}
+
+type gpmServiceInstallServiceServer struct {
+	grpc.ServerStream
+}
+
+func (x *gpmServiceInstallServiceServer) Send(m *InstallServiceRsp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *gpmServiceInstallServiceServer) Recv() (*InstallServiceReq, error) {
+	m := new(InstallServiceReq)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _GpmService_ListServiceVersions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListServiceVersionsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GpmServiceServer).ListServiceVersions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gpmv1.GpmService/ListServiceVersions",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GpmServiceServer).ListServiceVersions(ctx, req.(*ListServiceVersionsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GpmService_UpgradeService_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GpmServiceServer).UpgradeService(&gpmServiceUpgradeServiceServer{stream})
+}
+
+type GpmService_UpgradeServiceServer interface {
+	Send(*UpgradeServiceRsp) error
+	Recv() (*UpgradeServiceReq, error)
+	grpc.ServerStream
+}
+
+type gpmServiceUpgradeServiceServer struct {
+	grpc.ServerStream
+}
+
+func (x *gpmServiceUpgradeServiceServer) Send(m *UpgradeServiceRsp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *gpmServiceUpgradeServiceServer) Recv() (*UpgradeServiceReq, error) {
+	m := new(UpgradeServiceReq)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _GpmService_RollBackService_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(RollbackServiceReq)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GpmServiceServer).RollBackService(m, &gpmServiceRollBackServiceServer{stream})
+}
+
+type GpmService_RollBackServiceServer interface {
+	Send(*RollbackServiceRsp) error
+	grpc.ServerStream
+}
+
+type gpmServiceRollBackServiceServer struct {
+	grpc.ServerStream
+}
+
+func (x *gpmServiceRollBackServiceServer) Send(m *RollbackServiceRsp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _GpmService_Ls_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GpmServiceServer).Ls(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gpmv1.GpmService/Ls",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GpmServiceServer).Ls(ctx, req.(*LsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GpmService_Pull_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(PullReq)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(GpmServiceServer).Pull(m, &gpmServicePullServer{stream})
+}
+
+type GpmService_PullServer interface {
+	Send(*PullRsp) error
+	grpc.ServerStream
+}
+
+type gpmServicePullServer struct {
+	grpc.ServerStream
+}
+
+func (x *gpmServicePullServer) Send(m *PullRsp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _GpmService_Push_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GpmServiceServer).Push(&gpmServicePushServer{stream})
+}
+
+type GpmService_PushServer interface {
+	SendAndClose(*PushRsp) error
+	Recv() (*PushReq, error)
+	grpc.ServerStream
+}
+
+type gpmServicePushServer struct {
+	grpc.ServerStream
+}
+
+func (x *gpmServicePushServer) SendAndClose(m *PushRsp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *gpmServicePushServer) Recv() (*PushReq, error) {
+	m := new(PushReq)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _GpmService_Exec_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExecReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GpmServiceServer).Exec(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gpmv1.GpmService/Exec",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GpmServiceServer).Exec(ctx, req.(*ExecReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GpmService_Terminal_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GpmServiceServer).Terminal(&gpmServiceTerminalServer{stream})
+}
+
+type GpmService_TerminalServer interface {
+	Send(*TerminalRsp) error
+	Recv() (*TerminalReq, error)
+	grpc.ServerStream
+}
+
+type gpmServiceTerminalServer struct {
+	grpc.ServerStream
+}
+
+func (x *gpmServiceTerminalServer) Send(m *TerminalRsp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *gpmServiceTerminalServer) Recv() (*TerminalReq, error) {
+	m := new(TerminalReq)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 var _GpmService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "gpmv1.GpmService",
 	HandlerType: (*GpmServiceServer)(nil),
@@ -3795,10 +9073,6 @@ var _GpmService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetService",
 			Handler:    _GpmService_GetService_Handler,
-		},
-		{
-			MethodName: "GetServiceByName",
-			Handler:    _GpmService_GetServiceByName_Handler,
 		},
 		{
 			MethodName: "CreateService",
@@ -3820,7 +9094,62 @@ var _GpmService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteService",
 			Handler:    _GpmService_DeleteService_Handler,
 		},
+		{
+			MethodName: "CatServiceLog",
+			Handler:    _GpmService_CatServiceLog_Handler,
+		},
+		{
+			MethodName: "ListServiceVersions",
+			Handler:    _GpmService_ListServiceVersions_Handler,
+		},
+		{
+			MethodName: "Ls",
+			Handler:    _GpmService_Ls_Handler,
+		},
+		{
+			MethodName: "Exec",
+			Handler:    _GpmService_Exec_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "WatchServiceLog",
+			Handler:       _GpmService_WatchServiceLog_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "InstallService",
+			Handler:       _GpmService_InstallService_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "UpgradeService",
+			Handler:       _GpmService_UpgradeService_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "RollBackService",
+			Handler:       _GpmService_RollBackService_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "Pull",
+			Handler:       _GpmService_Pull_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "Push",
+			Handler:       _GpmService_Push_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "Terminal",
+			Handler:       _GpmService_Terminal_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "github.com/gpm2/gpm/proto/service/gpm/v1/gpm.proto",
 }

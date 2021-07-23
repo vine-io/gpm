@@ -1,4 +1,3 @@
-// +dao:output=github.com/gpm2/gpm/pkg/dao;dao
 syntax = "proto3";
 package gpmv1;
 
@@ -67,15 +66,24 @@ message Stat {
   float memPercent = 3;
 }
 
-message Event {
-  // 事件类型
-  string kind = 1;
-  // 事件描述
-  string desc = 2;
-  // 触发时间
-  int64 timestamp = 3;
+message GpmInfo {
+  string version = 1;
+  string gitCommit = 2;
+  int64 buildTime = 3;
+  string goos = 4;
+  string arch = 5;
+  string gov = 6;
 }
 
-message Package {
+message ServiceVersion {
+  string name = 1;
+  string timestamp = 2;
+}
 
+message FileInfo {
+  string name = 1;
+  int64 size = 2;
+  string mode = 3;
+  int64 modTime = 4;
+  bool IsDir = 5;
 }

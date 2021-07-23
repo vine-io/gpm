@@ -58,7 +58,7 @@ func main() {
 	//
 	//fmt.Println(rsp.Service)
 
-	rsp, err := cc.StopService(ctx, &pb.StopServiceReq{Id: 1}, client.WithRetries(0))
+	rsp, err := cc.StopService(ctx, &pb.StopServiceReq{Name: "test"}, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}

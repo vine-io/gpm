@@ -37,22 +37,6 @@ func (m *ListServiceReq) Validate() error {
 
 func (m *ListServiceReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if int64(m.Page) == 0 {
-		m.Page = 1
-	}
-	if int64(m.Page) != 0 {
-		if !(m.Page > 0) {
-			errs = append(errs, fmt.Errorf("field '%spage' must great than '0'", prefix))
-		}
-	}
-	if int64(m.Size) == 0 {
-		m.Size = 10
-	}
-	if int64(m.Size) != 0 {
-		if !(m.Size > 0) {
-			errs = append(errs, fmt.Errorf("field '%ssize' must great than '0'", prefix))
-		}
-	}
 	return is.MargeErr(errs...)
 }
 
@@ -71,8 +55,8 @@ func (m *GetServiceReq) Validate() error {
 
 func (m *GetServiceReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if int64(m.Id) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sid' is required", prefix))
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
 	}
 	return is.MargeErr(errs...)
 }
@@ -82,27 +66,6 @@ func (m *GetServiceRsp) Validate() error {
 }
 
 func (m *GetServiceRsp) ValidateE(prefix string) error {
-	errs := make([]error, 0)
-	return is.MargeErr(errs...)
-}
-
-func (m *GetServiceByNameReq) Validate() error {
-	return m.ValidateE("")
-}
-
-func (m *GetServiceByNameReq) ValidateE(prefix string) error {
-	errs := make([]error, 0)
-	if len(m.Name) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
-	}
-	return is.MargeErr(errs...)
-}
-
-func (m *GetServiceByNameRsp) Validate() error {
-	return m.ValidateE("")
-}
-
-func (m *GetServiceByNameRsp) ValidateE(prefix string) error {
 	errs := make([]error, 0)
 	return is.MargeErr(errs...)
 }
@@ -137,8 +100,8 @@ func (m *StartServiceReq) Validate() error {
 
 func (m *StartServiceReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if int64(m.Id) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sid' is required", prefix))
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
 	}
 	return is.MargeErr(errs...)
 }
@@ -158,8 +121,8 @@ func (m *StopServiceReq) Validate() error {
 
 func (m *StopServiceReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if int64(m.Id) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sid' is required", prefix))
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
 	}
 	return is.MargeErr(errs...)
 }
@@ -179,8 +142,8 @@ func (m *RebootServiceReq) Validate() error {
 
 func (m *RebootServiceReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if int64(m.Id) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sid' is required", prefix))
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
 	}
 	return is.MargeErr(errs...)
 }
@@ -200,8 +163,8 @@ func (m *DeleteServiceReq) Validate() error {
 
 func (m *DeleteServiceReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if int64(m.Id) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sid' is required", prefix))
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
 	}
 	return is.MargeErr(errs...)
 }
@@ -211,6 +174,253 @@ func (m *DeleteServiceRsp) Validate() error {
 }
 
 func (m *DeleteServiceRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *CatServiceLogReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *CatServiceLogReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *CatServiceLogRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *CatServiceLogRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *WatchServiceLogReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *WatchServiceLogReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *WatchServiceLogRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *WatchServiceLogRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *InstallServiceReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *InstallServiceReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	if len(m.Bin) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sbin' is required", prefix))
+	}
+	if len(m.Package) == 0 {
+		errs = append(errs, fmt.Errorf("field '%spackage' is required", prefix))
+	}
+	if int64(m.Total) == 0 {
+		errs = append(errs, fmt.Errorf("field '%stotal' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *InstallServiceRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *InstallServiceRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *ListServiceVersionsReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ListServiceVersionsReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *ListServiceVersionsRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ListServiceVersionsRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *UpgradeServiceReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *UpgradeServiceReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	if len(m.Package) == 0 {
+		errs = append(errs, fmt.Errorf("field '%spackage' is required", prefix))
+	}
+	if int64(m.Total) == 0 {
+		errs = append(errs, fmt.Errorf("field '%stotal' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *UpgradeServiceRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *UpgradeServiceRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *RollbackServiceReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *RollbackServiceReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *RollbackServiceRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *RollbackServiceRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *LsReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *LsReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Path) == 0 {
+		errs = append(errs, fmt.Errorf("field '%spath' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *LsRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *LsRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *PullReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *PullReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *PullRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *PullRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *PushReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *PushReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *PushRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *PushRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *ExecReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ExecReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Cmd) == 0 {
+		errs = append(errs, fmt.Errorf("field '%scmd' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *ExecRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ExecRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *TerminalReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *TerminalReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Cmd) == 0 {
+		errs = append(errs, fmt.Errorf("field '%scmd' is required", prefix))
+	}
+	if len(m.Exec) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sexec' is required", prefix))
+	} else {
+		if !is.In([]string{"sh", "bash", "zsh"}, string(m.Exec)) {
+			errs = append(errs, fmt.Errorf("field '%sexec' must in '[sh,bash,zsh]'", prefix))
+		}
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *TerminalRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *TerminalRsp) ValidateE(prefix string) error {
 	errs := make([]error, 0)
 	return is.MargeErr(errs...)
 }

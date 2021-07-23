@@ -27,8 +27,6 @@ func (m *Service) Validate() error {
 
 func (m *Service) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if int64(m.Id) != 0 {
-	}
 	if len(m.Name) == 0 {
 		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
 	}
@@ -70,36 +68,29 @@ func (m *Stat) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
-func (m *PageMeta) Validate() error {
+func (m *GpmInfo) Validate() error {
 	return m.ValidateE("")
 }
 
-func (m *PageMeta) ValidateE(prefix string) error {
+func (m *GpmInfo) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if int64(m.Page) == 0 {
-		m.Page = 1
-	}
-	if int64(m.Page) != 0 {
-		if !(m.Page > 0) {
-			errs = append(errs, fmt.Errorf("field '%spage' must great than '0'", prefix))
-		}
-	}
-	if int64(m.Size) == 0 {
-		m.Size = 10
-	}
-	if int64(m.Size) != 0 {
-		if !(m.Size > 0) {
-			errs = append(errs, fmt.Errorf("field '%ssize' must great than '0'", prefix))
-		}
-	}
 	return is.MargeErr(errs...)
 }
 
-func (m *Event) Validate() error {
+func (m *ServiceVersion) Validate() error {
 	return m.ValidateE("")
 }
 
-func (m *Event) ValidateE(prefix string) error {
+func (m *ServiceVersion) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *FileInfo) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *FileInfo) ValidateE(prefix string) error {
 	errs := make([]error, 0)
 	return is.MargeErr(errs...)
 }
