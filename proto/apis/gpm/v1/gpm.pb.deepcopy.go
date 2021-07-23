@@ -81,3 +81,62 @@ func (in *ServiceVersion) DeepCopyInto(out *ServiceVersion) {
 func (in *FileInfo) DeepCopyInto(out *FileInfo) {
 	*out = *in
 }
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *ExecIn) DeepCopyInto(out *ExecIn) {
+	*out = *in
+	if in.Args != nil {
+		in, out := &in.Args, &out.Args
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
+	if in.Env != nil {
+		in, out := &in.Env, &out.Env
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *ExecResult) DeepCopyInto(out *ExecResult) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *PullResult) DeepCopyInto(out *PullResult) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *PushIn) DeepCopyInto(out *PushIn) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *PushResult) DeepCopyInto(out *PushResult) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *TerminalIn) DeepCopyInto(out *TerminalIn) {
+	*out = *in
+	if in.Args != nil {
+		in, out := &in.Args, &out.Args
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
+	if in.Env != nil {
+		in, out := &in.Env, &out.Env
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *TerminalResult) DeepCopyInto(out *TerminalResult) {
+	*out = *in
+}

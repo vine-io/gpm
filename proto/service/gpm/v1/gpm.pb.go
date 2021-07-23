@@ -646,7 +646,7 @@ func (m *CatServiceLogReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_CatServiceLogReq proto.InternalMessageInfo
 
 type CatServiceLogRsp struct {
-	Text string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	Text []byte `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
 }
 
 func (m *CatServiceLogRsp) Reset()         { *m = CatServiceLogRsp{} }
@@ -721,7 +721,7 @@ func (m *WatchServiceLogReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_WatchServiceLogReq proto.InternalMessageInfo
 
 type WatchServiceLogRsp struct {
-	Text string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
+	Log *v1.ProcLog `protobuf:"bytes,1,opt,name=log,proto3" json:"log,omitempty"`
 }
 
 func (m *WatchServiceLogRsp) Reset()         { *m = WatchServiceLogRsp{} }
@@ -1129,7 +1129,7 @@ func (m *LsReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_LsReq proto.InternalMessageInfo
 
 type LsRsp struct {
-	Files *v1.FileInfo `protobuf:"bytes,1,opt,name=files,proto3" json:"files,omitempty"`
+	Files []*v1.FileInfo `protobuf:"bytes,1,rep,name=files,proto3" json:"files,omitempty"`
 }
 
 func (m *LsRsp) Reset()         { *m = LsRsp{} }
@@ -1166,8 +1166,7 @@ func (m *LsRsp) XXX_DiscardUnknown() {
 var xxx_messageInfo_LsRsp proto.InternalMessageInfo
 
 type PullReq struct {
-	Src string `protobuf:"bytes,1,opt,name=src,proto3" json:"src,omitempty"`
-	Dst string `protobuf:"bytes,2,opt,name=dst,proto3" json:"dst,omitempty"`
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 }
 
 func (m *PullReq) Reset()         { *m = PullReq{} }
@@ -1204,7 +1203,7 @@ func (m *PullReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_PullReq proto.InternalMessageInfo
 
 type PullRsp struct {
-	Chunk []byte `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk,omitempty"`
+	Result *v1.PullResult `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
 }
 
 func (m *PullRsp) Reset()         { *m = PullRsp{} }
@@ -1241,9 +1240,7 @@ func (m *PullRsp) XXX_DiscardUnknown() {
 var xxx_messageInfo_PullRsp proto.InternalMessageInfo
 
 type PushReq struct {
-	Src   string `protobuf:"bytes,1,opt,name=src,proto3" json:"src,omitempty"`
-	Dst   string `protobuf:"bytes,2,opt,name=dst,proto3" json:"dst,omitempty"`
-	Chunk []byte `protobuf:"bytes,3,opt,name=chunk,proto3" json:"chunk,omitempty"`
+	In *v1.PushIn `protobuf:"bytes,1,opt,name=in,proto3" json:"in,omitempty"`
 }
 
 func (m *PushReq) Reset()         { *m = PushReq{} }
@@ -1317,10 +1314,7 @@ var xxx_messageInfo_PushRsp proto.InternalMessageInfo
 
 type ExecReq struct {
 	// +gen:required
-	Cmd string            `protobuf:"bytes,1,opt,name=cmd,proto3" json:"cmd,omitempty"`
-	Env map[string]string `protobuf:"bytes,2,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	Uid string            `protobuf:"bytes,3,opt,name=uid,proto3" json:"uid,omitempty"`
-	Gid string            `protobuf:"bytes,4,opt,name=gid,proto3" json:"gid,omitempty"`
+	In *v1.ExecIn `protobuf:"bytes,1,opt,name=in,proto3" json:"in,omitempty"`
 }
 
 func (m *ExecReq) Reset()         { *m = ExecReq{} }
@@ -1357,7 +1351,7 @@ func (m *ExecReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_ExecReq proto.InternalMessageInfo
 
 type ExecRsp struct {
-	Out string `protobuf:"bytes,1,opt,name=out,proto3" json:"out,omitempty"`
+	Result *v1.ExecResult `protobuf:"bytes,1,opt,name=result,proto3" json:"result,omitempty"`
 }
 
 func (m *ExecRsp) Reset()         { *m = ExecRsp{} }
@@ -1395,11 +1389,7 @@ var xxx_messageInfo_ExecRsp proto.InternalMessageInfo
 
 type TerminalReq struct {
 	// +gen:required
-	Cmd string            `protobuf:"bytes,1,opt,name=cmd,proto3" json:"cmd,omitempty"`
-	Env map[string]string `protobuf:"bytes,2,rep,name=env,proto3" json:"env,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	// +gen:required
-	// +gen:enum=[sh,bash,zsh]
-	Exec string `protobuf:"bytes,3,opt,name=exec,proto3" json:"exec,omitempty"`
+	In *v1.TerminalIn `protobuf:"bytes,1,opt,name=in,proto3" json:"in,omitempty"`
 }
 
 func (m *TerminalReq) Reset()         { *m = TerminalReq{} }
@@ -1436,7 +1426,7 @@ func (m *TerminalReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_TerminalReq proto.InternalMessageInfo
 
 type TerminalRsp struct {
-	Out string `protobuf:"bytes,1,opt,name=out,proto3" json:"out,omitempty"`
+	Result *v1.TerminalResult `protobuf:"bytes,2,opt,name=result,proto3" json:"result,omitempty"`
 }
 
 func (m *TerminalRsp) Reset()         { *m = TerminalRsp{} }
@@ -1509,10 +1499,8 @@ func init() {
 	proto.RegisterType((*PushReq)(nil), "gpmv1.PushReq")
 	proto.RegisterType((*PushRsp)(nil), "gpmv1.PushRsp")
 	proto.RegisterType((*ExecReq)(nil), "gpmv1.ExecReq")
-	proto.RegisterMapType((map[string]string)(nil), "gpmv1.ExecReq.EnvEntry")
 	proto.RegisterType((*ExecRsp)(nil), "gpmv1.ExecRsp")
 	proto.RegisterType((*TerminalReq)(nil), "gpmv1.TerminalReq")
-	proto.RegisterMapType((map[string]string)(nil), "gpmv1.TerminalReq.EnvEntry")
 	proto.RegisterType((*TerminalRsp)(nil), "gpmv1.TerminalRsp")
 }
 
@@ -1521,83 +1509,80 @@ func init() {
 }
 
 var fileDescriptor_9386d4f8a96ae2d2 = []byte{
-	// 1203 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x57, 0xcf, 0x6f, 0xdb, 0xb6,
-	0x17, 0x8f, 0xa2, 0xb8, 0x76, 0x9e, 0xf3, 0xc3, 0xe5, 0x37, 0x4d, 0xf4, 0x65, 0x30, 0xd7, 0xd3,
-	0x96, 0xc2, 0x1b, 0x56, 0xa7, 0x49, 0x87, 0xa2, 0x6b, 0x8a, 0x01, 0x6d, 0x9a, 0xb5, 0xc1, 0x72,
-	0x28, 0x94, 0x75, 0x03, 0x76, 0x53, 0x64, 0x56, 0x16, 0x22, 0x59, 0x9c, 0x48, 0x1b, 0xc9, 0xfe,
-	0x82, 0x1d, 0x77, 0xde, 0x71, 0x87, 0xfd, 0x2d, 0x3d, 0xf6, 0xb8, 0xd3, 0xb0, 0x25, 0xff, 0xc8,
-	0x40, 0x8a, 0xb4, 0x25, 0x4b, 0xae, 0x9b, 0x60, 0x03, 0x76, 0x49, 0xf8, 0xf8, 0x3e, 0x7a, 0xbf,
-	0x48, 0xbe, 0xf7, 0x31, 0xec, 0xfa, 0x01, 0xef, 0x0d, 0x4e, 0x3a, 0x5e, 0x1c, 0x6d, 0xfb, 0x34,
-	0xda, 0x15, 0x7f, 0xb6, 0x69, 0x12, 0xf3, 0x78, 0x9b, 0x91, 0x64, 0x18, 0x78, 0x44, 0xee, 0x0c,
-	0x77, 0xc4, 0xbf, 0x8e, 0x54, 0xa0, 0x8a, 0x4f, 0xa3, 0xe1, 0x0e, 0xde, 0x9e, 0xfe, 0xa9, 0x4b,
-	0x03, 0x56, 0xf8, 0xce, 0xae, 0x42, 0xe5, 0x20, 0xa2, 0xfc, 0xdc, 0x6e, 0xc0, 0xca, 0x51, 0xc0,
-	0xf8, 0x71, 0xea, 0xc0, 0x21, 0x3f, 0xd8, 0x4e, 0x7e, 0x87, 0x51, 0xf4, 0x29, 0xd4, 0x54, 0x00,
-	0xcc, 0x32, 0x5a, 0x66, 0xbb, 0xbe, 0xbb, 0xd2, 0x91, 0x7e, 0x3b, 0x1a, 0x34, 0xd2, 0xa3, 0x35,
-	0xa8, 0xf0, 0x98, 0xbb, 0xa1, 0x35, 0xdf, 0x32, 0xda, 0xa6, 0x93, 0x0a, 0xf6, 0x47, 0xb0, 0xfc,
-	0x9c, 0x64, 0x9c, 0x20, 0x04, 0x0b, 0x7d, 0x37, 0x22, 0x96, 0xd1, 0x32, 0xda, 0x8b, 0x8e, 0x5c,
-	0xdb, 0x5f, 0xe4, 0x40, 0x8c, 0xa2, 0x36, 0x54, 0x95, 0x5d, 0x89, 0x2b, 0xba, 0xd5, 0x6a, 0xfb,
-	0x8f, 0x79, 0x68, 0xec, 0x27, 0xc4, 0xe5, 0xe4, 0xdd, 0x3e, 0x50, 0x03, 0xcc, 0x93, 0xa0, 0x2f,
-	0x83, 0x5b, 0x74, 0xc4, 0x52, 0xa0, 0xdc, 0xc4, 0x67, 0x96, 0xd9, 0x32, 0x05, 0x4a, 0xac, 0x05,
-	0xaa, 0x1b, 0x24, 0xd6, 0x42, 0x8a, 0xea, 0x06, 0x09, 0xda, 0x05, 0x93, 0xf4, 0x87, 0x56, 0x45,
-	0x66, 0xdf, 0x52, 0x61, 0x4c, 0x7a, 0xec, 0x1c, 0xf4, 0x87, 0x07, 0x7d, 0x9e, 0x9c, 0x3b, 0x02,
-	0x8c, 0x3e, 0x87, 0x3a, 0x3b, 0x67, 0x2f, 0x93, 0xd8, 0x7b, 0xc2, 0x79, 0x62, 0xdd, 0x90, 0x29,
-	0x20, 0x9d, 0xc2, 0x58, 0xe3, 0x64, 0x61, 0xa8, 0x05, 0x66, 0x18, 0xfb, 0x56, 0x35, 0x97, 0xb0,
-	0xd0, 0x1e, 0xc5, 0xbe, 0x23, 0x54, 0xc8, 0x82, 0xea, 0x90, 0x24, 0x2c, 0x88, 0xfb, 0x56, 0x4d,
-	0x46, 0xa8, 0x45, 0xd4, 0x82, 0xba, 0x3b, 0xe0, 0xb1, 0x43, 0x18, 0x77, 0x13, 0x6e, 0x2d, 0xb6,
-	0x8c, 0x76, 0xc5, 0xc9, 0x6e, 0xe1, 0x07, 0x50, 0xd3, 0x41, 0x8a, 0x2c, 0x4f, 0xc9, 0xb9, 0x2a,
-	0x8f, 0x58, 0x8a, 0xc3, 0x1b, 0xba, 0xe1, 0x80, 0xa8, 0xfa, 0xa4, 0xc2, 0xa3, 0xf9, 0x87, 0x86,
-	0xfd, 0x78, 0xb2, 0xbe, 0x57, 0x3a, 0x9e, 0x2d, 0x58, 0x3d, 0x16, 0xee, 0x67, 0x5c, 0x80, 0xbd,
-	0x09, 0xd8, 0x95, 0x7c, 0x7c, 0x0c, 0x2b, 0xc7, 0x3c, 0xa6, 0x33, 0x5c, 0x3c, 0xca, 0xa3, 0xae,
-	0xe4, 0xe1, 0x0e, 0x34, 0x1c, 0x72, 0x12, 0xc7, 0xb3, 0xd2, 0x78, 0x3c, 0x89, 0xbb, 0xaa, 0x97,
-	0x67, 0x24, 0x24, 0xb3, 0x6e, 0xb2, 0xf0, 0x92, 0xc7, 0x5d, 0xd5, 0xcb, 0xbe, 0xab, 0x03, 0x14,
-	0x37, 0x6b, 0x8a, 0x97, 0x02, 0x8e, 0x51, 0x81, 0xe3, 0xe4, 0x8c, 0x6b, 0x9c, 0x58, 0xdb, 0x6d,
-	0x40, 0xdf, 0xb9, 0xdc, 0xeb, 0xcd, 0xb6, 0x58, 0x82, 0x9c, 0x62, 0xf3, 0x37, 0x13, 0x6e, 0x1e,
-	0xf6, 0x19, 0x77, 0xc3, 0xf0, 0x5f, 0x7a, 0xd5, 0xf7, 0xb3, 0xaf, 0xfa, 0x43, 0x55, 0xab, 0x82,
-	0xcb, 0xff, 0xfe, 0xb3, 0x16, 0xdf, 0x52, 0xd7, 0x3b, 0x75, 0x7d, 0x62, 0xdd, 0x4a, 0xbf, 0x55,
-	0xe2, 0xb8, 0x1f, 0xaf, 0x67, 0xfa, 0xb1, 0xd8, 0xf5, 0x7a, 0x83, 0xfe, 0xa9, 0xb5, 0xd1, 0x32,
-	0xda, 0x4b, 0x4e, 0x2a, 0x5c, 0xbb, 0x39, 0xbc, 0x2a, 0x9c, 0x13, 0xa3, 0x22, 0x24, 0x69, 0x95,
-	0x74, 0xa5, 0x11, 0xd3, 0xd1, 0xa2, 0x30, 0xc4, 0x28, 0x21, 0x5d, 0x3d, 0x22, 0xa4, 0x20, 0x1c,
-	0x46, 0xcc, 0xb7, 0xcc, 0xd4, 0x61, 0xc4, 0x7c, 0xfb, 0x33, 0x58, 0xcf, 0x0c, 0xa2, 0x6f, 0xd3,
-	0x62, 0xb0, 0x69, 0xf7, 0xea, 0xeb, 0x72, 0x34, 0xa3, 0x68, 0x07, 0x6a, 0xaa, 0x92, 0x7a, 0x7c,
-	0xdd, 0xca, 0x3f, 0x0b, 0x05, 0x76, 0x46, 0x30, 0x3b, 0x82, 0x9b, 0xaf, 0xa8, 0x9f, 0xb8, 0xdd,
-	0x59, 0xf3, 0x24, 0x53, 0xf8, 0xfa, 0x94, 0xc2, 0x2f, 0x95, 0x16, 0x7e, 0x39, 0x53, 0x78, 0x51,
-	0xc0, 0x09, 0x77, 0xff, 0x48, 0x01, 0x9f, 0x01, 0x72, 0xe2, 0x30, 0x3c, 0x71, 0xbd, 0xd3, 0x19,
-	0x69, 0x60, 0xa8, 0x25, 0x64, 0x18, 0xc8, 0xcb, 0x97, 0x1e, 0xef, 0x48, 0xb6, 0xd7, 0x8a, 0x56,
-	0x18, 0xb5, 0x37, 0xa1, 0x72, 0xa4, 0xcf, 0x82, 0xba, 0xbc, 0xa7, 0xcd, 0x89, 0xb5, 0xdd, 0x91,
-	0x4a, 0x46, 0xd1, 0x16, 0x54, 0x5e, 0x07, 0xa1, 0xa4, 0x0d, 0xe2, 0xde, 0xaf, 0xaa, 0xba, 0x7f,
-	0x15, 0x84, 0xe4, 0xb0, 0xff, 0x3a, 0x76, 0x52, 0xad, 0x7d, 0x17, 0xaa, 0x2f, 0x07, 0x61, 0x28,
-	0xcc, 0x35, 0xc0, 0x64, 0x89, 0xa7, 0xef, 0x1d, 0x4b, 0x3c, 0xf9, 0x6c, 0x19, 0xd7, 0x8f, 0xbb,
-	0xcb, 0xb8, 0x7d, 0x5b, 0xc1, 0x19, 0x1d, 0xd7, 0xd3, 0xc8, 0xd6, 0x73, 0x5f, 0x00, 0x58, 0xef,
-	0x3d, 0xed, 0x8d, 0x8d, 0x98, 0x59, 0x23, 0x8b, 0xca, 0x08, 0xa3, 0xf6, 0xaf, 0x06, 0x54, 0x0f,
-	0xce, 0x88, 0xa7, 0x0c, 0x7a, 0x51, 0x57, 0x1b, 0xf4, 0xa2, 0x2e, 0xfa, 0x24, 0xed, 0x22, 0xf3,
-	0xf2, 0x6a, 0x6d, 0xa8, 0x14, 0x15, 0x7c, 0xa2, 0x77, 0x34, 0xc0, 0x1c, 0x04, 0x5d, 0x7d, 0x46,
-	0x83, 0x40, 0x9e, 0x9a, 0x1f, 0x74, 0x75, 0x53, 0xf2, 0x83, 0xee, 0xb5, 0x5f, 0xe1, 0xa6, 0x8a,
-	0x91, 0x51, 0xf1, 0x59, 0x3c, 0xd0, 0xcd, 0x54, 0x2c, 0xed, 0x5f, 0x0c, 0xa8, 0x7f, 0x43, 0x92,
-	0x28, 0xe8, 0xbb, 0x61, 0x79, 0x16, 0x77, 0xb3, 0x59, 0x6c, 0xaa, 0x2c, 0x32, 0x9f, 0x4c, 0x64,
-	0x82, 0x60, 0x81, 0x9c, 0x11, 0x4f, 0xa5, 0x22, 0xd7, 0xd7, 0x8e, 0xfc, 0x76, 0x26, 0xb6, 0xb2,
-	0xe8, 0x77, 0x7f, 0x5a, 0x04, 0x78, 0x4e, 0x23, 0x75, 0xfd, 0xd0, 0x16, 0x54, 0x5f, 0x10, 0x37,
-	0xe4, 0xbd, 0x1f, 0xd1, 0x92, 0x2e, 0xb7, 0x20, 0xb3, 0x38, 0x27, 0xa1, 0x3d, 0xa8, 0x67, 0x3a,
-	0x02, 0xd2, 0x8f, 0x3e, 0x4f, 0x77, 0x71, 0xd9, 0x36, 0xa3, 0xe8, 0x21, 0xc0, 0x98, 0x8c, 0xa2,
-	0x35, 0x05, 0xca, 0x91, 0x58, 0x5c, 0xb2, 0xcb, 0x28, 0x7a, 0x02, 0xcb, 0x39, 0xaa, 0x84, 0x36,
-	0xa6, 0xd0, 0x45, 0x5c, 0xae, 0x60, 0x14, 0x7d, 0x09, 0x4b, 0x59, 0x22, 0x84, 0xd6, 0x75, 0xbf,
-	0xca, 0x93, 0x28, 0x5c, 0xba, 0xcf, 0xa8, 0xc8, 0x3c, 0xc3, 0x72, 0x46, 0x99, 0xe7, 0xf9, 0x11,
-	0x2e, 0xdb, 0x4e, 0xe3, 0xcf, 0xd1, 0x97, 0x51, 0xfc, 0x93, 0xe4, 0x07, 0x97, 0x2b, 0x52, 0x13,
-	0x39, 0x6e, 0x32, 0x32, 0x31, 0xc9, 0x6c, 0x70, 0xb9, 0x42, 0x55, 0x31, 0x4b, 0x3c, 0xc6, 0x55,
-	0x9c, 0xa0, 0x2d, 0xb8, 0x5c, 0xc1, 0x28, 0x3a, 0x84, 0xd5, 0x09, 0xa6, 0x81, 0xfe, 0xaf, 0xb0,
-	0x45, 0xae, 0x82, 0xa7, 0xa9, 0x18, 0xbd, 0x67, 0xa0, 0x17, 0xb0, 0x92, 0x9f, 0x70, 0xc8, 0x9a,
-	0xc6, 0x16, 0xf0, 0x14, 0x0d, 0xa3, 0x6d, 0xe3, 0x9e, 0x81, 0x8e, 0xe1, 0x7f, 0x25, 0x63, 0x0a,
-	0x7d, 0x50, 0xbc, 0x85, 0x99, 0x81, 0x87, 0xdf, 0xa5, 0x66, 0x54, 0x84, 0x97, 0x9f, 0x1f, 0xa3,
-	0xf0, 0x0a, 0x53, 0x0c, 0x4f, 0xd1, 0xa8, 0xf0, 0x0e, 0x61, 0x55, 0x34, 0xfb, 0xa7, 0xe3, 0x66,
-	0x3f, 0xaa, 0x59, 0x71, 0x94, 0xe0, 0x69, 0x2a, 0x59, 0xb3, 0x16, 0xcc, 0x1f, 0xb1, 0xd1, 0x03,
-	0x95, 0xc3, 0x02, 0x67, 0x24, 0x49, 0x57, 0x17, 0x44, 0x1f, 0x47, 0x23, 0x3a, 0x94, 0xce, 0x00,
-	0x9c, 0x93, 0xa5, 0x2d, 0x89, 0x64, 0xbd, 0x0c, 0x52, 0x76, 0x77, 0x9c, 0x93, 0x45, 0x0a, 0xe8,
-	0x0e, 0x2c, 0x88, 0x2e, 0x38, 0x42, 0xaa, 0x3e, 0x8c, 0x73, 0x32, 0xa3, 0xe8, 0x01, 0xd4, 0x74,
-	0xcf, 0x41, 0xa8, 0xd8, 0xed, 0x70, 0x61, 0x2f, 0x2d, 0xd0, 0xd3, 0xa3, 0x37, 0x7f, 0x35, 0xe7,
-	0xde, 0x5c, 0x34, 0x8d, 0xb7, 0x17, 0x4d, 0xe3, 0xcf, 0x8b, 0xa6, 0xf1, 0xf3, 0x65, 0x73, 0xee,
-	0xed, 0x65, 0x73, 0xee, 0xf7, 0xcb, 0xe6, 0xdc, 0xf7, 0x9d, 0xf7, 0xfd, 0x09, 0xbf, 0x27, 0xad,
-	0x9f, 0xdc, 0x90, 0xba, 0xfb, 0x7f, 0x07, 0x00, 0x00, 0xff, 0xff, 0xab, 0xfb, 0x2c, 0x0e, 0xfb,
-	0x0f, 0x00, 0x00,
+	// 1158 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x57, 0xcd, 0x6e, 0x23, 0x45,
+	0x10, 0xce, 0xd8, 0xeb, 0xd8, 0x29, 0xe7, 0xb7, 0x49, 0xb2, 0x43, 0xa3, 0x58, 0xde, 0x81, 0x20,
+	0x83, 0xc0, 0xf9, 0xd9, 0x28, 0x5a, 0x36, 0x11, 0xd2, 0xfe, 0x84, 0xdd, 0x88, 0x1c, 0x56, 0x13,
+	0x16, 0x24, 0x6e, 0x13, 0xa7, 0xd7, 0x1e, 0x65, 0x3c, 0xd3, 0x99, 0x6e, 0x5b, 0x1b, 0x1e, 0x81,
+	0x13, 0x4f, 0xc1, 0xb3, 0xec, 0x71, 0x8f, 0x9c, 0x10, 0x24, 0x2f, 0x82, 0xba, 0xa7, 0x67, 0x32,
+	0x3d, 0x3f, 0x31, 0x46, 0x20, 0x71, 0x49, 0xa6, 0xba, 0xbe, 0xaa, 0xaf, 0xba, 0xba, 0xbb, 0xaa,
+	0x0c, 0xbb, 0x7d, 0x97, 0x0f, 0x46, 0x67, 0xdd, 0x5e, 0x30, 0xdc, 0xea, 0xd3, 0xe1, 0xae, 0xf8,
+	0xb3, 0x45, 0xc3, 0x80, 0x07, 0x5b, 0x8c, 0x84, 0x63, 0xb7, 0x47, 0xe4, 0xca, 0x78, 0x47, 0xfc,
+	0xeb, 0x4a, 0x05, 0xaa, 0xf5, 0xe9, 0x70, 0xbc, 0x83, 0xb7, 0xca, 0x4d, 0x1d, 0xea, 0xb2, 0x9c,
+	0x9d, 0x55, 0x87, 0xda, 0xd1, 0x90, 0xf2, 0x2b, 0x6b, 0x19, 0x16, 0x4f, 0x5c, 0xc6, 0x4f, 0x23,
+	0x02, 0x9b, 0x5c, 0x5a, 0xb6, 0xbe, 0xc2, 0x28, 0xfa, 0x1c, 0x1a, 0x2a, 0x00, 0x66, 0x1a, 0xed,
+	0x6a, 0xa7, 0xb9, 0xbb, 0xd8, 0x95, 0xbc, 0xdd, 0x18, 0x94, 0xe8, 0xd1, 0x2a, 0xd4, 0x78, 0xc0,
+	0x1d, 0xcf, 0xac, 0xb4, 0x8d, 0x4e, 0xd5, 0x8e, 0x04, 0xeb, 0x63, 0x58, 0x78, 0x41, 0x52, 0x24,
+	0x08, 0xc1, 0x3d, 0xdf, 0x19, 0x12, 0xd3, 0x68, 0x1b, 0x9d, 0x39, 0x5b, 0x7e, 0x5b, 0x5f, 0x69,
+	0x20, 0x46, 0x51, 0x07, 0xea, 0xca, 0xaf, 0xc4, 0xe5, 0x69, 0x63, 0xb5, 0xf5, 0x7b, 0x05, 0x96,
+	0x9f, 0x85, 0xc4, 0xe1, 0xe4, 0x6e, 0x0e, 0xb4, 0x0c, 0xd5, 0x33, 0xd7, 0x97, 0xc1, 0xcd, 0xd9,
+	0xe2, 0x53, 0xa0, 0x9c, 0xb0, 0xcf, 0xcc, 0x6a, 0xbb, 0x2a, 0x50, 0xe2, 0x5b, 0xa0, 0xce, 0xdd,
+	0xd0, 0xbc, 0x17, 0xa1, 0xce, 0xdd, 0x10, 0xed, 0x42, 0x95, 0xf8, 0x63, 0xb3, 0x26, 0x77, 0xdf,
+	0x56, 0x61, 0x64, 0x19, 0xbb, 0x47, 0xfe, 0xf8, 0xc8, 0xe7, 0xe1, 0x95, 0x2d, 0xc0, 0x68, 0x0f,
+	0x9a, 0xec, 0x8a, 0xbd, 0x0a, 0x83, 0xde, 0x13, 0xce, 0x43, 0x73, 0x56, 0x6e, 0x01, 0xc5, 0x5b,
+	0xb8, 0xd5, 0xd8, 0x69, 0x18, 0x6a, 0x43, 0xd5, 0x0b, 0xfa, 0x66, 0x5d, 0xdb, 0xb0, 0xd0, 0x9e,
+	0x04, 0x7d, 0x5b, 0xa8, 0x90, 0x09, 0xf5, 0x31, 0x09, 0x99, 0x1b, 0xf8, 0x66, 0x43, 0x46, 0x18,
+	0x8b, 0xa8, 0x0d, 0x4d, 0x67, 0xc4, 0x03, 0x9b, 0x30, 0xee, 0x84, 0xdc, 0x9c, 0x6b, 0x1b, 0x9d,
+	0x9a, 0x9d, 0x5e, 0xc2, 0xfb, 0xd0, 0x88, 0x83, 0x14, 0xbb, 0xbc, 0x20, 0x57, 0x2a, 0x3d, 0xe2,
+	0x53, 0x1c, 0xde, 0xd8, 0xf1, 0x46, 0x44, 0xe5, 0x27, 0x12, 0x1e, 0x57, 0x1e, 0x19, 0xd6, 0x61,
+	0x36, 0xbf, 0x53, 0x1d, 0xcf, 0x26, 0x2c, 0x9d, 0x0a, 0xfa, 0x09, 0x17, 0xe0, 0x20, 0x03, 0x9b,
+	0x8a, 0xe3, 0x13, 0x58, 0x3c, 0xe5, 0x01, 0x9d, 0x40, 0xf1, 0x58, 0x47, 0x4d, 0xc5, 0xf0, 0x29,
+	0x2c, 0xdb, 0xe4, 0x2c, 0x08, 0x26, 0x6d, 0xe3, 0x30, 0x8b, 0x9b, 0x96, 0xe5, 0x39, 0xf1, 0xc8,
+	0xa4, 0x9b, 0x2c, 0x58, 0x74, 0xdc, 0xb4, 0x2c, 0xcf, 0x9c, 0x38, 0x40, 0x71, 0xb3, 0x4a, 0x58,
+	0x72, 0x38, 0x46, 0x05, 0x8e, 0x93, 0xb7, 0x5c, 0xe2, 0xe6, 0x6d, 0xf9, 0x6d, 0x75, 0x00, 0xfd,
+	0xe0, 0xf0, 0xde, 0x60, 0xb2, 0xc7, 0xfd, 0x3c, 0x92, 0xd1, 0xf8, 0xd6, 0x1b, 0xa5, 0xb7, 0xde,
+	0xfa, 0xb5, 0x0a, 0x2b, 0xc7, 0x3e, 0xe3, 0x8e, 0xe7, 0xfd, 0x47, 0x6f, 0xfc, 0x61, 0xfa, 0x8d,
+	0x3f, 0x50, 0x31, 0xe4, 0x28, 0xff, 0xff, 0x8f, 0x5c, 0xd8, 0x52, 0xa7, 0x77, 0xe1, 0xf4, 0x89,
+	0xb9, 0x16, 0xd9, 0x2a, 0xf1, 0xb6, 0x3a, 0xaf, 0xa7, 0xaa, 0xb3, 0x58, 0xed, 0x0d, 0x46, 0xfe,
+	0x85, 0x79, 0x5f, 0x9e, 0x68, 0x24, 0xfc, 0xe3, 0x52, 0xf1, 0x3a, 0x77, 0x4e, 0x8c, 0x8a, 0x90,
+	0xa4, 0x57, 0x72, 0x2e, 0x9d, 0x54, 0xed, 0x58, 0x14, 0x8e, 0x18, 0x25, 0xe4, 0x3c, 0x6e, 0x18,
+	0x52, 0x10, 0x84, 0x43, 0xd6, 0x37, 0xab, 0x11, 0xe1, 0x90, 0xf5, 0xad, 0x2f, 0x60, 0x3d, 0xd5,
+	0x96, 0xbe, 0x8f, 0x92, 0xc1, 0xca, 0x6e, 0xd9, 0xb7, 0xc5, 0x68, 0x46, 0xd1, 0x0e, 0x34, 0x54,
+	0x26, 0xe3, 0x66, 0xb6, 0xa6, 0x3f, 0x12, 0x05, 0xb6, 0x13, 0x98, 0x35, 0x84, 0x95, 0xd7, 0xb4,
+	0x1f, 0x3a, 0xe7, 0x93, 0xba, 0x4b, 0x2a, 0xf1, 0xcd, 0x92, 0xc4, 0xcf, 0x17, 0x26, 0x7e, 0x21,
+	0x95, 0x78, 0x91, 0xc0, 0x0c, 0xdd, 0xbf, 0x92, 0xc0, 0xe7, 0x80, 0xec, 0xc0, 0xf3, 0xce, 0x9c,
+	0xde, 0xc5, 0x84, 0x6d, 0x60, 0x68, 0x84, 0x64, 0xec, 0xca, 0xcb, 0x17, 0x1d, 0x6f, 0x22, 0x5b,
+	0xab, 0x79, 0x2f, 0x8c, 0x5a, 0x1f, 0x41, 0xed, 0x24, 0x3e, 0x0b, 0xea, 0xf0, 0x41, 0xec, 0x4e,
+	0x7c, 0x5b, 0x5d, 0xa9, 0x64, 0x14, 0x6d, 0x42, 0xed, 0x8d, 0xeb, 0x25, 0x43, 0xc4, 0x92, 0xca,
+	0xfb, 0x37, 0xae, 0x47, 0x8e, 0xfd, 0x37, 0x81, 0x1d, 0x69, 0xad, 0x0d, 0xa8, 0xbf, 0x1a, 0x79,
+	0x5e, 0xd9, 0xd1, 0xee, 0x29, 0x35, 0xa3, 0xe8, 0x33, 0x98, 0x0d, 0x09, 0x1b, 0x79, 0x5c, 0x15,
+	0x8e, 0x95, 0xf8, 0x25, 0x49, 0x73, 0xa1, 0xb0, 0x15, 0xc0, 0xea, 0x08, 0x2b, 0x36, 0x10, 0x4e,
+	0x37, 0xa0, 0xe2, 0xfa, 0xca, 0x62, 0x21, 0xb1, 0x60, 0x83, 0x63, 0xdf, 0xae, 0xb8, 0xbe, 0x35,
+	0xa7, 0x90, 0x8c, 0x0a, 0xa3, 0xa3, 0xb7, 0xa4, 0x57, 0x66, 0x24, 0x74, 0xca, 0x68, 0x4f, 0x21,
+	0xef, 0x08, 0x2a, 0xf2, 0xa4, 0x05, 0xb5, 0x0d, 0xcd, 0xef, 0x48, 0x38, 0x74, 0x7d, 0x47, 0xee,
+	0xf6, 0x41, 0x8a, 0x23, 0xb6, 0x8a, 0xf5, 0x8a, 0xe7, 0x30, 0x65, 0xc1, 0x28, 0xfa, 0x32, 0xe1,
+	0xaa, 0x48, 0xab, 0xb5, 0x8c, 0x95, 0xce, 0xb7, 0xfb, 0xf3, 0x1c, 0xc0, 0x0b, 0x3a, 0x54, 0x07,
+	0x87, 0x36, 0xa1, 0xfe, 0x92, 0x38, 0x1e, 0x1f, 0xfc, 0x84, 0xe6, 0xe3, 0x20, 0xc5, 0x50, 0x88,
+	0x35, 0x09, 0x1d, 0x40, 0x33, 0xf5, 0x96, 0x50, 0xcc, 0xa1, 0x8f, 0x8d, 0xb8, 0x68, 0x99, 0x51,
+	0xf4, 0x08, 0xe0, 0x76, 0xa8, 0x43, 0xab, 0x0a, 0xa4, 0x0d, 0x83, 0xb8, 0x60, 0x95, 0x51, 0xf4,
+	0x04, 0x16, 0xb4, 0x91, 0x03, 0xdd, 0x2f, 0x19, 0xbb, 0x70, 0xb1, 0x82, 0x51, 0xf4, 0x35, 0xcc,
+	0xa7, 0x07, 0x0a, 0xb4, 0x1e, 0xbf, 0x74, 0x7d, 0x18, 0xc1, 0x85, 0xeb, 0x8c, 0x8a, 0x9d, 0xa7,
+	0xa6, 0x85, 0x64, 0xe7, 0xfa, 0x9c, 0x81, 0x8b, 0x96, 0xa3, 0xf8, 0xb5, 0x31, 0x20, 0x89, 0x3f,
+	0x3b, 0x44, 0xe0, 0x62, 0x45, 0xe4, 0x42, 0xeb, 0xf1, 0x89, 0x8b, 0xec, 0x84, 0x80, 0x8b, 0x15,
+	0x2a, 0x8b, 0xe9, 0x06, 0x7e, 0x9b, 0xc5, 0x4c, 0xfb, 0xc7, 0xc5, 0x0a, 0x46, 0xd1, 0x31, 0x2c,
+	0x65, 0x3a, 0x36, 0xfa, 0x50, 0x61, 0xf3, 0x3d, 0x1f, 0x97, 0xa9, 0x18, 0xdd, 0x36, 0xd0, 0x4b,
+	0x58, 0xd4, 0x7b, 0x03, 0x32, 0xcb, 0xfa, 0x2c, 0x2e, 0xd1, 0x30, 0xda, 0x31, 0xb6, 0x0d, 0x74,
+	0x0a, 0x1f, 0x14, 0x14, 0x78, 0xb4, 0x91, 0xbf, 0x85, 0xa9, 0x56, 0x81, 0xef, 0x52, 0x33, 0x2a,
+	0xc2, 0xd3, 0x2b, 0x6f, 0x12, 0x5e, 0xae, 0xfe, 0xe3, 0x12, 0x8d, 0x0a, 0xef, 0x18, 0x96, 0x44,
+	0x99, 0x7c, 0x7a, 0x5b, 0x26, 0x93, 0x9c, 0xe5, 0x8b, 0x30, 0x2e, 0x53, 0xc9, 0x9c, 0xb5, 0xa1,
+	0x72, 0xc2, 0x92, 0x07, 0x2a, 0xcb, 0x2c, 0x4e, 0x49, 0x72, 0xec, 0xbb, 0x27, 0x2a, 0x1e, 0x5a,
+	0xd4, 0xca, 0xdf, 0x25, 0xd6, 0x64, 0xe9, 0x4b, 0x22, 0xd9, 0x20, 0x85, 0x94, 0x25, 0x11, 0x6b,
+	0xb2, 0xd8, 0x82, 0x40, 0x8a, 0x82, 0x95, 0x20, 0x55, 0x1d, 0xc4, 0x9a, 0x2c, 0x7d, 0xee, 0x43,
+	0x23, 0x2e, 0x37, 0x08, 0xe5, 0xea, 0xcf, 0x25, 0xce, 0xad, 0x45, 0x29, 0x7a, 0x7a, 0xf2, 0xee,
+	0xcf, 0xd6, 0xcc, 0xbb, 0xeb, 0x96, 0xf1, 0xfe, 0xba, 0x65, 0xfc, 0x71, 0xdd, 0x32, 0x7e, 0xb9,
+	0x69, 0xcd, 0xbc, 0xbf, 0x69, 0xcd, 0xfc, 0x76, 0xd3, 0x9a, 0xf9, 0xb1, 0xfb, 0x77, 0x7f, 0x0c,
+	0x1f, 0x48, 0xef, 0x67, 0xb3, 0x52, 0xf7, 0xf0, 0xaf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x8f, 0xde,
+	0x13, 0xb1, 0x45, 0x0f, 0x00, 0x00,
 }
 
 func (m *Empty) XSize() (n int) {
@@ -1874,8 +1859,8 @@ func (m *WatchServiceLogRsp) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Text)
-	if l > 0 {
+	if m.Log != nil {
+		l = m.Log.XSize()
 		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
@@ -2077,9 +2062,11 @@ func (m *LsRsp) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	if m.Files != nil {
-		l = m.Files.XSize()
-		n += 1 + l + sovGpm(uint64(l))
+	if len(m.Files) > 0 {
+		for _, e := range m.Files {
+			l = e.XSize()
+			n += 1 + l + sovGpm(uint64(l))
+		}
 	}
 	return n
 }
@@ -2090,11 +2077,7 @@ func (m *PullReq) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Src)
-	if l > 0 {
-		n += 1 + l + sovGpm(uint64(l))
-	}
-	l = len(m.Dst)
+	l = len(m.Name)
 	if l > 0 {
 		n += 1 + l + sovGpm(uint64(l))
 	}
@@ -2107,8 +2090,8 @@ func (m *PullRsp) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Chunk)
-	if l > 0 {
+	if m.Result != nil {
+		l = m.Result.XSize()
 		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
@@ -2120,16 +2103,8 @@ func (m *PushReq) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Src)
-	if l > 0 {
-		n += 1 + l + sovGpm(uint64(l))
-	}
-	l = len(m.Dst)
-	if l > 0 {
-		n += 1 + l + sovGpm(uint64(l))
-	}
-	l = len(m.Chunk)
-	if l > 0 {
+	if m.In != nil {
+		l = m.In.XSize()
 		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
@@ -2150,24 +2125,8 @@ func (m *ExecReq) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Cmd)
-	if l > 0 {
-		n += 1 + l + sovGpm(uint64(l))
-	}
-	if len(m.Env) > 0 {
-		for k, v := range m.Env {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovGpm(uint64(len(k))) + 1 + len(v) + sovGpm(uint64(len(v)))
-			n += mapEntrySize + 1 + sovGpm(uint64(mapEntrySize))
-		}
-	}
-	l = len(m.Uid)
-	if l > 0 {
-		n += 1 + l + sovGpm(uint64(l))
-	}
-	l = len(m.Gid)
-	if l > 0 {
+	if m.In != nil {
+		l = m.In.XSize()
 		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
@@ -2179,8 +2138,8 @@ func (m *ExecRsp) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Out)
-	if l > 0 {
+	if m.Result != nil {
+		l = m.Result.XSize()
 		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
@@ -2192,20 +2151,8 @@ func (m *TerminalReq) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Cmd)
-	if l > 0 {
-		n += 1 + l + sovGpm(uint64(l))
-	}
-	if len(m.Env) > 0 {
-		for k, v := range m.Env {
-			_ = k
-			_ = v
-			mapEntrySize := 1 + len(k) + sovGpm(uint64(len(k))) + 1 + len(v) + sovGpm(uint64(len(v)))
-			n += mapEntrySize + 1 + sovGpm(uint64(mapEntrySize))
-		}
-	}
-	l = len(m.Exec)
-	if l > 0 {
+	if m.In != nil {
+		l = m.In.XSize()
 		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
@@ -2217,8 +2164,8 @@ func (m *TerminalRsp) XSize() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.Out)
-	if l > 0 {
+	if m.Result != nil {
+		l = m.Result.XSize()
 		n += 1 + l + sovGpm(uint64(l))
 	}
 	return n
@@ -2896,10 +2843,15 @@ func (m *WatchServiceLogRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Text) > 0 {
-		i -= len(m.Text)
-		copy(dAtA[i:], m.Text)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Text)))
+	if m.Log != nil {
+		{
+			size, err := m.Log.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0xa
 	}
@@ -3345,17 +3297,19 @@ func (m *LsRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.Files != nil {
-		{
-			size, err := m.Files.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
+	if len(m.Files) > 0 {
+		for iNdEx := len(m.Files) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Files[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGpm(dAtA, i, uint64(size))
 			}
-			i -= size
-			i = encodeVarintGpm(dAtA, i, uint64(size))
+			i--
+			dAtA[i] = 0xa
 		}
-		i--
-		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -3380,17 +3334,10 @@ func (m *PullReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Dst) > 0 {
-		i -= len(m.Dst)
-		copy(dAtA[i:], m.Dst)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Dst)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Src) > 0 {
-		i -= len(m.Src)
-		copy(dAtA[i:], m.Src)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Src)))
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -3417,10 +3364,15 @@ func (m *PullRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Chunk) > 0 {
-		i -= len(m.Chunk)
-		copy(dAtA[i:], m.Chunk)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Chunk)))
+	if m.Result != nil {
+		{
+			size, err := m.Result.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0xa
 	}
@@ -3447,24 +3399,15 @@ func (m *PushReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Chunk) > 0 {
-		i -= len(m.Chunk)
-		copy(dAtA[i:], m.Chunk)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Chunk)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Dst) > 0 {
-		i -= len(m.Dst)
-		copy(dAtA[i:], m.Dst)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Dst)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.Src) > 0 {
-		i -= len(m.Src)
-		copy(dAtA[i:], m.Src)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Src)))
+	if m.In != nil {
+		{
+			size, err := m.In.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0xa
 	}
@@ -3514,43 +3457,15 @@ func (m *ExecReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Gid) > 0 {
-		i -= len(m.Gid)
-		copy(dAtA[i:], m.Gid)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Gid)))
-		i--
-		dAtA[i] = 0x22
-	}
-	if len(m.Uid) > 0 {
-		i -= len(m.Uid)
-		copy(dAtA[i:], m.Uid)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Uid)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Env) > 0 {
-		for k := range m.Env {
-			v := m.Env[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintGpm(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintGpm(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintGpm(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x12
+	if m.In != nil {
+		{
+			size, err := m.In.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
 		}
-	}
-	if len(m.Cmd) > 0 {
-		i -= len(m.Cmd)
-		copy(dAtA[i:], m.Cmd)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Cmd)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -3577,10 +3492,15 @@ func (m *ExecRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Out) > 0 {
-		i -= len(m.Out)
-		copy(dAtA[i:], m.Out)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Out)))
+	if m.Result != nil {
+		{
+			size, err := m.Result.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
+		}
 		i--
 		dAtA[i] = 0xa
 	}
@@ -3607,36 +3527,15 @@ func (m *TerminalReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Exec) > 0 {
-		i -= len(m.Exec)
-		copy(dAtA[i:], m.Exec)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Exec)))
-		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.Env) > 0 {
-		for k := range m.Env {
-			v := m.Env[k]
-			baseI := i
-			i -= len(v)
-			copy(dAtA[i:], v)
-			i = encodeVarintGpm(dAtA, i, uint64(len(v)))
-			i--
-			dAtA[i] = 0x12
-			i -= len(k)
-			copy(dAtA[i:], k)
-			i = encodeVarintGpm(dAtA, i, uint64(len(k)))
-			i--
-			dAtA[i] = 0xa
-			i = encodeVarintGpm(dAtA, i, uint64(baseI-i))
-			i--
-			dAtA[i] = 0x12
+	if m.In != nil {
+		{
+			size, err := m.In.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
 		}
-	}
-	if len(m.Cmd) > 0 {
-		i -= len(m.Cmd)
-		copy(dAtA[i:], m.Cmd)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Cmd)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -3663,12 +3562,17 @@ func (m *TerminalRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.Out) > 0 {
-		i -= len(m.Out)
-		copy(dAtA[i:], m.Out)
-		i = encodeVarintGpm(dAtA, i, uint64(len(m.Out)))
+	if m.Result != nil {
+		{
+			size, err := m.Result.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintGpm(dAtA, i, uint64(size))
+		}
 		i--
-		dAtA[i] = 0xa
+		dAtA[i] = 0x12
 	}
 	return len(dAtA) - i, nil
 }
@@ -5356,7 +5260,7 @@ func (m *CatServiceLogRsp) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Text", wireType)
 			}
-			var stringLen uint64
+			var byteLen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -5366,23 +5270,25 @@ func (m *CatServiceLogRsp) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				byteLen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if byteLen < 0 {
 				return ErrInvalidLengthGpm
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + byteLen
 			if postIndex < 0 {
 				return ErrInvalidLengthGpm
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Text = string(dAtA[iNdEx:postIndex])
+			m.Text = append(m.Text[:0], dAtA[iNdEx:postIndex]...)
+			if m.Text == nil {
+				m.Text = []byte{}
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -5518,9 +5424,9 @@ func (m *WatchServiceLogRsp) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Text", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Log", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -5530,23 +5436,27 @@ func (m *WatchServiceLogRsp) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthGpm
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthGpm
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Text = string(dAtA[iNdEx:postIndex])
+			if m.Log == nil {
+				m.Log = &v1.ProcLog{}
+			}
+			if err := m.Log.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -6959,10 +6869,8 @@ func (m *LsRsp) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Files == nil {
-				m.Files = &v1.FileInfo{}
-			}
-			if err := m.Files.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.Files = append(m.Files, &v1.FileInfo{})
+			if err := m.Files[len(m.Files)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -7018,7 +6926,7 @@ func (m *PullReq) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Src", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -7046,39 +6954,7 @@ func (m *PullReq) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Src = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Dst", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGpm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Dst = string(dAtA[iNdEx:postIndex])
+			m.Name = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -7132,9 +7008,9 @@ func (m *PullRsp) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Chunk", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
 			}
-			var byteLen int
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -7144,24 +7020,26 @@ func (m *PullRsp) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthGpm
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthGpm
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Chunk = append(m.Chunk[:0], dAtA[iNdEx:postIndex]...)
-			if m.Chunk == nil {
-				m.Chunk = []byte{}
+			if m.Result == nil {
+				m.Result = &v1.PullResult{}
+			}
+			if err := m.Result.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
 			iNdEx = postIndex
 		default:
@@ -7216,9 +7094,9 @@ func (m *PushReq) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Src", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field In", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -7228,88 +7106,26 @@ func (m *PushReq) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthGpm
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthGpm
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Src = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Dst", wireType)
+			if m.In == nil {
+				m.In = &v1.PushIn{}
 			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGpm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Dst = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Chunk", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthGpm
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Chunk = append(m.Chunk[:0], dAtA[iNdEx:postIndex]...)
-			if m.Chunk == nil {
-				m.Chunk = []byte{}
+			if err := m.In.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
 			iNdEx = postIndex
 		default:
@@ -7414,39 +7230,7 @@ func (m *ExecReq) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cmd", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGpm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Cmd = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field In", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7473,167 +7257,12 @@ func (m *ExecReq) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Env == nil {
-				m.Env = make(map[string]string)
+			if m.In == nil {
+				m.In = &v1.ExecIn{}
 			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowGpm
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowGpm
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthGpm
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthGpm
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowGpm
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthGpm
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthGpm
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipGpm(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthGpm
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
+			if err := m.In.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			m.Env[mapkey] = mapvalue
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Uid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGpm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Uid = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Gid", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGpm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Gid = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -7687,9 +7316,9 @@ func (m *ExecRsp) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Out", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -7699,23 +7328,27 @@ func (m *ExecRsp) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthGpm
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthGpm
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Out = string(dAtA[iNdEx:postIndex])
+			if m.Result == nil {
+				m.Result = &v1.ExecResult{}
+			}
+			if err := m.Result.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -7769,39 +7402,7 @@ func (m *TerminalReq) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Cmd", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGpm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Cmd = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Env", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field In", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -7828,135 +7429,12 @@ func (m *TerminalReq) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Env == nil {
-				m.Env = make(map[string]string)
+			if m.In == nil {
+				m.In = &v1.TerminalIn{}
 			}
-			var mapkey string
-			var mapvalue string
-			for iNdEx < postIndex {
-				entryPreIndex := iNdEx
-				var wire uint64
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return ErrIntOverflowGpm
-					}
-					if iNdEx >= l {
-						return io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					wire |= uint64(b&0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				fieldNum := int32(wire >> 3)
-				if fieldNum == 1 {
-					var stringLenmapkey uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowGpm
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapkey |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapkey := int(stringLenmapkey)
-					if intStringLenmapkey < 0 {
-						return ErrInvalidLengthGpm
-					}
-					postStringIndexmapkey := iNdEx + intStringLenmapkey
-					if postStringIndexmapkey < 0 {
-						return ErrInvalidLengthGpm
-					}
-					if postStringIndexmapkey > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapkey = string(dAtA[iNdEx:postStringIndexmapkey])
-					iNdEx = postStringIndexmapkey
-				} else if fieldNum == 2 {
-					var stringLenmapvalue uint64
-					for shift := uint(0); ; shift += 7 {
-						if shift >= 64 {
-							return ErrIntOverflowGpm
-						}
-						if iNdEx >= l {
-							return io.ErrUnexpectedEOF
-						}
-						b := dAtA[iNdEx]
-						iNdEx++
-						stringLenmapvalue |= uint64(b&0x7F) << shift
-						if b < 0x80 {
-							break
-						}
-					}
-					intStringLenmapvalue := int(stringLenmapvalue)
-					if intStringLenmapvalue < 0 {
-						return ErrInvalidLengthGpm
-					}
-					postStringIndexmapvalue := iNdEx + intStringLenmapvalue
-					if postStringIndexmapvalue < 0 {
-						return ErrInvalidLengthGpm
-					}
-					if postStringIndexmapvalue > l {
-						return io.ErrUnexpectedEOF
-					}
-					mapvalue = string(dAtA[iNdEx:postStringIndexmapvalue])
-					iNdEx = postStringIndexmapvalue
-				} else {
-					iNdEx = entryPreIndex
-					skippy, err := skipGpm(dAtA[iNdEx:])
-					if err != nil {
-						return err
-					}
-					if (skippy < 0) || (iNdEx+skippy) < 0 {
-						return ErrInvalidLengthGpm
-					}
-					if (iNdEx + skippy) > postIndex {
-						return io.ErrUnexpectedEOF
-					}
-					iNdEx += skippy
-				}
+			if err := m.In.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
 			}
-			m.Env[mapkey] = mapvalue
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Exec", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowGpm
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthGpm
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthGpm
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Exec = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -8008,11 +7486,11 @@ func (m *TerminalRsp) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: TerminalRsp: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 1:
+		case 2:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Out", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowGpm
@@ -8022,23 +7500,27 @@ func (m *TerminalRsp) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthGpm
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthGpm
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Out = string(dAtA[iNdEx:postIndex])
+			if m.Result == nil {
+				m.Result = &v1.TerminalResult{}
+			}
+			if err := m.Result.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -8203,7 +7685,7 @@ type GpmServiceClient interface {
 	Push(ctx context.Context, opts ...grpc.CallOption) (GpmService_PushClient, error)
 	// +gen:summary=远程执行命令
 	// +gen:post=/api/v1/Action/exec
-	Exec(ctx context.Context, in *ExecReq, opts ...grpc.CallOption) (*ExecRsp, error)
+	Exec(ctx context.Context, in *ExecReq, opts ...grpc.CallOption) (GpmService_ExecClient, error)
 	// +gen:summary=远程命令行交互
 	// +gen:post=/api/v1/Action/terminal
 	Terminal(ctx context.Context, opts ...grpc.CallOption) (GpmService_TerminalClient, error)
@@ -8508,17 +7990,40 @@ func (x *gpmServicePushClient) CloseAndRecv() (*PushRsp, error) {
 	return m, nil
 }
 
-func (c *gpmServiceClient) Exec(ctx context.Context, in *ExecReq, opts ...grpc.CallOption) (*ExecRsp, error) {
-	out := new(ExecRsp)
-	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/Exec", in, out, opts...)
+func (c *gpmServiceClient) Exec(ctx context.Context, in *ExecReq, opts ...grpc.CallOption) (GpmService_ExecClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_GpmService_serviceDesc.Streams[6], "/gpmv1.GpmService/Exec", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &gpmServiceExecClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type GpmService_ExecClient interface {
+	Recv() (*ExecRsp, error)
+	grpc.ClientStream
+}
+
+type gpmServiceExecClient struct {
+	grpc.ClientStream
+}
+
+func (x *gpmServiceExecClient) Recv() (*ExecRsp, error) {
+	m := new(ExecRsp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *gpmServiceClient) Terminal(ctx context.Context, opts ...grpc.CallOption) (GpmService_TerminalClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_GpmService_serviceDesc.Streams[6], "/gpmv1.GpmService/Terminal", opts...)
+	stream, err := c.cc.NewStream(ctx, &_GpmService_serviceDesc.Streams[7], "/gpmv1.GpmService/Terminal", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -8603,7 +8108,7 @@ type GpmServiceServer interface {
 	Push(GpmService_PushServer) error
 	// +gen:summary=远程执行命令
 	// +gen:post=/api/v1/Action/exec
-	Exec(context.Context, *ExecReq) (*ExecRsp, error)
+	Exec(*ExecReq, GpmService_ExecServer) error
 	// +gen:summary=远程命令行交互
 	// +gen:post=/api/v1/Action/terminal
 	Terminal(GpmService_TerminalServer) error
@@ -8664,8 +8169,8 @@ func (*UnimplementedGpmServiceServer) Pull(req *PullReq, srv GpmService_PullServ
 func (*UnimplementedGpmServiceServer) Push(srv GpmService_PushServer) error {
 	return status.Errorf(codes.Unimplemented, "method Push not implemented")
 }
-func (*UnimplementedGpmServiceServer) Exec(ctx context.Context, req *ExecReq) (*ExecRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Exec not implemented")
+func (*UnimplementedGpmServiceServer) Exec(req *ExecReq, srv GpmService_ExecServer) error {
+	return status.Errorf(codes.Unimplemented, "method Exec not implemented")
 }
 func (*UnimplementedGpmServiceServer) Terminal(srv GpmService_TerminalServer) error {
 	return status.Errorf(codes.Unimplemented, "method Terminal not implemented")
@@ -9014,22 +8519,25 @@ func (x *gpmServicePushServer) Recv() (*PushReq, error) {
 	return m, nil
 }
 
-func _GpmService_Exec_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ExecReq)
-	if err := dec(in); err != nil {
-		return nil, err
+func _GpmService_Exec_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ExecReq)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(GpmServiceServer).Exec(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/gpmv1.GpmService/Exec",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GpmServiceServer).Exec(ctx, req.(*ExecReq))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(GpmServiceServer).Exec(m, &gpmServiceExecServer{stream})
+}
+
+type GpmService_ExecServer interface {
+	Send(*ExecRsp) error
+	grpc.ServerStream
+}
+
+type gpmServiceExecServer struct {
+	grpc.ServerStream
+}
+
+func (x *gpmServiceExecServer) Send(m *ExecRsp) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 func _GpmService_Terminal_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -9106,10 +8614,6 @@ var _GpmService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "Ls",
 			Handler:    _GpmService_Ls_Handler,
 		},
-		{
-			MethodName: "Exec",
-			Handler:    _GpmService_Exec_Handler,
-		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -9143,6 +8647,11 @@ var _GpmService_serviceDesc = grpc.ServiceDesc{
 			StreamName:    "Push",
 			Handler:       _GpmService_Push_Handler,
 			ClientStreams: true,
+		},
+		{
+			StreamName:    "Exec",
+			Handler:       _GpmService_Exec_Handler,
+			ServerStreams: true,
 		},
 		{
 			StreamName:    "Terminal",

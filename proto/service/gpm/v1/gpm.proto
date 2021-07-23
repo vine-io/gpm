@@ -64,7 +64,7 @@ service GpmService {
   rpc Push(stream PushReq) returns (PushRsp);
   // +gen:summary=远程执行命令
   // +gen:post=/api/v1/Action/exec
-  rpc Exec(ExecReq) returns (ExecRsp);
+  rpc Exec(ExecReq) returns (stream ExecRsp);
   // +gen:summary=远程命令行交互
   // +gen:post=/api/v1/Action/terminal
   rpc Terminal(stream TerminalReq) returns (stream TerminalRsp);
@@ -158,7 +158,7 @@ message CatServiceLogReq {
 }
 
 message CatServiceLogRsp {
-  string text = 1;
+  bytes text = 1;
 }
 
 message WatchServiceLogReq {
@@ -167,7 +167,7 @@ message WatchServiceLogReq {
 }
 
 message WatchServiceLogRsp {
-  string text = 1;
+  gpmv1.ProcLog log = 1;
 }
 
 message InstallServiceReq {
@@ -248,49 +248,37 @@ message LsReq {
 }
 
 message LsRsp {
-  gpmv1.FileInfo files = 1;
+  repeated gpmv1.FileInfo files = 1;
 }
 
 message PullReq {
-  string src = 1;
-  string dst = 2;
+  string name = 1;
 }
 
 message PullRsp {
-  bytes chunk = 1;
+  gpmv1.PullResult result = 1;
 }
 
 message PushReq {
-  string src = 1;
-  string dst = 2;
-  bytes chunk = 3;
+  gpmv1.PushIn in = 1;
 }
 
-message PushRsp {
-
-}
+message PushRsp {}
 
 message ExecReq {
   // +gen:required
-  string cmd = 1;
-  map<string, string> env = 2;
-  string uid = 3;
-  string gid = 4;
+  gpmv1.ExecIn in = 1;
 }
 
 message ExecRsp {
-  string out = 1;
+  gpmv1.ExecResult result = 1;
 }
 
 message TerminalReq {
   // +gen:required
-  string cmd = 1;
-  map<string, string> env = 2;
-  // +gen:required
-  // +gen:enum=[sh,bash,zsh]
-  string exec = 3;
+  gpmv1.TerminalIn in = 1;
 }
 
 message TerminalRsp {
-  string out = 1;
+  gpmv1.TerminalResult result = 2;
 }

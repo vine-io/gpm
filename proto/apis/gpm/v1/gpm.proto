@@ -55,6 +55,9 @@ message SysProcAttr {
 }
 
 message ProcLog {
+  string text = 1;
+  string error = 2;
+  int64 timestamp = 3;
 }
 
 message Stat {
@@ -86,4 +89,50 @@ message FileInfo {
   string mode = 3;
   int64 modTime = 4;
   bool IsDir = 5;
+}
+
+message ExecIn {
+  // +gen:required
+  string name = 1;
+  repeated string args = 2;
+  map<string, string> env = 3;
+  int32 uid = 4;
+  int32 gid = 5;
+}
+
+message ExecResult {
+  string result = 1;
+  string error = 2;
+  bool finished = 3;
+}
+
+message PullResult {
+  string name = 1;
+  bytes chunk = 2;
+  string error = 3;
+  bool finished = 4;
+}
+
+message PushIn {
+  string dst = 1;
+  bytes chunk = 2;
+  bool isOk = 3;
+}
+
+message PushResult {
+  string error = 1;
+}
+
+message TerminalIn {
+  // +gen:required
+  string name = 1;
+  repeated string args = 2;
+  map<string, string> env = 3;
+  int32 uid = 4;
+  int32 gid = 5;
+}
+
+message TerminalResult {
+  string result = 1;
+  string error = 2;
 }

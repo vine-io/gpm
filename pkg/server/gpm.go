@@ -24,6 +24,7 @@ package server
 
 import (
 	"context"
+	"io"
 	gruntime "runtime"
 
 	"github.com/gpm2/gpm/pkg/dao"
@@ -115,48 +116,205 @@ func (s *server) DeleteService(ctx context.Context, req *pb.DeleteServiceReq, rs
 	return
 }
 
-func (s *server) CatServiceLog(ctx context.Context, req *pb.CatServiceLogReq, rsp *pb.CatServiceLogRsp) error {
+func (s *server) CatServiceLog(ctx context.Context, req *pb.CatServiceLogReq, rsp *pb.CatServiceLogRsp) (err error) {
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
+	rsp.Text, err = s.H.CatServiceLog(ctx, req.Name)
+	return
+}
+
+func (s *server) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq, stream pb.GpmService_WatchServiceLogStream) (err error) {
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
+
+	outs, e := s.H.WatchServiceLog(ctx, req.Name)
+	if e != nil {
+		err = e
+		return
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case out := <-outs:
+			rsp := &pb.WatchServiceLogRsp{Log: out}
+			e = stream.Send(rsp)
+			if e != nil && e != io.EOF {
+				return e
+			}
+		}
+	}
+}
+
+func (s *server) InstallService(ctx context.Context, stream pb.GpmService_InstallServiceStream) (err error) {
 	panic("implement me")
 }
 
-func (s *server) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq, stream pb.GpmService_WatchServiceLogStream) error {
+func (s *server) ListServiceVersions(ctx context.Context, req *pb.ListServiceVersionsReq, rsp *pb.ListServiceVersionsRsp) (err error) {
 	panic("implement me")
 }
 
-func (s *server) InstallService(ctx context.Context, stream pb.GpmService_InstallServiceStream) error {
+func (s *server) UpgradeService(ctx context.Context, stream pb.GpmService_UpgradeServiceStream) (err error) {
 	panic("implement me")
 }
 
-func (s *server) ListServiceVersions(ctx context.Context, req *pb.ListServiceVersionsReq, rsp *pb.ListServiceVersionsRsp) error {
+func (s *server) RollBackService(ctx context.Context, req *pb.RollbackServiceReq, stream pb.GpmService_RollBackServiceStream) (err error) {
 	panic("implement me")
 }
 
-func (s *server) UpgradeService(ctx context.Context, stream pb.GpmService_UpgradeServiceStream) error {
-	panic("implement me")
+func (s *server) Ls(ctx context.Context, req *pb.LsReq, rsp *pb.LsRsp) (err error) {
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
+
+	rsp.Files, err = s.H.Ls(ctx, req.Path)
+	return
 }
 
-func (s *server) RollBackService(ctx context.Context, req *pb.RollbackServiceReq, stream pb.GpmService_RollBackServiceStream) error {
-	panic("implement me")
+func (s *server) Pull(ctx context.Context, req *pb.PullReq, stream pb.GpmService_PullStream) (err error) {
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
+	outs, e := s.H.Pull(ctx, req.Name)
+	if e != nil {
+		err = e
+		return
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case result := <-outs:
+			rsp := &pb.PullRsp{Result: result}
+			e = stream.Send(rsp)
+			if e != nil && e != io.EOF {
+				err = e
+				return
+			}
+			if result.Finished {
+				return
+			}
+		}
+	}
 }
 
-func (s *server) Ls(ctx context.Context, req *pb.LsReq, rsp *pb.LsRsp) error {
-	panic("implement me")
+func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err error) {
+	req, err := stream.Recv()
+	if err != nil {
+		return verrs.InternalServerError(s.Name(), err.Error())
+	}
+
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
+
+	in := make(chan *gpmv1.PushIn, 10)
+	defer close(in)
+
+	in <- req.In
+	outs, e := s.H.Push(ctx, in)
+	if e != nil {
+		err = e
+		return
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case out := <-outs:
+			if out.Error != "" {
+				return verrs.InternalServerError(s.Name(), out.Error)
+			}
+		default:
+		}
+
+		req, err = stream.Recv()
+		if err != nil {
+			return
+		}
+
+		in <- req.In
+	}
 }
 
-func (s *server) Pull(ctx context.Context, req *pb.PullReq, stream pb.GpmService_PullStream) error {
-	panic("implement me")
+func (s *server) Exec(ctx context.Context, req *pb.ExecReq, stream pb.GpmService_ExecStream) (err error) {
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
+	outs, e := s.H.Exec(ctx, req.In)
+	if e != nil {
+		err = e
+		return
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case out := <-outs:
+			rsp := &pb.ExecRsp{Result: out}
+			e = stream.Send(rsp)
+			if e != nil && e != io.EOF {
+				err = e
+				return
+			}
+			if out.Finished {
+				return
+			}
+		}
+	}
 }
 
-func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) error {
-	panic("implement me")
-}
+func (s *server) Terminal(ctx context.Context, stream pb.GpmService_TerminalStream) (err error) {
+	req, err := stream.Recv()
+	if err != nil {
+		return verrs.InternalServerError(s.Name(), err.Error())
+	}
 
-func (s *server) Exec(ctx context.Context, req *pb.ExecReq, rsp *pb.ExecRsp) error {
-	panic("implement me")
-}
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
 
-func (s *server) Terminal(ctx context.Context, stream pb.GpmService_TerminalStream) error {
-	panic("implement me")
+	in := make(chan *gpmv1.TerminalIn, 10)
+	defer close(in)
+
+	in <- req.In
+	outs, e := s.H.Terminal(ctx, in)
+	if e != nil {
+		err = e
+		return
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case out := <-outs:
+			if out.Error != "" {
+				return verrs.InternalServerError(s.Name(), out.Error)
+			}
+
+			rsp := &pb.TerminalRsp{Result: out}
+			e = stream.Send(rsp)
+			if e != nil {
+				err = e
+				return
+			}
+		default:
+		}
+
+		req, err = stream.Recv()
+		if err != nil {
+			return
+		}
+
+		in <- req.In
+	}
 }
 
 func (s *server) Init() error {
@@ -180,9 +338,9 @@ func (s *server) Init() error {
 			cfg.Root = c.String("root")
 			if cfg.Root == "" {
 				if gruntime.GOOS == "windows" {
-					cfg.Root = "C:\\opt\\lack\\gpmd"
+					cfg.Root = "C:\\opt\\gpm"
 				} else {
-					cfg.Root = "/opt/lack/gpmd"
+					cfg.Root = "/opt/gpm"
 				}
 			}
 

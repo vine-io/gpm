@@ -94,3 +94,72 @@ func (m *FileInfo) ValidateE(prefix string) error {
 	errs := make([]error, 0)
 	return is.MargeErr(errs...)
 }
+
+func (m *ExecIn) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ExecIn) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *ExecResult) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ExecResult) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *PullResult) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *PullResult) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *PushIn) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *PushIn) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *PushResult) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *PushResult) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *TerminalIn) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *TerminalIn) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *TerminalResult) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *TerminalResult) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}

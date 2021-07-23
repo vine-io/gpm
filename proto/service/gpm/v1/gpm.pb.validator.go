@@ -382,8 +382,10 @@ func (m *ExecReq) Validate() error {
 
 func (m *ExecReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if len(m.Cmd) == 0 {
-		errs = append(errs, fmt.Errorf("field '%scmd' is required", prefix))
+	if m.In == nil {
+		errs = append(errs, fmt.Errorf("field '%sin' is required", prefix))
+	} else {
+		errs = append(errs, m.In.ValidateE(prefix+"in."))
 	}
 	return is.MargeErr(errs...)
 }
@@ -403,15 +405,10 @@ func (m *TerminalReq) Validate() error {
 
 func (m *TerminalReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if len(m.Cmd) == 0 {
-		errs = append(errs, fmt.Errorf("field '%scmd' is required", prefix))
-	}
-	if len(m.Exec) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sexec' is required", prefix))
+	if m.In == nil {
+		errs = append(errs, fmt.Errorf("field '%sin' is required", prefix))
 	} else {
-		if !is.In([]string{"sh", "bash", "zsh"}, string(m.Exec)) {
-			errs = append(errs, fmt.Errorf("field '%sexec' must in '[sh,bash,zsh]'", prefix))
-		}
+		errs = append(errs, m.In.ValidateE(prefix+"in."))
 	}
 	return is.MargeErr(errs...)
 }

@@ -99,3 +99,15 @@ func injectSysProcAttr(cmd *exec.Cmd, attr *gpmv1.SysProcAttr) {
 
 	cmd.SysProcAttr = sysAttr
 }
+
+func execSysProcAttr(cmd *exec.Cmd, uid, gid int32) {
+	sysAttr := &syscall.SysProcAttr{
+		Setpgid: true,
+		Credential: &syscall.Credential{
+			Uid: uint32(uid),
+			Gid: uint32(gid),
+		},
+	}
+
+	cmd.SysProcAttr = sysAttr
+}

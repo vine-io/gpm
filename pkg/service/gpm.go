@@ -24,6 +24,7 @@ package service
 
 import (
 	"context"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
@@ -33,6 +34,8 @@ import (
 	"github.com/gpm2/gpm/pkg/runtime/config"
 	"github.com/gpm2/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	"github.com/hpcloud/tail"
+
 	"github.com/lack-io/vine"
 	verrs "github.com/lack-io/vine/proto/apis/errors"
 )
@@ -46,6 +49,14 @@ type Gpm interface {
 	StopService(context.Context, string) (*gpmv1.Service, error)
 	RebootService(context.Context, string) (*gpmv1.Service, error)
 	DeleteService(context.Context, string) (*gpmv1.Service, error)
+	CatServiceLog(context.Context, string) ([]byte, error)
+	WatchServiceLog(context.Context, string) (<-chan *gpmv1.ProcLog, error)
+
+	Ls(context.Context, string) ([]*gpmv1.FileInfo, error)
+	Pull(context.Context, string) (<-chan *gpmv1.PullResult, error)
+	Push(context.Context, <-chan *gpmv1.PushIn) (<-chan *gpmv1.PushResult, error)
+	Exec(context.Context, *gpmv1.ExecIn) (<-chan *gpmv1.ExecResult, error)
+	Terminal(context.Context, <-chan *gpmv1.TerminalIn) (<-chan *gpmv1.TerminalResult, error)
 }
 
 func init() {
@@ -263,4 +274,78 @@ func (g *gpm) DeleteService(ctx context.Context, name string) (*gpmv1.Service, e
 
 	err = g.DB.DeleteService(ctx, s.Name)
 	return s, err
+}
+
+func (g *gpm) CatServiceLog(ctx context.Context, name string) ([]byte, error) {
+	f := filepath.Join(g.Cfg.Root, "logs", name)
+	stat, _ := os.Stat(f)
+	if stat == nil {
+		return nil, verrs.NotFound(g.Name(), "service '%s' log not exists", name)
+	}
+
+	var out []byte
+	ech := make(chan error, 1)
+	done := make(chan struct{}, 1)
+
+	go func() {
+		var err error
+		out, err = ioutil.ReadFile(filepath.Join(f, name+".log"))
+		if err != nil {
+			ech <- err
+			return
+		}
+
+		done <- struct{}{}
+	}()
+
+	select {
+	case <-ctx.Done():
+		return out, nil
+	case e := <-ech:
+		return nil, e
+	case <-done:
+		return out, nil
+	}
+}
+
+func (g *gpm) WatchServiceLog(ctx context.Context, name string) (<-chan *gpmv1.ProcLog, error) {
+	f := filepath.Join(g.Cfg.Root, "logs", name)
+	stat, _ := os.Stat(f)
+	if stat == nil {
+		return nil, verrs.NotFound(g.Name(), "service '%s' log not exists", name)
+	}
+
+	out := make(chan *gpmv1.ProcLog, 10)
+	ech := make(chan error, 1)
+
+	go func() {
+		cfg := tail.Config{
+			Poll:   true,
+			Follow: true,
+		}
+
+		t, err := tail.TailFile(filepath.Join(f, name+".log"), cfg)
+		if err != nil {
+			ech <- err
+			return
+		}
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case line := <-t.Lines:
+				l := &gpmv1.ProcLog{
+					Text:      line.Text,
+					Timestamp: line.Time.Unix(),
+				}
+				if line.Err != nil {
+					l.Error = line.Err.Error()
+				}
+				out <- l
+			}
+		}
+	}()
+
+	return out, nil
 }

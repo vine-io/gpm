@@ -23,6 +23,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -33,6 +34,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/gpm2/gpm/pkg/dao"
 	"github.com/gpm2/gpm/pkg/runtime/config"
 	"github.com/gpm2/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
@@ -51,6 +53,7 @@ type Process struct {
 	pr *proc.Process
 
 	cfg *config.Config
+	db  *dao.DB
 
 	lw io.WriteCloser
 
@@ -73,6 +76,7 @@ func NewProcess(in *gpmv1.Service) *Process {
 	}
 
 	_ = inject.Resolve(process.cfg)
+	_ = inject.Resolve(process.db)
 
 	return process
 }
@@ -86,6 +90,7 @@ func (p *Process) Start() (int32, error) {
 			return 0, err
 		}
 	}
+	pid = int32(p.Pid)
 
 	p.done = make(chan struct{}, 1)
 	p.done <- struct{}{}
@@ -174,14 +179,14 @@ func (p *Process) watching() {
 			if err != nil {
 				pid, _ := p.run()
 				log.Infof("reboot service(dead) %s at pid: %d", p.Name, pid)
-				//dao.FromService(p.Service).Updates(context.TODO())
+				p.db.UpdateService(context.TODO(), p.Service)
 			} else {
 				status, _ := pr.Status()
 				if status == "Z" {
 					log.Infof("watching service(pid=%d) %s status: %s", p.Pid, p.Name, status)
 					_ = p.kill()
 					pid, _ := p.run()
-					//dao.FromService(p.Service).Updates(context.TODO())
+					p.db.UpdateService(context.TODO(), p.Service)
 					log.Infof("reboot service(Z) %s at pid: %d", p.Name, pid)
 				}
 			}
