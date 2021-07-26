@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package pkg
 
 import (
 	"context"
@@ -28,7 +28,6 @@ import (
 	"log"
 
 	"github.com/gpm2/gpm/pkg/runtime"
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
 	"github.com/lack-io/vine"
 	"github.com/lack-io/vine/core/client"
@@ -40,20 +39,9 @@ func main() {
 
 	ctx := context.Background()
 
-	rsp, err := cc.Exec(ctx, &pb.ExecReq{In: &gpmv1.ExecIn{
-		Name: "top",
-	}}, client.WithRetries(0))
+	rsp, err := cc.ListServiceVersions(ctx, &pb.ListServiceVersionsReq{Name: "test"}, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}
-	for {
-		out, err := rsp.Recv()
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(out.Result.Result)
-		if out.Result.Finished {
-			break
-		}
-	}
+	fmt.Println(rsp.Versions)
 }

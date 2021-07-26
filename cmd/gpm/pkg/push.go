@@ -20,14 +20,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package pkg
 
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
+	"os"
 
 	"github.com/gpm2/gpm/pkg/runtime"
+	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
 	"github.com/lack-io/vine"
 	"github.com/lack-io/vine/core/client"
@@ -35,32 +38,57 @@ import (
 
 func main() {
 	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+
+	cc := pb.NewGpmService(
+		runtime.GpmName, app.Client(),
+	)
 
 	ctx := context.Background()
 
-	//in := &pb.CreateServiceReq{
-	//	Name: "test",
-	//	Bin:  "/tmp/web",
-	//	Args: nil,
-	//	Dir:  "/tmp",
-	//	Env:  nil,
-	//	//SysProcAttr: ,
-	//	//Log:         nil,
-	//	//Version:     "",
-	//	AutoRestart: false,
-	//}
-	//
-	//rsp, err := client.CreateService(ctx, in)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//fmt.Println(rsp.Service)
+	in := &gpmv1.PushIn{
+		Dst:   "/tmp/web.bbb",
+		Chunk: nil,
+		IsOk:  false,
+	}
 
-	rsp, err := cc.StartService(ctx, &pb.StartServiceReq{Name: "test"}, client.WithRetries(0))
+	rsp, err := cc.Push(ctx, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(rsp.Service)
+	f, err := os.Open("/tmp/web.tar.gz")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	go func() {
+		buf := make([]byte, 1024)
+		for {
+			n, err := f.Read(buf)
+			if err != nil && err != io.EOF {
+				log.Fatal(err)
+			}
+			fmt.Println(n)
+			if n > 0 {
+				in.Chunk = buf[0:n]
+				rsp.Send(&pb.PushReq{In: in})
+			}
+			if err == io.EOF {
+				in.IsOk = true
+				rsp.Send(&pb.PushReq{In: in})
+				return
+			}
+		}
+	}()
+
+	for {
+		result, err := rsp.Recv()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(result)
+		if result.Result.IsOk {
+			return
+		}
+	}
 }

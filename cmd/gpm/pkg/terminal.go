@@ -20,13 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package pkg
 
 import (
 	"context"
-	"io"
+	"fmt"
 	"log"
-	"os"
 
 	"github.com/gpm2/gpm/pkg/runtime"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
@@ -44,48 +43,32 @@ func main() {
 
 	ctx := context.Background()
 
-	in := &pb.UpgradeServiceReq{
-		Name:    "test",
-		Version: "v1.0.1",
+	in := &pb.TerminalReq{
+		In: &gpmv1.TerminalIn{
+			Command: "",
+			Env:     map[string]string{"a": "bbb"},
+			Uid:     0,
+			Gid:     0,
+		},
 	}
 
-	rsp, err := cc.UpgradeService(ctx, client.WithRetries(0))
+	rsp, err := cc.Terminal(ctx, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}
-	f, err := os.Open("/tmp/web.tar.gz")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-	stat, _ := f.Stat()
-	pack := &gpmv1.Package{
-		Package: "/tmp/web.tar.gz",
-		Total:   stat.Size(),
-		Chunk:   nil,
-		IsOk:    false,
-	}
 
-	in.Pack = pack
 	go func() {
-		buf := make([]byte, 1024*32)
-		for {
-			n, err := f.Read(buf)
-			if err != nil && err != io.EOF {
-				log.Fatal(err)
-			}
-
-			if err == io.EOF {
-				in.Pack.IsOk = true
-			}
-
-			in.Pack.Chunk = buf[0:n]
-			rsp.Send(in)
-
-			if err == io.EOF {
-				break
-			}
+		in.In.Command = `echo $a`
+		e := rsp.Send(in)
+		if e != nil {
+			log.Fatal(err)
 		}
+
+		in.In.Command = `ifconfig`
+		rsp.Send(in)
+
+		in.In.Command = `exit`
+		rsp.Send(in)
 	}()
 
 	for {
@@ -93,11 +76,9 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		if out.Result.Error != "" {
-			log.Fatal(out.Result.Error)
-		}
+		fmt.Println(out.Result)
 		if out.Result.IsOk {
-			break
+			return
 		}
 	}
 }

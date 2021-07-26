@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package pkg
 
 import (
 	"context"
@@ -35,32 +35,29 @@ import (
 
 func main() {
 	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+
+	cc := pb.NewGpmService(
+		runtime.GpmName, app.Client(),
+	)
 
 	ctx := context.Background()
 
-	//in := &pb.CreateServiceReq{
-	//	Name: "test",
-	//	Bin:  "/tmp/web",
-	//	Args: nil,
-	//	Dir:  "/tmp",
-	//	Env:  nil,
-	//	//SysProcAttr: ,
-	//	//Log:         nil,
-	//	//Version:     "",
-	//	AutoRestart: false,
-	//}
-	//
-	//rsp, err := client.CreateService(ctx, in)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//fmt.Println(rsp.Service)
+	in := &pb.CreateServiceReq{
+		Name: "test",
+		Bin:  "/tmp/web",
+		Args: nil,
+		Dir:  "/tmp",
+		Env:  nil,
+		//SysProcAttr: ,
+		//Log:         nil,
+		//Version:     "",
+		AutoRestart: 1,
+	}
 
-	rsp, err := cc.RebootService(ctx, &pb.RebootServiceReq{Name: "test"}, client.WithRetries(0))
+	rsp, err := cc.CreateService(ctx, in, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	fmt.Println(rsp.Service)
 }

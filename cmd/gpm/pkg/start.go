@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package pkg
 
 import (
 	"context"
@@ -58,7 +58,7 @@ func main() {
 	//
 	//fmt.Println(rsp.Service)
 
-	rsp, err := cc.StopService(ctx, &pb.StopServiceReq{Name: "test"}, client.WithRetries(0))
+	rsp, err := cc.StartService(ctx, &pb.StartServiceReq{Name: "test"}, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}

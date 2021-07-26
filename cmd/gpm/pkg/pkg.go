@@ -20,28 +20,4 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
-
-import (
-	"context"
-	"fmt"
-	"log"
-
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
-)
-
-func main() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
-
-	ctx := context.Background()
-
-	rsp, err := cc.Ls(ctx, &pb.LsReq{Path: "/"}, client.WithRetries(0))
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(rsp.Files)
-}
+package pkg

@@ -20,14 +20,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package pkg
 
 import (
 	"context"
-	"fmt"
+	"io"
 	"log"
+	"os"
 
 	"github.com/gpm2/gpm/pkg/runtime"
+	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
 	"github.com/lack-io/vine"
 	"github.com/lack-io/vine/core/client"
@@ -35,13 +37,73 @@ import (
 
 func main() {
 	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+
+	cc := pb.NewGpmService(
+		runtime.GpmName, app.Client(),
+	)
 
 	ctx := context.Background()
 
-	rsp, err := cc.ListServiceVersions(ctx, &pb.ListServiceVersionsReq{Name: "test"}, client.WithRetries(0))
+	in := &pb.InstallServiceReq{
+		Name:        "test",
+		Bin:         "/opt/web/web",
+		Args:        nil,
+		Dir:         "/opt/web",
+		Env:         nil,
+		Version:     "v1.0.0",
+		AutoRestart: 1,
+	}
+
+	rsp, err := cc.InstallService(ctx, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(rsp.Versions)
+	f, err := os.Open("/tmp/web.tar.gz")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+	stat, _ := f.Stat()
+	pack := &gpmv1.Package{
+		Package: "/tmp/web.tar.gz",
+		Total:   stat.Size(),
+		Version: "v1.0.0",
+		Chunk:   nil,
+		IsOk:    false,
+	}
+
+	in.Pack = pack
+	go func() {
+		buf := make([]byte, 1024*32)
+		for {
+			n, err := f.Read(buf)
+			if err != nil && err != io.EOF {
+				log.Fatal(err)
+			}
+
+			if err == io.EOF {
+				in.Pack.IsOk = true
+			}
+
+			in.Pack.Chunk = buf[0:n]
+			rsp.Send(in)
+
+			if err == io.EOF {
+				break
+			}
+		}
+	}()
+
+	for {
+		out, err := rsp.Recv()
+		if err != nil {
+			log.Fatal(err)
+		}
+		if out.Result.Error != "" {
+			log.Fatal(out.Result.Error)
+		}
+		if out.Result.IsOk {
+			break
+		}
+	}
 }

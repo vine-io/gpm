@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package pkg
 
 import (
 	"context"
@@ -39,15 +39,28 @@ func main() {
 
 	ctx := context.Background()
 
-	rsp, err := cc.WatchServiceLog(ctx, &pb.WatchServiceLogReq{Name: "test"}, client.WithRetries(0))
+	//in := &pb.CreateServiceReq{
+	//	Name: "test",
+	//	Bin:  "/tmp/web",
+	//	Args: nil,
+	//	Dir:  "/tmp",
+	//	Env:  nil,
+	//	//SysProcAttr: ,
+	//	//Log:         nil,
+	//	//Version:     "",
+	//	AutoRestart: false,
+	//}
+	//
+	//rsp, err := client.CreateService(ctx, in)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//
+	//fmt.Println(rsp.Service)
+
+	rsp, err := cc.CatServiceLog(ctx, &pb.CatServiceLogReq{Name: "test"}, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}
-	for {
-		out, err := rsp.Recv()
-		if err != nil {
-			return
-		}
-		fmt.Println(out)
-	}
+	fmt.Println(string(rsp.Text))
 }

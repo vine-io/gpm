@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package pkg
 
 import (
 	"context"
@@ -36,49 +36,24 @@ import (
 
 func main() {
 	app := vine.NewService()
-
-	cc := pb.NewGpmService(
-		runtime.GpmName, app.Client(),
-	)
+	cc := pb.NewGpmService(runtime.GpmName, app.Client())
 
 	ctx := context.Background()
 
-	in := &pb.TerminalReq{
-		In: &gpmv1.TerminalIn{
-			Command: "",
-			Env:     map[string]string{"a": "bbb"},
-			Uid:     0,
-			Gid:     0,
-		},
-	}
-
-	rsp, err := cc.Terminal(ctx, client.WithRetries(0))
+	rsp, err := cc.Exec(ctx, &pb.ExecReq{In: &gpmv1.ExecIn{
+		Name: "top",
+	}}, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	go func() {
-		in.In.Command = `echo $a`
-		e := rsp.Send(in)
-		if e != nil {
-			log.Fatal(err)
-		}
-
-		in.In.Command = `ifconfig`
-		rsp.Send(in)
-
-		in.In.Command = `exit`
-		rsp.Send(in)
-	}()
-
 	for {
 		out, err := rsp.Recv()
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println(out.Result)
-		if out.Result.IsOk {
-			return
+		fmt.Println(out.Result.Result)
+		if out.Result.Finished {
+			break
 		}
 	}
 }
