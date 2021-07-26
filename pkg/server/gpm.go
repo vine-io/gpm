@@ -383,7 +383,7 @@ func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err
 	defer close(in)
 
 	in <- req.In
-	outs, e := s.H.Push(ctx, in)
+	outs, e := s.H.Push(ctx, req.In.Dst, in)
 	if e != nil {
 		err = e
 		return
@@ -405,9 +405,7 @@ func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err
 		case <-ctx.Done():
 			return
 		case out := <-outs:
-			if out.Error != "" {
-				return verrs.InternalServerError(s.Name(), out.Error)
-			}
+			stream.Send(&pb.PushRsp{Result: out})
 		}
 	}
 }
@@ -476,14 +474,13 @@ func (s *server) Terminal(ctx context.Context, stream pb.GpmService_TerminalStre
 		case <-ctx.Done():
 			return
 		case out := <-outs:
-			if out.Error != "" {
-				return verrs.InternalServerError(s.Name(), out.Error)
-			}
-
 			rsp := &pb.TerminalRsp{Result: out}
 			e = stream.Send(rsp)
 			if e != nil {
 				err = e
+				return
+			}
+			if out.IsOk {
 				return
 			}
 		}

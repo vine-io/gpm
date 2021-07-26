@@ -25,6 +25,7 @@
 package service
 
 import (
+	"os"
 	"os/exec"
 	"os/user"
 	"strconv"
@@ -95,4 +96,40 @@ func injectSysProcAttr(cmd *exec.Cmd, attr *gpmv1.SysProcAttr) {
 	}
 
 	cmd.SysProcAttr = sysAttr
+}
+
+func execSysProcAttr(cmd *exec.Cmd, uid, gid int32) {
+	sysAttr := &syscall.SysProcAttr{
+		Setpgid: true,
+		Credential: &syscall.Credential{
+			Uid: uint32(uid),
+			Gid: uint32(gid),
+		},
+	}
+
+	cmd.SysProcAttr = sysAttr
+}
+
+func startTerminal(uid, gid int32, env map[string]string) *exec.Cmd {
+	cmd := exec.Command("/bin/bash")
+
+	sysAttr := &syscall.SysProcAttr{
+		Setpgid: true,
+		Credential: &syscall.Credential{
+			Uid: uint32(uid),
+			Gid: uint32(gid),
+		},
+	}
+
+	cmd.SysProcAttr = sysAttr
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	for k, v := range env {
+		cmd.Env = append(cmd.Env, k+"="+v)
+	}
+	home, err := os.UserHomeDir()
+	if err == nil {
+		cmd.Dir = home
+	}
+
+	return cmd
 }

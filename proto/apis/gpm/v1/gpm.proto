@@ -141,18 +141,20 @@ message PushIn {
 
 message PushResult {
   string error = 1;
+  bool isOk = 2;
 }
 
 message TerminalIn {
   // +gen:required
-  string name = 1;
-  repeated string args = 2;
-  map<string, string> env = 3;
-  int32 uid = 4;
-  int32 gid = 5;
+  string command = 1;
+  map<string, string> env = 2;
+  int32 uid = 3;
+  int32 gid = 4;
 }
 
 message TerminalResult {
-  string result = 1;
-  string error = 2;
+  bytes stdout = 1;
+  bytes stderr = 2;
+  string error = 3;
+  bool isOk = 4;
 }

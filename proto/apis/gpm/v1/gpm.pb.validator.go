@@ -182,8 +182,8 @@ func (m *TerminalIn) Validate() error {
 
 func (m *TerminalIn) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if len(m.Name) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	if len(m.Command) == 0 {
+		errs = append(errs, fmt.Errorf("field '%scommand' is required", prefix))
 	}
 	return is.MargeErr(errs...)
 }

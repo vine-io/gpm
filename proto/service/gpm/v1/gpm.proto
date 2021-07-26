@@ -61,7 +61,7 @@ service GpmService {
   rpc Pull(PullReq) returns (stream PullRsp);
   // +gen:summary=推送文件
   // +gen:post=/api/v1/Action/push
-  rpc Push(stream PushReq) returns (PushRsp);
+  rpc Push(stream PushReq) returns (stream PushRsp);
   // +gen:summary=远程执行命令
   // +gen:post=/api/v1/Action/exec
   rpc Exec(ExecReq) returns (stream ExecRsp);
@@ -256,7 +256,9 @@ message PushReq {
   gpmv1.PushIn in = 1;
 }
 
-message PushRsp {}
+message PushRsp {
+  gpmv1.PushResult result = 1;
+}
 
 message ExecReq {
   // +gen:required

@@ -256,12 +256,11 @@ func (g *gpm) UpgradeService(
 		vf := service.Version + "@" + time.Now().Format("20060102150405")
 		_ = ioutil.WriteFile(filepath.Join(g.Cfg.Root, "services", name, "versions", vf), []byte(""), os.ModePerm)
 
+		service.Version = version
+		g.DB.UpdateService(ctx, service)
 		if isRunning {
 			g.StartService(ctx, service.Name)
 		}
-
-		service.Version = version
-		g.DB.UpdateService(ctx, service)
 
 		outs <- &gpmv1.UpgradeServiceResult{IsOk: true}
 		return
@@ -301,13 +300,14 @@ func (g *gpm) RollbackService(ctx context.Context, name string, version string) 
 	if err != nil {
 		return verrs.InternalServerError(g.Name(), err.Error())
 	}
-	if isRunning {
-		g.StartService(ctx, name)
-	}
+
 	s.Version = version
 	_, err = g.DB.UpdateService(ctx, s)
 	if err != nil {
 		return err
+	}
+	if isRunning {
+		g.StartService(ctx, name)
 	}
 
 	return nil

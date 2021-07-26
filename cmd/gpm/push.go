@@ -20,55 +20,75 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// +build windows
-
-package service
+package main
 
 import (
+	"context"
+	"fmt"
+	"io"
+	"log"
 	"os"
-	"os/exec"
-	"syscall"
 
+	"github.com/gpm2/gpm/pkg/runtime"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+	"github.com/lack-io/vine"
+	"github.com/lack-io/vine/core/client"
 )
 
-func fillService(service *gpmv1.Service) error {
+func main() {
+	app := vine.NewService()
 
-	return nil
-}
+	cc := pb.NewGpmService(
+		runtime.GpmName, app.Client(),
+	)
 
-func injectSysProcAttr(cmd *exec.Cmd, attr *gpmv1.SysProcAttr) {
-	sysAttr := &syscall.SysProcAttr{
-		HideWindow: true,
+	ctx := context.Background()
+
+	in := &gpmv1.PushIn{
+		Dst:   "/tmp/web.bbb",
+		Chunk: nil,
+		IsOk:  false,
 	}
 
-	cmd.SysProcAttr = sysAttr
-}
-
-func execSysProcAttr(cmd *exec.Cmd, uid, gid int32) {
-	sysAttr := &syscall.SysProcAttr{
-		HideWindow: true,
+	rsp, err := cc.Push(ctx, client.WithRetries(0))
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	cmd.SysProcAttr = sysAttr
-}
-
-func startTerminal(uid, gid int32, env map[string]string) *exec.Cmd {
-	cmd := exec.Command("powershell.exe")
-
-	sysAttr := &syscall.SysProcAttr{
-		HideWindow: true,
+	f, err := os.Open("/tmp/web.tar.gz")
+	if err != nil {
+		log.Fatal(err)
 	}
+	defer f.Close()
 
-	cmd.SysProcAttr = sysAttr
-	cmd.Env = append(cmd.Env, os.Environ()...)
-	for k, v := range env {
-		cmd.Env = append(cmd.Env, k+"="+v)
-	}
-	home, err := os.UserHomeDir()
-	if err == nil {
-		cmd.Dir = home
-	}
+	go func() {
+		buf := make([]byte, 1024)
+		for {
+			n, err := f.Read(buf)
+			if err != nil && err != io.EOF {
+				log.Fatal(err)
+			}
+			fmt.Println(n)
+			if n > 0 {
+				in.Chunk = buf[0:n]
+				rsp.Send(&pb.PushReq{In: in})
+			}
+			if err == io.EOF {
+				in.IsOk = true
+				rsp.Send(&pb.PushReq{In: in})
+				return
+			}
+		}
+	}()
 
-	return cmd
+	for {
+		result, err := rsp.Recv()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(result)
+		if result.Result.IsOk {
+			return
+		}
+	}
 }

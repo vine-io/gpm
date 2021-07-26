@@ -137,11 +137,6 @@ func (in *PushResult) DeepCopyInto(out *PushResult) {
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
 func (in *TerminalIn) DeepCopyInto(out *TerminalIn) {
 	*out = *in
-	if in.Args != nil {
-		in, out := &in.Args, &out.Args
-		*out = make([]string, len(*in))
-		copy(*out, *in)
-	}
 	if in.Env != nil {
 		in, out := &in.Env, &out.Env
 		*out = make(map[string]string, len(*in))

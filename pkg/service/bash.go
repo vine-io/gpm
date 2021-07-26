@@ -7,8 +7,11 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
+	"github.com/google/uuid"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	log "github.com/lack-io/vine/lib/logger"
 	verrs "github.com/lack-io/vine/proto/apis/errors"
 )
 
@@ -123,8 +126,52 @@ func (g *gpm) Pull(ctx context.Context, name string) (<-chan *gpmv1.PullResult, 
 	return outs, nil
 }
 
-func (g *gpm) Push(ctx context.Context, in <-chan *gpmv1.PushIn) (<-chan *gpmv1.PushResult, error) {
-	panic("implement me")
+func (g *gpm) Push(ctx context.Context, dst string, in <-chan *gpmv1.PushIn) (<-chan *gpmv1.PushResult, error) {
+	stat, _ := os.Stat(dst)
+	if stat != nil && stat.IsDir() {
+		dst = filepath.Join(dst, filepath.Base(dst))
+	}
+	dir := filepath.Dir(dst)
+	stat, _ = os.Stat(dir)
+	if stat == nil {
+		err := os.MkdirAll(dir, os.ModePerm)
+		if err != nil {
+			return nil, verrs.InternalServerError(g.Name(), err.Error())
+		}
+	}
+
+	log.Infof("receive file: %s", dst)
+	outs := make(chan *gpmv1.PushResult, 10)
+	go func() {
+		f, err := os.Create(dst)
+		if err != nil {
+			outs <- &gpmv1.PushResult{Error: err.Error()}
+			return
+		}
+		defer f.Close()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case b, ok := <-in:
+				if !ok {
+					return
+				}
+
+				_, err = f.Write(b.Chunk)
+				if err != nil {
+					outs <- &gpmv1.PushResult{Error: err.Error()}
+					return
+				}
+				if b.IsOk {
+					outs <- &gpmv1.PushResult{IsOk: true}
+					return
+				}
+			}
+		}
+	}()
+
+	return outs, nil
 }
 
 func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (<-chan *gpmv1.ExecResult, error) {
@@ -183,5 +230,105 @@ func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (<-chan *gpmv1.ExecRes
 }
 
 func (g *gpm) Terminal(ctx context.Context, in <-chan *gpmv1.TerminalIn) (<-chan *gpmv1.TerminalResult, error) {
-	panic("implement me")
+	b := <-in
+
+	var err error
+	if err = b.Validate(); err != nil {
+		return nil, verrs.BadGateway(g.Name(), err.Error())
+	}
+	tid := uuid.New().String()
+
+	outs := make(chan *gpmv1.TerminalResult, 10)
+
+	cmd := startTerminal(b.Uid, b.Gid, b.Env)
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return nil, verrs.InternalServerError(g.Name(), err.Error())
+	}
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, verrs.InternalServerError(g.Name(), err.Error())
+	}
+	stderr, err := cmd.StderrPipe()
+	if err != nil {
+		return nil, verrs.InternalServerError(g.Name(), err.Error())
+	}
+
+	go func() {
+		var ok bool
+		defer stdin.Close()
+
+		for {
+			shell := strings.TrimSpace(b.Command)
+			if shell == "" {
+				continue
+			}
+			log.Infof("terminal %s write stdin: %s", tid, shell)
+			_, e := stdin.Write([]byte(shell + "\n"))
+			if e != nil {
+				outs <- &gpmv1.TerminalResult{Error: e.Error()}
+				log.Warnf("terminal %s stdin failed: %v", tid, e)
+			}
+
+			select {
+			case <-ctx.Done():
+				return
+			case b, ok = <-in:
+				if !ok {
+					return
+				}
+			}
+		}
+	}()
+
+	go func() {
+		defer stdout.Close()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+
+			buf := make([]byte, 1024*16)
+			n, _ := stdout.Read(buf)
+			if n > 0 {
+				outs <- &gpmv1.TerminalResult{Stdout: buf[0:n]}
+			}
+		}
+	}()
+
+	go func() {
+		defer stderr.Close()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+
+			buf := make([]byte, 1024*16)
+			n, _ := stderr.Read(buf)
+			if n > 0 {
+				outs <- &gpmv1.TerminalResult{Stderr: buf[0:n]}
+			}
+		}
+	}()
+
+	if err = cmd.Start(); err != nil {
+		return nil, verrs.InternalServerError(g.Name(), err.Error())
+	}
+
+	go func() {
+		select {
+		case <-ctx.Done():
+			cmd.Process.Kill()
+			cmd.Process.Wait()
+			cmd.Process.Release()
+			log.Infof("terminal %s done!", tid)
+			return
+		}
+	}()
+
+	return outs, nil
 }

@@ -20,55 +20,65 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// +build windows
-
-package service
+package main
 
 import (
-	"os"
-	"os/exec"
-	"syscall"
+	"context"
+	"fmt"
+	"log"
 
+	"github.com/gpm2/gpm/pkg/runtime"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+	"github.com/lack-io/vine"
+	"github.com/lack-io/vine/core/client"
 )
 
-func fillService(service *gpmv1.Service) error {
+func main() {
+	app := vine.NewService()
 
-	return nil
-}
+	cc := pb.NewGpmService(
+		runtime.GpmName, app.Client(),
+	)
 
-func injectSysProcAttr(cmd *exec.Cmd, attr *gpmv1.SysProcAttr) {
-	sysAttr := &syscall.SysProcAttr{
-		HideWindow: true,
+	ctx := context.Background()
+
+	in := &pb.TerminalReq{
+		In: &gpmv1.TerminalIn{
+			Command: "",
+			Env:     map[string]string{"a": "bbb"},
+			Uid:     0,
+			Gid:     0,
+		},
 	}
 
-	cmd.SysProcAttr = sysAttr
-}
-
-func execSysProcAttr(cmd *exec.Cmd, uid, gid int32) {
-	sysAttr := &syscall.SysProcAttr{
-		HideWindow: true,
+	rsp, err := cc.Terminal(ctx, client.WithRetries(0))
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	cmd.SysProcAttr = sysAttr
-}
+	go func() {
+		in.In.Command = `echo $a`
+		e := rsp.Send(in)
+		if e != nil {
+			log.Fatal(err)
+		}
 
-func startTerminal(uid, gid int32, env map[string]string) *exec.Cmd {
-	cmd := exec.Command("powershell.exe")
+		in.In.Command = `ifconfig`
+		rsp.Send(in)
 
-	sysAttr := &syscall.SysProcAttr{
-		HideWindow: true,
+		in.In.Command = `exit`
+		rsp.Send(in)
+	}()
+
+	for {
+		out, err := rsp.Recv()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(out.Result)
+		if out.Result.IsOk {
+			return
+		}
 	}
-
-	cmd.SysProcAttr = sysAttr
-	cmd.Env = append(cmd.Env, os.Environ()...)
-	for k, v := range env {
-		cmd.Env = append(cmd.Env, k+"="+v)
-	}
-	home, err := os.UserHomeDir()
-	if err == nil {
-		cmd.Dir = home
-	}
-
-	return cmd
 }
