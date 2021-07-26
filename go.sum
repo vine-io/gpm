@@ -359,6 +359,8 @@ github.com/lack-io/gscheduler v0.2.0 h1:CypnkxCe+qJKK4EMMiMoR+Jltz+LECI8A8A/j7pD
 github.com/lack-io/gscheduler v0.2.0/go.mod h1:Q52YN4D8eGbSPbSnRBblJTZTn1niT6wb8gmQi2/SKXI=
 github.com/lack-io/pkg/inject v0.2.0 h1:ZQS6dD3StyhG8zlgCamrM7W3uyKxzn/1OpoHEqBWvcg=
 github.com/lack-io/pkg/inject v0.2.0/go.mod h1:l9iSZNUa+TAoGm6gLxGYUU4KveZVDdB5N8uvHBe49mM=
+github.com/lack-io/pkg/unit v0.2.0 h1:ziAbqw7miooNYC4w+CW5uYPtbe11Le74UET3hpvE8BM=
+github.com/lack-io/pkg/unit v0.2.0/go.mod h1:MmyS1I7fjc71I2GuObaZ/cuXLqT6uOtAd4RoH5ieZ8A=
 github.com/lack-io/plugins/dao/postgres v0.18.0 h1:W1lZGf+hsMthoBMM5htNS0TXGKjaGpf/TmT7sLqwub4=
 github.com/lack-io/plugins/dao/postgres v0.18.0/go.mod h1:x2TUfyxRXwbMLWYITteYGbxZkUHrqS87FxCx6ZM7YEY=
 github.com/lack-io/plugins/dao/postgres v0.20.0 h1:p9TYSpLIpffHpYWe+dmU19wuoXLr00ZlFWdiu4BkmEk=
@@ -400,6 +402,7 @@ github.com/mattn/go-isatty v0.0.9/go.mod h1:YNRxwqDuOph6SZLI9vUUz6OYw3QyUt7WiY2y
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
 github.com/mattn/go-runewidth v0.0.2/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
 github.com/mattn/go-runewidth v0.0.4/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzpuz5H//U1FU=
+github.com/mattn/go-runewidth v0.0.9 h1:Lm995f3rfxdpd6TSmuVCHVb/QhupuXlYr8sCI/QdE+0=
 github.com/mattn/go-runewidth v0.0.9/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m2gUSrubnMI=
 github.com/mattn/go-sqlite3 v1.14.7 h1:fxWBnXkxfM6sRiuH3bqJ4CfzZojMOLVc0UTsTglEghA=
 github.com/mattn/go-sqlite3 v1.14.7/go.mod h1:NyWgC/yNuGj7Q9rpYnZvas74GogHl5/Z4A/KQRfk6bU=
@@ -448,6 +451,7 @@ github.com/oklog/oklog v0.3.2/go.mod h1:FCV+B7mhrz4o+ueLpx+KqkyXRGMWOYEvfiXtdGtb
 github.com/oklog/run v1.0.0/go.mod h1:dlhp/R75TPv97u0XWUtDeV/lRKWPKSdTuV0TZvrmrQA=
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
 github.com/olekukonko/tablewriter v0.0.1/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
+github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=

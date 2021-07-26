@@ -35,7 +35,7 @@ import (
 	"github.com/lack-io/vine/core/client"
 )
 
-func main() {
+func install() {
 	app := vine.NewService()
 
 	cc := pb.NewGpmService(
@@ -67,7 +67,6 @@ func main() {
 	pack := &gpmv1.Package{
 		Package: "/tmp/web.tar.gz",
 		Total:   stat.Size(),
-		Version: "v1.0.0",
 		Chunk:   nil,
 		IsOk:    false,
 	}

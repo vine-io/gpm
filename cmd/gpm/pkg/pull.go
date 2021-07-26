@@ -33,7 +33,7 @@ import (
 	"github.com/lack-io/vine/core/client"
 )
 
-func main() {
+func pull() {
 	app := vine.NewService()
 	cc := pb.NewGpmService(runtime.GpmName, app.Client())
 

@@ -23,41 +23,60 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"log"
+	"os"
+	"sort"
+	"time"
 
+	"github.com/gpm2/gpm/cmd/gpm/pkg"
 	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/lack-io/cli"
+	verrs "github.com/lack-io/vine/proto/apis/errors"
 )
 
 func main() {
-	app := vine.NewService()
-
-	cc := pb.NewGpmService(
-		runtime.GpmName, app.Client(),
-	)
-
-	ctx := context.Background()
-
-	in := &pb.CreateServiceReq{
-		Name: "test",
-		Bin:  "/tmp/web",
-		Args: nil,
-		Dir:  "/tmp",
-		Env:  nil,
-		//SysProcAttr: ,
-		//Log:         nil,
-		//Version:     "",
-		AutoRestart: 1,
+	app := &cli.App{
+		Name:    "gpm",
+		Usage:   "package manage tools",
+		Version: runtime.GetVersion(),
+		Commands: []*cli.Command{
+			pkg.ListServicesCmd(),
+			pkg.GetServiceCmd(),
+		},
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:      "host",
+				Aliases:   []string{"H"},
+				Usage:     "the ip address of gpmd",
+				EnvVars:   []string{"GPM_HOST"},
+				TakesFile: false,
+				Value:     "127.0.0.1:7700",
+			},
+			&cli.DurationFlag{
+				Name:    "request-timeout",
+				Aliases: []string{"R"},
+				Usage:   "specify request timeout for call option",
+				EnvVars: []string{"GPM_REQUEST_TIMEOUT"},
+				Value:   time.Second * 15,
+			},
+		},
+		EnableBashCompletion: true,
+		//Action: func(ctx *cli.Context) error {
+		//	fmt.Println(ctx.Generic("host"))
+		//	fmt.Println(ctx.Args())
+		//	return nil
+		//},
+		Authors: []*cli.Author{{
+			Name:  "lack",
+			Email: "598223084@qq.com",
+		}},
 	}
 
-	rsp, err := cc.CreateService(ctx, in, client.WithRetries(0))
+	sort.Sort(cli.FlagsByName(app.Flags))
+	sort.Sort(cli.CommandsByName(app.Commands))
+
+	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(verrs.FromErr(err).Detail)
 	}
-
-	fmt.Println(rsp.Service)
 }

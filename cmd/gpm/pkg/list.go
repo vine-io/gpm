@@ -25,25 +25,65 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"log"
+	"os"
+	"time"
 
 	"github.com/gpm2/gpm/pkg/runtime"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
+	"github.com/lack-io/pkg/unit"
+	"github.com/olekukonko/tablewriter"
+
+	"github.com/lack-io/cli"
 	"github.com/lack-io/vine/core/client"
+	"github.com/lack-io/vine/core/client/grpc"
 )
 
-func main() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+func listService(c *cli.Context) error {
+	conn := grpc.NewClient(client.Retries(0))
+	cc := pb.NewGpmService(runtime.GpmName, conn)
+
+	addr := c.String("host")
 
 	ctx := context.Background()
 
-	rsp, err := cc.ListService(ctx, &pb.ListServiceReq{}, client.WithRetries(0))
+	in := &pb.ListServiceReq{}
+	rsp, err := cc.ListService(ctx, in, client.WithAddress(addr))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	tw := tablewriter.NewWriter(os.Stdout)
+	tw.SetHeader([]string{"Name", "User", "Pid", "CPU", "Memory", "Status", "Uptime"})
+
 	for _, item := range rsp.Services {
-		fmt.Println(item)
+		row := make([]string, 0)
+		row = append(row, item.Name)
+		if item.SysProcAttr != nil {
+			row = append(row, fmt.Sprintf("%s:%s", item.SysProcAttr.User, item.SysProcAttr.Group))
+		} else {
+			row = append(row, " ")
+		}
+		row = append(row, fmt.Sprintf("%d", item.Pid))
+		row = append(row, fmt.Sprintf("%.1f%%", item.Stat.CpuPercent*100))
+		row = append(row, fmt.Sprintf("%s/%.1f%%", unit.ConvAuto(int64(item.Stat.Memory), 1), item.Stat.MemPercent*100))
+		row = append(row, item.Status)
+		row = append(row, time.Now().Sub(time.Unix(item.StartTimestamp, 0)).String())
+		tw.Append(row)
+	}
+
+	tw.SetColumnColor(tablewriter.Colors{}, tablewriter.Colors{}, tablewriter.Colors{}, tablewriter.Colors{},
+		tablewriter.Colors{}, tablewriter.Colors{tablewriter.FgRedColor}, tablewriter.Colors{})
+	tw.Render()
+	fmt.Fprintf(os.Stdout, "\nTotal: %d\n", rsp.Total)
+
+	return nil
+}
+
+func ListServicesCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "list-service",
+		Usage:    "list all local services",
+		Category: "service",
+		Action:   listService,
 	}
 }

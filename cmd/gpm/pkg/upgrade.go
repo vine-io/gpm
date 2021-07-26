@@ -35,7 +35,7 @@ import (
 	"github.com/lack-io/vine/core/client"
 )
 
-func main() {
+func upgrade() {
 	app := vine.NewService()
 
 	cc := pb.NewGpmService(
