@@ -77,6 +77,39 @@ func (m *GpmInfo) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
+func (m *Package) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *Package) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Package) == 0 {
+		errs = append(errs, fmt.Errorf("field '%spackage' is required", prefix))
+	}
+	if int64(m.Total) == 0 {
+		errs = append(errs, fmt.Errorf("field '%stotal' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *InstallServiceResult) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *InstallServiceResult) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *UpgradeServiceResult) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *UpgradeServiceResult) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
 func (m *ServiceVersion) Validate() error {
 	return m.ValidateE("")
 }

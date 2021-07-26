@@ -232,11 +232,10 @@ func (m *InstallServiceReq) ValidateE(prefix string) error {
 	if len(m.Bin) == 0 {
 		errs = append(errs, fmt.Errorf("field '%sbin' is required", prefix))
 	}
-	if len(m.Package) == 0 {
-		errs = append(errs, fmt.Errorf("field '%spackage' is required", prefix))
-	}
-	if int64(m.Total) == 0 {
-		errs = append(errs, fmt.Errorf("field '%stotal' is required", prefix))
+	if m.Pack == nil {
+		errs = append(errs, fmt.Errorf("field '%spack' is required", prefix))
+	} else {
+		errs = append(errs, m.Pack.ValidateE(prefix+"pack."))
 	}
 	return is.MargeErr(errs...)
 }
@@ -280,11 +279,13 @@ func (m *UpgradeServiceReq) ValidateE(prefix string) error {
 	if len(m.Name) == 0 {
 		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
 	}
-	if len(m.Package) == 0 {
-		errs = append(errs, fmt.Errorf("field '%spackage' is required", prefix))
+	if len(m.Version) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sversion' is required", prefix))
 	}
-	if int64(m.Total) == 0 {
-		errs = append(errs, fmt.Errorf("field '%stotal' is required", prefix))
+	if m.Pack == nil {
+		errs = append(errs, fmt.Errorf("field '%spack' is required", prefix))
+	} else {
+		errs = append(errs, m.Pack.ValidateE(prefix+"pack."))
 	}
 	return is.MargeErr(errs...)
 }

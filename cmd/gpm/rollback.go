@@ -39,11 +39,9 @@ func main() {
 
 	ctx := context.Background()
 
-	rsp, err := cc.ListService(ctx, &pb.ListServiceReq{}, client.WithRetries(0))
+	rsp, err := cc.RollBackService(ctx, &pb.RollbackServiceReq{Name: "test", Revision: "v1.0.0"}, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, item := range rsp.Services {
-		fmt.Println(item)
-	}
+	fmt.Println(rsp)
 }

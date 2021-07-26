@@ -39,11 +39,9 @@ func main() {
 
 	ctx := context.Background()
 
-	rsp, err := cc.ListService(ctx, &pb.ListServiceReq{}, client.WithRetries(0))
+	rsp, err := cc.ListServiceVersions(ctx, &pb.ListServiceVersionsReq{Name: "test"}, client.WithRetries(0))
 	if err != nil {
 		log.Fatal(err)
 	}
-	for _, item := range rsp.Services {
-		fmt.Println(item)
-	}
+	fmt.Println(rsp.Versions)
 }

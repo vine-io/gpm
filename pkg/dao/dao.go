@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	json "github.com/json-iterator/go"
 
@@ -116,6 +118,58 @@ func (db *DB) FindService(ctx context.Context, name string) (*gpmv1.Service, err
 	}
 }
 
+func (db *DB) ListServiceVersion(ctx context.Context, name string) ([]*gpmv1.ServiceVersion, error) {
+	var (
+		done = make(chan struct{}, 1)
+		ech  = make(chan error, 1)
+		outs = make([]*gpmv1.ServiceVersion, 0)
+	)
+
+	go func() {
+		root := filepath.Join(db.Cfg.Root, "services", name, "versions")
+		err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if d.IsDir() && path != root {
+				return filepath.SkipDir
+			}
+
+			if !strings.Contains(d.Name(), "@") {
+				return nil
+			}
+
+			parts := strings.Split(d.Name(), "@")
+			if len(parts) > 1 {
+				t, _ := time.Parse("20060102150405", parts[1])
+				sv := &gpmv1.ServiceVersion{
+					Name:      name,
+					Version:   parts[0],
+					Timestamp: t.Unix(),
+				}
+				outs = append(outs, sv)
+			}
+
+			return nil
+		})
+		if err != nil {
+			ech <- err
+		} else {
+			done <- struct{}{}
+		}
+	}()
+
+	select {
+	case <-ctx.Done():
+		return nil, ErrTimeout
+	case e := <-ech:
+		return nil, e
+	case <-done:
+		return outs, nil
+	}
+}
+
 func (db *DB) CreateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Service, error) {
 	var (
 		done = make(chan struct{}, 1)
@@ -126,6 +180,9 @@ func (db *DB) CreateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 	go func() {
 		_ = os.MkdirAll(filepath.Join(db.Cfg.Root, "services", s.Name), os.ModePerm)
 		_ = os.MkdirAll(filepath.Join(db.Cfg.Root, "logs", s.Name), os.ModePerm)
+		_ = os.MkdirAll(filepath.Join(db.Cfg.Root, "services", s.Name, "versions"), os.ModePerm)
+		version := s.Version + "@" + time.Now().Format("20060102150405")
+		_ = ioutil.WriteFile(filepath.Join(db.Cfg.Root, "services", s.Name, "versions", version), []byte(""), os.ModePerm)
 
 		b, err := json.Marshal(s)
 		if err != nil {

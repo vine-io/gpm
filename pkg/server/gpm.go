@@ -24,6 +24,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"io"
 	gruntime "runtime"
 
@@ -43,6 +44,61 @@ type server struct {
 	vine.Service
 
 	H service.Gpm `inject:""`
+}
+
+func (s *server) Init() error {
+	var err error
+
+	opts := []vine.Option{
+		vine.Name(runtime.GpmName),
+		vine.Id(runtime.GpmId),
+		vine.Version(runtime.GetVersion()),
+		vine.Metadata(map[string]string{
+			"namespace": runtime.Namespace,
+		}),
+		vine.Flags(&cli.StringFlag{
+			Name:    "root",
+			Usage:   "gpmd root directory",
+			EnvVars: []string{"GPMD_ROOT"},
+		}),
+		vine.Action(func(c *cli.Context) error {
+
+			cfg := &config.Config{}
+			cfg.Root = c.String("root")
+			if cfg.Root == "" {
+				if gruntime.GOOS == "windows" {
+					cfg.Root = "C:\\opt\\gpm"
+				} else {
+					cfg.Root = "/opt/gpm"
+				}
+			}
+
+			return inject.Provide(cfg)
+		}),
+	}
+
+	s.Service.Init(opts...)
+
+	db := new(dao.DB)
+	if err = inject.Provide(s.Service, s.Client(), s, db); err != nil {
+		return err
+	}
+
+	// TODO: inject more objects
+
+	if err = inject.Populate(); err != nil {
+		return err
+	}
+
+	if err = s.H.Init(); err != nil {
+		return err
+	}
+
+	if err = pb.RegisterGpmServiceHandler(s.Service.Server(), s); err != nil {
+		return err
+	}
+
+	return err
 }
 
 func (s *server) Healthz(ctx context.Context, req *pb.Empty, rsp *pb.Empty) error {
@@ -150,19 +206,130 @@ func (s *server) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq
 }
 
 func (s *server) InstallService(ctx context.Context, stream pb.GpmService_InstallServiceStream) (err error) {
-	panic("implement me")
+	req, err := stream.Recv()
+	if err != nil {
+		return verrs.InternalServerError(s.Name(), err.Error())
+	}
+
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
+
+	in := make(chan *gpmv1.Package, 10)
+	defer close(in)
+
+	ss := &gpmv1.Service{
+		Name:        req.Name,
+		Bin:         req.Bin,
+		Args:        req.Args,
+		Dir:         req.Dir,
+		Env:         req.Env,
+		SysProcAttr: req.SysProcAttr,
+		Log:         req.Log,
+		Version:     req.Version,
+		AutoRestart: req.AutoRestart,
+	}
+
+	in <- req.Pack
+	outs, e := s.H.InstallService(ctx, ss, in)
+	if e != nil {
+		err = e
+		return
+	}
+
+	go func() {
+		for {
+			req, err = stream.Recv()
+			if err != nil {
+				return
+			}
+
+			in <- req.Pack
+		}
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case out, ok := <-outs:
+			fmt.Println(out, ok)
+			if !ok {
+				return
+			}
+			rsp := &pb.InstallServiceRsp{Result: out}
+			_ = stream.Send(rsp)
+			if out.IsOk {
+				err = nil
+				return
+			}
+		}
+	}
 }
 
 func (s *server) ListServiceVersions(ctx context.Context, req *pb.ListServiceVersionsReq, rsp *pb.ListServiceVersionsRsp) (err error) {
-	panic("implement me")
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
+	rsp.Versions, err = s.H.ListServiceVersions(ctx, req.Name)
+	return
 }
 
 func (s *server) UpgradeService(ctx context.Context, stream pb.GpmService_UpgradeServiceStream) (err error) {
-	panic("implement me")
+	req, err := stream.Recv()
+	if err != nil {
+		return verrs.InternalServerError(s.Name(), err.Error())
+	}
+
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
+
+	in := make(chan *gpmv1.Package, 10)
+	defer close(in)
+
+	in <- req.Pack
+	outs, e := s.H.UpgradeService(ctx, req.Name, req.Version, in)
+	if e != nil {
+		err = e
+		return
+	}
+
+	go func() {
+		for {
+			req, err = stream.Recv()
+			if err != nil {
+				return
+			}
+
+			in <- req.Pack
+		}
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case out := <-outs:
+			if out.Error != "" {
+				return verrs.InternalServerError(s.Name(), out.Error)
+			}
+			rsp := &pb.UpgradeServiceRsp{Result: out}
+			_ = stream.Send(rsp)
+			if out.IsOk {
+				err = nil
+				return
+			}
+		}
+	}
 }
 
-func (s *server) RollBackService(ctx context.Context, req *pb.RollbackServiceReq, stream pb.GpmService_RollBackServiceStream) (err error) {
-	panic("implement me")
+func (s *server) RollBackService(ctx context.Context, req *pb.RollbackServiceReq, rsp *pb.RollbackServiceRsp) (err error) {
+	if err = req.Validate(); err != nil {
+		return verrs.BadGateway(s.Name(), err.Error())
+	}
+	err = s.H.RollbackService(ctx, req.Name, req.Revision)
+	return
 }
 
 func (s *server) Ls(ctx context.Context, req *pb.LsReq, rsp *pb.LsRsp) (err error) {
@@ -222,6 +389,17 @@ func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err
 		return
 	}
 
+	go func() {
+		for {
+			req, err = stream.Recv()
+			if err != nil {
+				return
+			}
+
+			in <- req.In
+		}
+	}()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -230,15 +408,7 @@ func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err
 			if out.Error != "" {
 				return verrs.InternalServerError(s.Name(), out.Error)
 			}
-		default:
 		}
-
-		req, err = stream.Recv()
-		if err != nil {
-			return
-		}
-
-		in <- req.In
 	}
 }
 
@@ -290,6 +460,17 @@ func (s *server) Terminal(ctx context.Context, stream pb.GpmService_TerminalStre
 		return
 	}
 
+	go func() {
+		for {
+			req, err = stream.Recv()
+			if err != nil {
+				return
+			}
+
+			in <- req.In
+		}
+	}()
+
 	for {
 		select {
 		case <-ctx.Done():
@@ -305,71 +486,8 @@ func (s *server) Terminal(ctx context.Context, stream pb.GpmService_TerminalStre
 				err = e
 				return
 			}
-		default:
 		}
-
-		req, err = stream.Recv()
-		if err != nil {
-			return
-		}
-
-		in <- req.In
 	}
-}
-
-func (s *server) Init() error {
-	var err error
-
-	opts := []vine.Option{
-		vine.Name(runtime.GpmName),
-		vine.Id(runtime.GpmId),
-		vine.Version(runtime.GetVersion()),
-		vine.Metadata(map[string]string{
-			"namespace": runtime.Namespace,
-		}),
-		vine.Flags(&cli.StringFlag{
-			Name:    "root",
-			Usage:   "gpmd root directory",
-			EnvVars: []string{"GPMD_ROOT"},
-		}),
-		vine.Action(func(c *cli.Context) error {
-
-			cfg := &config.Config{}
-			cfg.Root = c.String("root")
-			if cfg.Root == "" {
-				if gruntime.GOOS == "windows" {
-					cfg.Root = "C:\\opt\\gpm"
-				} else {
-					cfg.Root = "/opt/gpm"
-				}
-			}
-
-			return inject.Provide(cfg)
-		}),
-	}
-
-	s.Service.Init(opts...)
-
-	db := new(dao.DB)
-	if err = inject.Provide(s.Service, s.Client(), s, db); err != nil {
-		return err
-	}
-
-	// TODO: inject more objects
-
-	if err = inject.Populate(); err != nil {
-		return err
-	}
-
-	if err = s.H.Init(); err != nil {
-		return err
-	}
-
-	if err = pb.RegisterGpmServiceHandler(s.Service.Server(), s); err != nil {
-		return err
-	}
-
-	return err
 }
 
 func New(opts ...vine.Option) *server {

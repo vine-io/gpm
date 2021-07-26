@@ -143,7 +143,6 @@ func NewGpmServiceEndpoints() []*apipb.Endpoint {
 			Path:        []string{"/api/v1/Service/{name}/rollback"},
 			Method:      []string{"POST"},
 			Body:        "*",
-			Stream:      true,
 			Handler:     "rpc",
 		},
 		&apipb.Endpoint{
@@ -210,18 +209,59 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 			},
 		},
 		Paths: map[string]*openapi.OpenAPIPath{
-			"/api/healthz": &openapi.OpenAPIPath{
-				Get: &openapi.OpenAPIPathDocs{
+			"/api/v1/Service/install": &openapi.OpenAPIPath{
+				Post: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
-					Description: "GpmService Healthz",
-					OperationId: "GpmServiceHealthz",
-					Parameters:  []*openapi.PathParameters{},
+					Summary:     "远程安装服务",
+					Description: "GpmService InstallService",
+					OperationId: "GpmServiceInstallService",
+					RequestBody: &openapi.PathRequestBody{
+						Description: "InstallService InstallServiceReq",
+						Content: &openapi.PathRequestBodyContent{
+							ApplicationJson: &openapi.ApplicationContent{
+								Schema: &openapi.Schema{
+									Ref: "#/components/schemas/v1.InstallServiceReq",
+								},
+							},
+						},
+					},
 					Responses: map[string]*openapi.PathResponse{
 						"200": &openapi.PathResponse{
 							Description: "successful response (stream response)",
 							Content: &openapi.PathRequestBodyContent{
 								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.Empty"},
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.InstallServiceRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
+			"/api/v1/Service/{name}/versions": &openapi.OpenAPIPath{
+				Get: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "查看服务历史版本",
+					Description: "GpmService ListServiceVersions",
+					OperationId: "GpmServiceListServiceVersions",
+					Parameters: []*openapi.PathParameters{
+						&openapi.PathParameters{
+							Name:        "name",
+							In:          "path",
+							Description: "ListServiceVersionsReq field name",
+							Required:    true,
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type: "string",
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.ListServiceVersionsRsp"},
 								},
 							},
 						},
@@ -276,119 +316,6 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 					Security: []*openapi.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{name}/action/stop": &openapi.OpenAPIPath{
-				Patch: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "停止服务",
-					Description: "GpmService StopService",
-					OperationId: "GpmServiceStopService",
-					Parameters: []*openapi.PathParameters{
-						&openapi.PathParameters{
-							Name:        "name",
-							In:          "path",
-							Description: "StopServiceReq field name",
-							Required:    true,
-							Explode:     true,
-							Schema: &openapi.Schema{
-								Type: "string",
-							},
-						},
-					},
-					RequestBody: &openapi.PathRequestBody{
-						Description: "StopService StopServiceReq",
-						Content: &openapi.PathRequestBodyContent{
-							ApplicationJson: &openapi.ApplicationContent{
-								Schema: &openapi.Schema{
-									Ref: "#/components/schemas/v1.StopServiceReq",
-								},
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.StopServiceRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
-			"/api/v1/Service/{name}/watchLogs": &openapi.OpenAPIPath{
-				Post: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "动态监听服务日志",
-					Description: "GpmService WatchServiceLog",
-					OperationId: "GpmServiceWatchServiceLog",
-					Parameters: []*openapi.PathParameters{
-						&openapi.PathParameters{
-							Name:        "name",
-							In:          "path",
-							Description: "WatchServiceLogReq field name",
-							Required:    true,
-							Explode:     true,
-							Schema: &openapi.Schema{
-								Type: "string",
-							},
-						},
-					},
-					RequestBody: &openapi.PathRequestBody{
-						Description: "WatchServiceLog WatchServiceLogReq",
-						Content: &openapi.PathRequestBodyContent{
-							ApplicationJson: &openapi.ApplicationContent{
-								Schema: &openapi.Schema{
-									Ref: "#/components/schemas/v1.WatchServiceLogReq",
-								},
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.WatchServiceLogRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
-			"/api/v1/Service/{name}/versions": &openapi.OpenAPIPath{
-				Get: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "查看服务历史版本",
-					Description: "GpmService ListServiceVersions",
-					OperationId: "GpmServiceListServiceVersions",
-					Parameters: []*openapi.PathParameters{
-						&openapi.PathParameters{
-							Name:        "name",
-							In:          "path",
-							Description: "ListServiceVersionsReq field name",
-							Required:    true,
-							Explode:     true,
-							Schema: &openapi.Schema{
-								Type: "string",
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.ListServiceVersionsRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
 			"/api/v1/Service/{name}/action/start": &openapi.OpenAPIPath{
 				Patch: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
@@ -430,18 +357,30 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 					Security: []*openapi.PathSecurity{},
 				},
 			},
-			"/api/v1/Action/push": &openapi.OpenAPIPath{
-				Post: &openapi.OpenAPIPathDocs{
+			"/api/v1/Service/{name}/action/reboot": &openapi.OpenAPIPath{
+				Patch: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
-					Summary:     "推送文件",
-					Description: "GpmService Push",
-					OperationId: "GpmServicePush",
+					Summary:     "重启服务",
+					Description: "GpmService RebootService",
+					OperationId: "GpmServiceRebootService",
+					Parameters: []*openapi.PathParameters{
+						&openapi.PathParameters{
+							Name:        "name",
+							In:          "path",
+							Description: "RebootServiceReq field name",
+							Required:    true,
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type: "string",
+							},
+						},
+					},
 					RequestBody: &openapi.PathRequestBody{
-						Description: "Push PushReq",
+						Description: "RebootService RebootServiceReq",
 						Content: &openapi.PathRequestBodyContent{
 							ApplicationJson: &openapi.ApplicationContent{
 								Schema: &openapi.Schema{
-									Ref: "#/components/schemas/v1.PushReq",
+									Ref: "#/components/schemas/v1.RebootServiceReq",
 								},
 							},
 						},
@@ -451,7 +390,57 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &openapi.PathRequestBodyContent{
 								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.PushRsp"},
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.RebootServiceRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
+			"/api/v1/Service/{name}/logs": &openapi.OpenAPIPath{
+				Get: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "查看服务日志",
+					Description: "GpmService CatServiceLog",
+					OperationId: "GpmServiceCatServiceLog",
+					Parameters: []*openapi.PathParameters{
+						&openapi.PathParameters{
+							Name:        "name",
+							In:          "path",
+							Description: "CatServiceLogReq field name",
+							Required:    true,
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type: "string",
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.CatServiceLogRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
+			"/api/healthz": &openapi.OpenAPIPath{
+				Get: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Description: "GpmService Healthz",
+					OperationId: "GpmServiceHealthz",
+					Parameters:  []*openapi.PathParameters{},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.Empty"},
 								},
 							},
 						},
@@ -512,206 +501,6 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 							Content: &openapi.PathRequestBodyContent{
 								ApplicationJson: &openapi.ApplicationContent{
 									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.DeleteServiceRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
-			"/api/v1/Service/{name}/action/reboot": &openapi.OpenAPIPath{
-				Patch: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "重启服务",
-					Description: "GpmService RebootService",
-					OperationId: "GpmServiceRebootService",
-					Parameters: []*openapi.PathParameters{
-						&openapi.PathParameters{
-							Name:        "name",
-							In:          "path",
-							Description: "RebootServiceReq field name",
-							Required:    true,
-							Explode:     true,
-							Schema: &openapi.Schema{
-								Type: "string",
-							},
-						},
-					},
-					RequestBody: &openapi.PathRequestBody{
-						Description: "RebootService RebootServiceReq",
-						Content: &openapi.PathRequestBodyContent{
-							ApplicationJson: &openapi.ApplicationContent{
-								Schema: &openapi.Schema{
-									Ref: "#/components/schemas/v1.RebootServiceReq",
-								},
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.RebootServiceRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
-			"/api/v1/Service/{name}/upgrade": &openapi.OpenAPIPath{
-				Post: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "升级服务",
-					Description: "GpmService UpgradeService",
-					OperationId: "GpmServiceUpgradeService",
-					Parameters: []*openapi.PathParameters{
-						&openapi.PathParameters{
-							Name:        "name",
-							In:          "path",
-							Description: "服务名称",
-							Required:    true,
-							Explode:     true,
-							Schema: &openapi.Schema{
-								Type: "string",
-							},
-						},
-					},
-					RequestBody: &openapi.PathRequestBody{
-						Description: "UpgradeService UpgradeServiceReq",
-						Content: &openapi.PathRequestBodyContent{
-							ApplicationJson: &openapi.ApplicationContent{
-								Schema: &openapi.Schema{
-									Ref: "#/components/schemas/v1.UpgradeServiceReq",
-								},
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.UpgradeServiceRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
-			"/api/v1/Action/exec": &openapi.OpenAPIPath{
-				Post: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "远程执行命令",
-					Description: "GpmService Exec",
-					OperationId: "GpmServiceExec",
-					RequestBody: &openapi.PathRequestBody{
-						Description: "Exec ExecReq",
-						Content: &openapi.PathRequestBodyContent{
-							ApplicationJson: &openapi.ApplicationContent{
-								Schema: &openapi.Schema{
-									Ref: "#/components/schemas/v1.ExecReq",
-								},
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.ExecRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
-			"/api/v1/Action/terminal": &openapi.OpenAPIPath{
-				Post: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "远程命令行交互",
-					Description: "GpmService Terminal",
-					OperationId: "GpmServiceTerminal",
-					RequestBody: &openapi.PathRequestBody{
-						Description: "Terminal TerminalReq",
-						Content: &openapi.PathRequestBodyContent{
-							ApplicationJson: &openapi.ApplicationContent{
-								Schema: &openapi.Schema{
-									Ref: "#/components/schemas/v1.TerminalReq",
-								},
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.TerminalRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
-			"/api/v1/Service/{name}/logs": &openapi.OpenAPIPath{
-				Get: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "查看服务日志",
-					Description: "GpmService CatServiceLog",
-					OperationId: "GpmServiceCatServiceLog",
-					Parameters: []*openapi.PathParameters{
-						&openapi.PathParameters{
-							Name:        "name",
-							In:          "path",
-							Description: "CatServiceLogReq field name",
-							Required:    true,
-							Explode:     true,
-							Schema: &openapi.Schema{
-								Type: "string",
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.CatServiceLogRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
-			"/api/v1/Service/install": &openapi.OpenAPIPath{
-				Post: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "远程安装服务",
-					Description: "GpmService InstallService",
-					OperationId: "GpmServiceInstallService",
-					RequestBody: &openapi.PathRequestBody{
-						Description: "InstallService InstallServiceReq",
-						Content: &openapi.PathRequestBodyContent{
-							ApplicationJson: &openapi.ApplicationContent{
-								Schema: &openapi.Schema{
-									Ref: "#/components/schemas/v1.InstallServiceReq",
-								},
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.InstallServiceRsp"},
 								},
 							},
 						},
@@ -792,6 +581,216 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 					Security: []*openapi.PathSecurity{},
 				},
 			},
+			"/api/v1/Action/terminal": &openapi.OpenAPIPath{
+				Post: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "远程命令行交互",
+					Description: "GpmService Terminal",
+					OperationId: "GpmServiceTerminal",
+					RequestBody: &openapi.PathRequestBody{
+						Description: "Terminal TerminalReq",
+						Content: &openapi.PathRequestBodyContent{
+							ApplicationJson: &openapi.ApplicationContent{
+								Schema: &openapi.Schema{
+									Ref: "#/components/schemas/v1.TerminalReq",
+								},
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.TerminalRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
+			"/api/v1/Service/{name}/action/stop": &openapi.OpenAPIPath{
+				Patch: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "停止服务",
+					Description: "GpmService StopService",
+					OperationId: "GpmServiceStopService",
+					Parameters: []*openapi.PathParameters{
+						&openapi.PathParameters{
+							Name:        "name",
+							In:          "path",
+							Description: "StopServiceReq field name",
+							Required:    true,
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type: "string",
+							},
+						},
+					},
+					RequestBody: &openapi.PathRequestBody{
+						Description: "StopService StopServiceReq",
+						Content: &openapi.PathRequestBodyContent{
+							ApplicationJson: &openapi.ApplicationContent{
+								Schema: &openapi.Schema{
+									Ref: "#/components/schemas/v1.StopServiceReq",
+								},
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.StopServiceRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
+			"/api/v1/Service/{name}/upgrade": &openapi.OpenAPIPath{
+				Post: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "升级服务",
+					Description: "GpmService UpgradeService",
+					OperationId: "GpmServiceUpgradeService",
+					Parameters: []*openapi.PathParameters{
+						&openapi.PathParameters{
+							Name:        "name",
+							In:          "path",
+							Description: "服务名称",
+							Required:    true,
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type: "string",
+							},
+						},
+					},
+					RequestBody: &openapi.PathRequestBody{
+						Description: "UpgradeService UpgradeServiceReq",
+						Content: &openapi.PathRequestBodyContent{
+							ApplicationJson: &openapi.ApplicationContent{
+								Schema: &openapi.Schema{
+									Ref: "#/components/schemas/v1.UpgradeServiceReq",
+								},
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.UpgradeServiceRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
+			"/api/v1/Action/push": &openapi.OpenAPIPath{
+				Post: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "推送文件",
+					Description: "GpmService Push",
+					OperationId: "GpmServicePush",
+					RequestBody: &openapi.PathRequestBody{
+						Description: "Push PushReq",
+						Content: &openapi.PathRequestBodyContent{
+							ApplicationJson: &openapi.ApplicationContent{
+								Schema: &openapi.Schema{
+									Ref: "#/components/schemas/v1.PushReq",
+								},
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.PushRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
+			"/api/v1/Action/exec": &openapi.OpenAPIPath{
+				Post: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "远程执行命令",
+					Description: "GpmService Exec",
+					OperationId: "GpmServiceExec",
+					RequestBody: &openapi.PathRequestBody{
+						Description: "Exec ExecReq",
+						Content: &openapi.PathRequestBodyContent{
+							ApplicationJson: &openapi.ApplicationContent{
+								Schema: &openapi.Schema{
+									Ref: "#/components/schemas/v1.ExecReq",
+								},
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.ExecRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
+			"/api/v1/Service/{name}/watchLogs": &openapi.OpenAPIPath{
+				Post: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "动态监听服务日志",
+					Description: "GpmService WatchServiceLog",
+					OperationId: "GpmServiceWatchServiceLog",
+					Parameters: []*openapi.PathParameters{
+						&openapi.PathParameters{
+							Name:        "name",
+							In:          "path",
+							Description: "WatchServiceLogReq field name",
+							Required:    true,
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type: "string",
+							},
+						},
+					},
+					RequestBody: &openapi.PathRequestBody{
+						Description: "WatchServiceLog WatchServiceLogReq",
+						Content: &openapi.PathRequestBodyContent{
+							ApplicationJson: &openapi.ApplicationContent{
+								Schema: &openapi.Schema{
+									Ref: "#/components/schemas/v1.WatchServiceLogReq",
+								},
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.WatchServiceLogRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
 			"/api/v1/Action/pull": &openapi.OpenAPIPath{
 				Post: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
@@ -825,9 +824,73 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 		Components: &openapi.OpenAPIComponents{
 			SecuritySchemes: &openapi.SecuritySchemes{},
 			Schemas: map[string]*openapi.Model{
-				"v1.Empty": &openapi.Model{
-					Type:       "object",
-					Properties: map[string]*openapi.Schema{},
+				"v1.InstallServiceReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+						"bin": &openapi.Schema{
+							Type: "string",
+						},
+						"args": &openapi.Schema{
+							Type:  "array",
+							Items: &openapi.Schema{Type: "string"},
+						},
+						"dir": &openapi.Schema{
+							Type: "string",
+						},
+						"env": &openapi.Schema{
+							AdditionalProperties: &openapi.Schema{},
+						},
+						"sysProcAttr": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.SysProcAttr",
+						},
+						"log": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.ProcLog",
+						},
+						"version": &openapi.Schema{
+							Type: "string",
+						},
+						"autoRestart": &openapi.Schema{
+							Type:   "integer",
+							Format: "int32",
+						},
+						"pack": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.Package",
+						},
+					},
+					Required: []string{"name", "bin", "pack"},
+				},
+				"v1.InstallServiceRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"result": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.InstallServiceResult",
+						},
+					},
+				},
+				"v1.ListServiceVersionsReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+					},
+					Required: []string{"name"},
+				},
+				"v1.ListServiceVersionsRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"versions": &openapi.Schema{
+							Type:  "array",
+							Items: &openapi.Schema{Ref: "#/components/schemas/v1.ServiceVersion"},
+						},
+					},
 				},
 				"v1.ListServiceReq": &openapi.Model{
 					Type:       "object",
@@ -892,60 +955,6 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
-				"v1.StopServiceReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"name": &openapi.Schema{
-							Type: "string",
-						},
-					},
-					Required: []string{"name"},
-				},
-				"v1.StopServiceRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"service": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.Service",
-						},
-					},
-				},
-				"v1.WatchServiceLogReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"name": &openapi.Schema{
-							Type: "string",
-						},
-					},
-					Required: []string{"name"},
-				},
-				"v1.WatchServiceLogRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"log": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.ProcLog",
-						},
-					},
-				},
-				"v1.ListServiceVersionsReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"name": &openapi.Schema{
-							Type: "string",
-						},
-					},
-					Required: []string{"name"},
-				},
-				"v1.ListServiceVersionsRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"versions": &openapi.Schema{
-							Type:  "array",
-							Items: &openapi.Schema{Ref: "#/components/schemas/v1.ServiceVersion"},
-						},
-					},
-				},
 				"v1.StartServiceReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -964,16 +973,40 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
-				"v1.PushReq": &openapi.Model{
+				"v1.RebootServiceReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
-						"in": &openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+					},
+					Required: []string{"name"},
+				},
+				"v1.RebootServiceRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"service": &openapi.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.PushIn",
+							Ref:  "#/components/schemas/v1.Service",
 						},
 					},
 				},
-				"v1.PushRsp": &openapi.Model{
+				"v1.CatServiceLogReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+					},
+					Required: []string{"name"},
+				},
+				"v1.CatServiceLogRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"text": &openapi.Schema{},
+					},
+				},
+				"v1.Empty": &openapi.Model{
 					Type:       "object",
 					Properties: map[string]*openapi.Schema{},
 				},
@@ -1013,171 +1046,6 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
-				"v1.RebootServiceReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"name": &openapi.Schema{
-							Type: "string",
-						},
-					},
-					Required: []string{"name"},
-				},
-				"v1.RebootServiceRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"service": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.Service",
-						},
-					},
-				},
-				"v1.UpgradeServiceReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"name": &openapi.Schema{
-							Type: "string",
-						},
-						"package": &openapi.Schema{
-							Type: "string",
-						},
-						"total": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
-						},
-						"chunk": &openapi.Schema{},
-					},
-					Required: []string{"name", "package", "total"},
-				},
-				"v1.UpgradeServiceRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"chunked": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
-						},
-						"speed": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
-						},
-						"msg": &openapi.Schema{
-							Type: "string",
-						},
-					},
-				},
-				"v1.ExecReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"in": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.ExecIn",
-						},
-					},
-					Required: []string{"in"},
-				},
-				"v1.ExecRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"result": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.ExecResult",
-						},
-					},
-				},
-				"v1.TerminalReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"in": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.TerminalIn",
-						},
-					},
-					Required: []string{"in"},
-				},
-				"v1.TerminalRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"result": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.TerminalResult",
-						},
-					},
-				},
-				"v1.CatServiceLogReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"name": &openapi.Schema{
-							Type: "string",
-						},
-					},
-					Required: []string{"name"},
-				},
-				"v1.CatServiceLogRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"text": &openapi.Schema{},
-					},
-				},
-				"v1.InstallServiceReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"name": &openapi.Schema{
-							Type: "string",
-						},
-						"bin": &openapi.Schema{
-							Type: "string",
-						},
-						"args": &openapi.Schema{
-							Type:  "array",
-							Items: &openapi.Schema{Type: "string"},
-						},
-						"dir": &openapi.Schema{
-							Type: "string",
-						},
-						"env": &openapi.Schema{
-							AdditionalProperties: &openapi.Schema{},
-						},
-						"sysProcAttr": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.SysProcAttr",
-						},
-						"log": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.ProcLog",
-						},
-						"version": &openapi.Schema{
-							Type: "string",
-						},
-						"autoRestart": &openapi.Schema{
-							Type:   "integer",
-							Format: "int32",
-						},
-						"package": &openapi.Schema{
-							Type: "string",
-						},
-						"total": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
-						},
-						"chunk": &openapi.Schema{},
-					},
-					Required: []string{"name", "bin", "package", "total"},
-				},
-				"v1.InstallServiceRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"chunked": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
-						},
-						"speed": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
-						},
-						"msg": &openapi.Schema{
-							Type: "string",
-						},
-					},
-				},
 				"v1.RollbackServiceReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -1212,6 +1080,118 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
+				"v1.TerminalReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"in": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.TerminalIn",
+						},
+					},
+					Required: []string{"in"},
+				},
+				"v1.TerminalRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"result": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.TerminalResult",
+						},
+					},
+				},
+				"v1.StopServiceReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+					},
+					Required: []string{"name"},
+				},
+				"v1.StopServiceRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"service": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.Service",
+						},
+					},
+				},
+				"v1.UpgradeServiceReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+						"version": &openapi.Schema{
+							Type: "string",
+						},
+						"pack": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.Package",
+						},
+					},
+					Required: []string{"name", "version", "pack"},
+				},
+				"v1.UpgradeServiceRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"result": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.UpgradeServiceResult",
+						},
+					},
+				},
+				"v1.PushReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"in": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.PushIn",
+						},
+					},
+				},
+				"v1.PushRsp": &openapi.Model{
+					Type:       "object",
+					Properties: map[string]*openapi.Schema{},
+				},
+				"v1.ExecReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"in": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.ExecIn",
+						},
+					},
+					Required: []string{"in"},
+				},
+				"v1.ExecRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"result": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.ExecResult",
+						},
+					},
+				},
+				"v1.WatchServiceLogReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+					},
+					Required: []string{"name"},
+				},
+				"v1.WatchServiceLogRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"log": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.ProcLog",
+						},
+					},
+				},
 				"v1.PullReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -1226,6 +1206,86 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						"result": &openapi.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/v1.PullResult",
+						},
+					},
+				},
+				"v1.SysProcAttr": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"chroot": &openapi.Schema{
+							Type: "string",
+						},
+						"uid": &openapi.Schema{
+							Type:   "integer",
+							Format: "int32",
+						},
+						"user": &openapi.Schema{
+							Type: "string",
+						},
+						"gid": &openapi.Schema{
+							Type:   "integer",
+							Format: "int32",
+						},
+						"group": &openapi.Schema{
+							Type: "string",
+						},
+					},
+				},
+				"v1.ProcLog": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"text": &openapi.Schema{
+							Type: "string",
+						},
+						"error": &openapi.Schema{
+							Type: "string",
+						},
+						"timestamp": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
+					},
+				},
+				"v1.Package": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"package": &openapi.Schema{
+							Type: "string",
+						},
+						"total": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
+						"chunk": &openapi.Schema{},
+						"isOk": &openapi.Schema{
+							Type: "boolean",
+						},
+					},
+					Required: []string{"package", "total"},
+				},
+				"v1.InstallServiceResult": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"isOk": &openapi.Schema{
+							Type: "boolean",
+						},
+						"error": &openapi.Schema{
+							Type: "string",
+						},
+					},
+				},
+				"v1.ServiceVersion": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+						"version": &openapi.Schema{
+							Type: "string",
+						},
+						"timestamp": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
 						},
 					},
 				},
@@ -1293,50 +1353,70 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 					},
 					Required: []string{"name", "bin"},
 				},
-				"v1.SysProcAttr": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"chroot": &openapi.Schema{
-							Type: "string",
-						},
-						"uid": &openapi.Schema{
-							Type:   "integer",
-							Format: "int32",
-						},
-						"user": &openapi.Schema{
-							Type: "string",
-						},
-						"gid": &openapi.Schema{
-							Type:   "integer",
-							Format: "int32",
-						},
-						"group": &openapi.Schema{
-							Type: "string",
-						},
-					},
-				},
-				"v1.ProcLog": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"text": &openapi.Schema{
-							Type: "string",
-						},
-						"error": &openapi.Schema{
-							Type: "string",
-						},
-						"timestamp": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
-						},
-					},
-				},
-				"v1.ServiceVersion": &openapi.Model{
+				"v1.FileInfo": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
 						"name": &openapi.Schema{
 							Type: "string",
 						},
-						"timestamp": &openapi.Schema{
+						"size": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
+						"mode": &openapi.Schema{
+							Type: "string",
+						},
+						"modTime": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
+						"IsDir": &openapi.Schema{
+							Type: "boolean",
+						},
+					},
+				},
+				"v1.TerminalIn": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+						"args": &openapi.Schema{
+							Type:  "array",
+							Items: &openapi.Schema{Type: "string"},
+						},
+						"env": &openapi.Schema{
+							AdditionalProperties: &openapi.Schema{},
+						},
+						"uid": &openapi.Schema{
+							Type:   "integer",
+							Format: "int32",
+						},
+						"gid": &openapi.Schema{
+							Type:   "integer",
+							Format: "int32",
+						},
+					},
+					Required: []string{"name"},
+				},
+				"v1.TerminalResult": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"result": &openapi.Schema{
+							Type: "string",
+						},
+						"error": &openapi.Schema{
+							Type: "string",
+						},
+					},
+				},
+				"v1.UpgradeServiceResult": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"isOk": &openapi.Schema{
+							Type: "boolean",
+						},
+						"error": &openapi.Schema{
 							Type: "string",
 						},
 					},
@@ -1387,63 +1467,6 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 							Type: "string",
 						},
 						"finished": &openapi.Schema{
-							Type: "boolean",
-						},
-					},
-				},
-				"v1.TerminalIn": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"name": &openapi.Schema{
-							Type: "string",
-						},
-						"args": &openapi.Schema{
-							Type:  "array",
-							Items: &openapi.Schema{Type: "string"},
-						},
-						"env": &openapi.Schema{
-							AdditionalProperties: &openapi.Schema{},
-						},
-						"uid": &openapi.Schema{
-							Type:   "integer",
-							Format: "int32",
-						},
-						"gid": &openapi.Schema{
-							Type:   "integer",
-							Format: "int32",
-						},
-					},
-					Required: []string{"name"},
-				},
-				"v1.TerminalResult": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"result": &openapi.Schema{
-							Type: "string",
-						},
-						"error": &openapi.Schema{
-							Type: "string",
-						},
-					},
-				},
-				"v1.FileInfo": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"name": &openapi.Schema{
-							Type: "string",
-						},
-						"size": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
-						},
-						"mode": &openapi.Schema{
-							Type: "string",
-						},
-						"modTime": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
-						},
-						"IsDir": &openapi.Schema{
 							Type: "boolean",
 						},
 					},
@@ -1526,7 +1549,7 @@ type GpmService interface {
 	UpgradeService(ctx context.Context, opts ...client.CallOption) (GpmService_UpgradeServiceService, error)
 	// +gen:summary=回滚服务
 	// +gen:post=/api/v1/Service/{name}/rollback
-	RollBackService(ctx context.Context, in *RollbackServiceReq, opts ...client.CallOption) (GpmService_RollBackServiceService, error)
+	RollBackService(ctx context.Context, in *RollbackServiceReq, opts ...client.CallOption) (*RollbackServiceRsp, error)
 	// +gen:summary=获取目录信息下文件列表
 	// +gen:get=/api/v1/Action/ls
 	Ls(ctx context.Context, in *LsReq, opts ...client.CallOption) (*LsRsp, error)
@@ -1807,53 +1830,14 @@ func (x *gpmServiceUpgradeService) Recv() (*UpgradeServiceRsp, error) {
 	return m, nil
 }
 
-func (c *gpmService) RollBackService(ctx context.Context, in *RollbackServiceReq, opts ...client.CallOption) (GpmService_RollBackServiceService, error) {
-	req := c.c.NewRequest(c.name, "GpmService.RollBackService", &RollbackServiceReq{})
-	stream, err := c.c.Stream(ctx, req, opts...)
+func (c *gpmService) RollBackService(ctx context.Context, in *RollbackServiceReq, opts ...client.CallOption) (*RollbackServiceRsp, error) {
+	req := c.c.NewRequest(c.name, "GpmService.RollBackService", in)
+	out := new(RollbackServiceRsp)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
-	}
-	return &gpmServiceRollBackService{stream}, nil
-}
-
-type GpmService_RollBackServiceService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*RollbackServiceRsp, error)
-}
-
-type gpmServiceRollBackService struct {
-	stream client.Stream
-}
-
-func (x *gpmServiceRollBackService) Close() error {
-	return x.stream.Close()
-}
-
-func (x *gpmServiceRollBackService) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *gpmServiceRollBackService) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *gpmServiceRollBackService) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *gpmServiceRollBackService) Recv() (*RollbackServiceRsp, error) {
-	m := new(RollbackServiceRsp)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 func (c *gpmService) Ls(ctx context.Context, in *LsReq, opts ...client.CallOption) (*LsRsp, error) {
@@ -2105,7 +2089,7 @@ type GpmServiceHandler interface {
 	UpgradeService(context.Context, GpmService_UpgradeServiceStream) error
 	// +gen:summary=回滚服务
 	// +gen:post=/api/v1/Service/{name}/rollback
-	RollBackService(context.Context, *RollbackServiceReq, GpmService_RollBackServiceStream) error
+	RollBackService(context.Context, *RollbackServiceReq, *RollbackServiceRsp) error
 	// +gen:summary=获取目录信息下文件列表
 	// +gen:get=/api/v1/Action/ls
 	Ls(context.Context, *LsReq, *LsRsp) error
@@ -2138,7 +2122,7 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		InstallService(ctx context.Context, stream server.Stream) error
 		ListServiceVersions(ctx context.Context, in *ListServiceVersionsReq, out *ListServiceVersionsRsp) error
 		UpgradeService(ctx context.Context, stream server.Stream) error
-		RollBackService(ctx context.Context, stream server.Stream) error
+		RollBackService(ctx context.Context, in *RollbackServiceReq, out *RollbackServiceRsp) error
 		Ls(ctx context.Context, in *LsReq, out *LsRsp) error
 		Pull(ctx context.Context, stream server.Stream) error
 		Push(ctx context.Context, stream server.Stream) error
@@ -2262,7 +2246,6 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		Path:        []string{"/api/v1/Service/{name}/rollback"},
 		Method:      []string{"POST"},
 		Body:        "*",
-		Stream:      true,
 		Handler:     "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
@@ -2487,44 +2470,8 @@ func (x *gpmServiceUpgradeServiceStream) Recv() (*UpgradeServiceReq, error) {
 	return m, nil
 }
 
-func (h *gpmServiceHandler) RollBackService(ctx context.Context, stream server.Stream) error {
-	m := new(RollbackServiceReq)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.GpmServiceHandler.RollBackService(ctx, m, &gpmServiceRollBackServiceStream{stream})
-}
-
-type GpmService_RollBackServiceStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*RollbackServiceRsp) error
-}
-
-type gpmServiceRollBackServiceStream struct {
-	stream server.Stream
-}
-
-func (x *gpmServiceRollBackServiceStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *gpmServiceRollBackServiceStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *gpmServiceRollBackServiceStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *gpmServiceRollBackServiceStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *gpmServiceRollBackServiceStream) Send(m *RollbackServiceRsp) error {
-	return x.stream.Send(m)
+func (h *gpmServiceHandler) RollBackService(ctx context.Context, in *RollbackServiceReq, out *RollbackServiceRsp) error {
+	return h.GpmServiceHandler.RollBackService(ctx, in, out)
 }
 
 func (h *gpmServiceHandler) Ls(ctx context.Context, in *LsReq, out *LsRsp) error {

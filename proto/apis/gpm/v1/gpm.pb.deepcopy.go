@@ -73,6 +73,21 @@ func (in *GpmInfo) DeepCopyInto(out *GpmInfo) {
 }
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *Package) DeepCopyInto(out *Package) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *InstallServiceResult) DeepCopyInto(out *InstallServiceResult) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *UpgradeServiceResult) DeepCopyInto(out *UpgradeServiceResult) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
 func (in *ServiceVersion) DeepCopyInto(out *ServiceVersion) {
 	*out = *in
 }

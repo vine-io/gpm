@@ -51,7 +51,7 @@ service GpmService {
   rpc UpgradeService(stream UpgradeServiceReq) returns (stream UpgradeServiceRsp);
   // +gen:summary=回滚服务
   // +gen:post=/api/v1/Service/{name}/rollback
-  rpc RollBackService(RollbackServiceReq) returns (stream RollbackServiceRsp);
+  rpc RollBackService(RollbackServiceReq) returns (RollbackServiceRsp);
 
   // +gen:summary=获取目录信息下文件列表
   // +gen:get=/api/v1/Action/ls
@@ -193,16 +193,11 @@ message InstallServiceReq {
   int32 autoRestart = 9;
 
   // +gen:required
-  string package = 21;
-  // +gen:required
-  int64 total = 22;
-  bytes chunk = 23;
+  gpmv1.Package pack = 21;
 }
 
 message InstallServiceRsp {
-  int64 chunked = 1;
-  int64 speed = 2;
-  string msg = 3;
+  gpmv1.InstallServiceResult result = 1;
 }
 
 message ListServiceVersionsReq {
@@ -220,16 +215,14 @@ message UpgradeServiceReq {
   string name = 1;
 
   // +gen:required
-  string package = 11;
+  string version = 2;
+
   // +gen:required
-  int64 total = 12;
-  bytes chunk = 13;
+  gpmv1.Package pack = 21;
 }
 
 message UpgradeServiceRsp {
-  int64 chunked = 1;
-  int64 speed = 2;
-  string msg = 3;
+  gpmv1.UpgradeServiceResult result = 1;
 }
 
 message RollbackServiceReq {

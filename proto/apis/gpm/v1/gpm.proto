@@ -78,9 +78,29 @@ message GpmInfo {
   string gov = 6;
 }
 
+message Package {
+  // +gen:required
+  string package = 1;
+  // +gen:required
+  int64 total = 2;
+  bytes chunk = 3;
+  bool isOk = 4;
+}
+
+message InstallServiceResult {
+  bool isOk = 1;
+  string error = 2;
+}
+
+message UpgradeServiceResult {
+  bool isOk = 1;
+  string error = 2;
+}
+
 message ServiceVersion {
   string name = 1;
-  string timestamp = 2;
+  string version = 2;
+  int64 timestamp = 3;
 }
 
 message FileInfo {

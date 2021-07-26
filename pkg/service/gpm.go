@@ -52,6 +52,11 @@ type Gpm interface {
 	CatServiceLog(context.Context, string) ([]byte, error)
 	WatchServiceLog(context.Context, string) (<-chan *gpmv1.ProcLog, error)
 
+	InstallService(context.Context, *gpmv1.Service, <-chan *gpmv1.Package) (<-chan *gpmv1.InstallServiceResult, error)
+	ListServiceVersions(context.Context, string) ([]*gpmv1.ServiceVersion, error)
+	UpgradeService(context.Context, string, string, <-chan *gpmv1.Package) (<-chan *gpmv1.UpgradeServiceResult, error)
+	RollbackService(context.Context, string, string) error
+
 	Ls(context.Context, string) ([]*gpmv1.FileInfo, error)
 	Pull(context.Context, string) (<-chan *gpmv1.PullResult, error)
 	Push(context.Context, <-chan *gpmv1.PushIn) (<-chan *gpmv1.PushResult, error)
