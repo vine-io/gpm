@@ -28,34 +28,33 @@ import (
 	"os"
 	"time"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+	"github.com/gpm2/gpm/pkg/runtime/client"
 	"github.com/lack-io/pkg/unit"
 	"github.com/olekukonko/tablewriter"
 
 	"github.com/lack-io/cli"
-	"github.com/lack-io/vine/core/client"
-	"github.com/lack-io/vine/core/client/grpc"
+	vclient "github.com/lack-io/vine/core/client"
 )
 
 func listService(c *cli.Context) error {
-	conn := grpc.NewClient(client.Retries(0))
-	cc := pb.NewGpmService(runtime.GpmName, conn)
 
 	addr := c.String("host")
+	cc := client.New(addr)
 
 	ctx := context.Background()
 
-	in := &pb.ListServiceReq{}
-	rsp, err := cc.ListService(ctx, in, client.WithAddress(addr))
+	list, total, err := cc.ListService(ctx, vclient.WithAddress(addr))
 	if err != nil {
 		return err
+	}
+	if total == 0 {
+		return fmt.Errorf("no services")
 	}
 
 	tw := tablewriter.NewWriter(os.Stdout)
 	tw.SetHeader([]string{"Name", "User", "Pid", "CPU", "Memory", "Status", "Uptime"})
 
-	for _, item := range rsp.Services {
+	for _, item := range list {
 		row := make([]string, 0)
 		row = append(row, item.Name)
 		if item.SysProcAttr != nil {
@@ -74,14 +73,14 @@ func listService(c *cli.Context) error {
 	tw.SetColumnColor(tablewriter.Colors{}, tablewriter.Colors{}, tablewriter.Colors{}, tablewriter.Colors{},
 		tablewriter.Colors{}, tablewriter.Colors{tablewriter.FgRedColor}, tablewriter.Colors{})
 	tw.Render()
-	fmt.Fprintf(os.Stdout, "\nTotal: %d\n", rsp.Total)
+	fmt.Fprintf(os.Stdout, "\nTotal: %d\n", total)
 
 	return nil
 }
 
 func ListServicesCmd() *cli.Command {
 	return &cli.Command{
-		Name:     "list-service",
+		Name:     "list",
 		Usage:    "list all local services",
 		Category: "service",
 		Action:   listService,

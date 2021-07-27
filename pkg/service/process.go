@@ -64,6 +64,7 @@ func NewProcess(in *gpmv1.Service) *Process {
 	process := &Process{
 		Service: in,
 		cfg:     &config.Config{},
+		db:      &dao.DB{},
 		done:    make(chan struct{}, 1),
 	}
 	if process.Pid != 0 {

@@ -25,42 +25,46 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"log"
+	"os"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/gpm2/gpm/pkg/runtime/client"
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
 )
 
-func reboot() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+func rebootService(c *cli.Context) error {
 
-	ctx := context.Background()
-
-	//in := &pb.CreateServiceReq{
-	//	Name: "test",
-	//	Bin:  "/tmp/web",
-	//	Args: nil,
-	//	Dir:  "/tmp",
-	//	Env:  nil,
-	//	//SysProcAttr: ,
-	//	//Log:         nil,
-	//	//Version:     "",
-	//	AutoRestart: false,
-	//}
-	//
-	//rsp, err := client.CreateService(ctx, in)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//fmt.Println(rsp.Service)
-
-	rsp, err := cc.RebootService(ctx, &pb.RebootServiceReq{Name: "test"}, client.WithRetries(0))
-	if err != nil {
-		log.Fatal(err)
+	addr := c.String("host")
+	name := c.String("name")
+	if len(name) == 0 {
+		return fmt.Errorf("missing name")
 	}
-	fmt.Println(rsp.Service)
+
+	cc := client.New(addr)
+	ctx := context.Background()
+	outE := os.Stdout
+
+	s, err := cc.RebootService(ctx, name, vclient.WithAddress(addr))
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(outE, "service '%s' %s\n", s.Name, s.Status)
+	return nil
+}
+
+func RebootServiceCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "reboot",
+		Usage:    "reboot a service",
+		Category: "service",
+		Action:   rebootService,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "specify the name of service",
+			},
+		},
+	}
 }

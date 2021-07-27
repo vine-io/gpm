@@ -76,11 +76,10 @@ func (m *CreateServiceReq) Validate() error {
 
 func (m *CreateServiceReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if len(m.Name) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
-	}
-	if len(m.Bin) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sbin' is required", prefix))
+	if m.Spec == nil {
+		errs = append(errs, fmt.Errorf("field '%sspec' is required", prefix))
+	} else {
+		errs = append(errs, m.Spec.ValidateE(prefix+"spec."))
 	}
 	return is.MargeErr(errs...)
 }
@@ -226,11 +225,10 @@ func (m *InstallServiceReq) Validate() error {
 
 func (m *InstallServiceReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if len(m.Name) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
-	}
-	if len(m.Bin) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sbin' is required", prefix))
+	if m.Spec == nil {
+		errs = append(errs, fmt.Errorf("field '%sspec' is required", prefix))
+	} else {
+		errs = append(errs, m.Spec.ValidateE(prefix+"spec."))
 	}
 	if m.Pack == nil {
 		errs = append(errs, fmt.Errorf("field '%spack' is required", prefix))

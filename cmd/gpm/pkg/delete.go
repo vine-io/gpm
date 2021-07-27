@@ -25,42 +25,47 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"log"
+	"os"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/gpm2/gpm/pkg/runtime/client"
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
 )
 
-func delete() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+func deleteService(c *cli.Context) error {
+
+	addr := c.String("host")
+	name := c.String("name")
+	if len(name) == 0 {
+		return fmt.Errorf("missing name")
+	}
+
+	cc := client.New(addr)
 
 	ctx := context.Background()
+	outE := os.Stdout
 
-	//in := &pb.CreateServiceReq{
-	//	Name: "test",
-	//	Bin:  "/tmp/web",
-	//	Args: nil,
-	//	Dir:  "/tmp",
-	//	Env:  nil,
-	//	//SysProcAttr: ,
-	//	//Log:         nil,
-	//	//Version:     "",
-	//	AutoRestart: false,
-	//}
-	//
-	//rsp, err := client.CreateService(ctx, in)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//fmt.Println(rsp.Service)
-
-	rsp, err := cc.DeleteService(ctx, &pb.DeleteServiceReq{Name: "test"}, client.WithRetries(0))
+	s, err := cc.DeleteService(ctx, name, vclient.WithAddress(addr))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	fmt.Println(rsp.Service)
+
+	fmt.Fprintf(outE, "service '%s' deleted\n", s.Name)
+	return nil
+}
+
+func DeleteServiceCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "delete",
+		Usage:    "delete a service",
+		Category: "service",
+		Action:   deleteService,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "specify the name of service",
+			},
+		},
+	}
 }

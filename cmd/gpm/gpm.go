@@ -42,6 +42,12 @@ func main() {
 		Commands: []*cli.Command{
 			pkg.ListServicesCmd(),
 			pkg.GetServiceCmd(),
+			pkg.CreateServiceCmd(),
+			pkg.StartServiceCmd(),
+			pkg.StopServiceCmd(),
+			pkg.DeleteServiceCmd(),
+			pkg.RebootServiceCmd(),
+			pkg.InstallServiceCmd(),
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{

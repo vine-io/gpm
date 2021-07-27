@@ -90,26 +90,8 @@ message GetServiceRsp {
 }
 
 message CreateServiceReq {
-  // 服务名称
   // +gen:required
-  string name = 1;
-  // 执行器路径
-  // +gen:required
-  string bin = 2;
-  // 服务启动参数
-  repeated string args = 3;
-  // 服务家目录
-  string dir = 4;
-  // 服务环境变量
-  map<string, string> env = 5;
-  // 服务系统参数
-  gpmv1.SysProcAttr sysProcAttr = 6;
-  // 服务日志配置
-  gpmv1.ProcLog log = 7;
-  // 服务版本
-  string version = 8;
-  // 是否自启动, 默认为 false
-  int32 autoRestart = 9;
+  gpmv1.ServiceSpec spec = 1;
 }
 
 message CreateServiceRsp {
@@ -167,33 +149,15 @@ message WatchServiceLogReq {
 }
 
 message WatchServiceLogRsp {
-  gpmv1.ProcLog log = 1;
+  gpmv1.ServiceLog log = 1;
 }
 
 message InstallServiceReq {
-  // 服务名称
   // +gen:required
-  string name = 1;
-  // 执行器路径
-  // +gen:required
-  string bin = 2;
-  // 服务启动参数
-  repeated string args = 3;
-  // 服务家目录
-  string dir = 4;
-  // 服务环境变量
-  map<string, string> env = 5;
-  // 服务系统参数
-  gpmv1.SysProcAttr sysProcAttr = 6;
-  // 服务日志配置
-  gpmv1.ProcLog log = 7;
-  // 服务版本
-  string version = 8;
-  // 是否自启动, 默认为 false
-  int32 autoRestart = 9;
+  gpmv1.ServiceSpec spec = 1;
 
   // +gen:required
-  gpmv1.Package pack = 21;
+  gpmv1.Package pack = 2;
 }
 
 message InstallServiceRsp {

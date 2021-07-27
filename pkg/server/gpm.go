@@ -84,8 +84,6 @@ func (s *server) Init() error {
 		return err
 	}
 
-	// TODO: inject more objects
-
 	if err = inject.Populate(); err != nil {
 		return err
 	}
@@ -125,18 +123,7 @@ func (s *server) CreateService(ctx context.Context, req *pb.CreateServiceReq, rs
 	if err = req.Validate(); err != nil {
 		return verrs.BadGateway(s.Name(), err.Error())
 	}
-	ss := &gpmv1.Service{
-		Name:        req.Name,
-		Bin:         req.Bin,
-		Args:        req.Args,
-		Dir:         req.Dir,
-		Env:         req.Env,
-		SysProcAttr: req.SysProcAttr,
-		Log:         req.Log,
-		Version:     req.Version,
-		AutoRestart: req.AutoRestart,
-	}
-	rsp.Service, err = s.H.CreateService(ctx, ss)
+	rsp.Service, err = s.H.CreateService(ctx, req.Spec)
 	return
 }
 
@@ -218,20 +205,7 @@ func (s *server) InstallService(ctx context.Context, stream pb.GpmService_Instal
 	in := make(chan *gpmv1.Package, 10)
 	defer close(in)
 
-	ss := &gpmv1.Service{
-		Name:        req.Name,
-		Bin:         req.Bin,
-		Args:        req.Args,
-		Dir:         req.Dir,
-		Env:         req.Env,
-		SysProcAttr: req.SysProcAttr,
-		Log:         req.Log,
-		Version:     req.Version,
-		AutoRestart: req.AutoRestart,
-	}
-
-	in <- req.Pack
-	outs, e := s.H.InstallService(ctx, ss, in)
+	outs, e := s.H.InstallService(ctx, req.Spec, in)
 	if e != nil {
 		err = e
 		return

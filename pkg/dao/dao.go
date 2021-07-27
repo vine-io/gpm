@@ -251,6 +251,7 @@ func (db *DB) DeleteService(ctx context.Context, name string) error {
 	go func() {
 		_ = os.RemoveAll(filepath.Join(db.Cfg.Root, "services", name))
 		_ = os.RemoveAll(filepath.Join(db.Cfg.Root, "logs", name))
+		_ = os.RemoveAll(filepath.Join(db.Cfg.Root, "packages", name))
 
 		done <- struct{}{}
 	}()

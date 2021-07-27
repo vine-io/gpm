@@ -41,20 +41,20 @@ import (
 
 func (g *gpm) InstallService(
 	ctx context.Context,
-	service *gpmv1.Service,
+	spec *gpmv1.ServiceSpec,
 	in <-chan *gpmv1.Package,
 ) (<-chan *gpmv1.InstallServiceResult, error) {
 
-	v, _ := g.GetService(ctx, service.Name)
+	v, _ := g.GetService(ctx, spec.Name)
 	if v != nil {
-		return nil, verrs.Conflict(g.Name(), "service '%s' already exists", service.Name)
+		return nil, verrs.Conflict(g.Name(), "service '%s' already exists", spec.Name)
 	}
 
 	outs := make(chan *gpmv1.InstallServiceResult, 10)
 
 	go func() {
 		_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages"), 0755)
-		pack := filepath.Join(g.Cfg.Root, "packages", service.Name+"-"+service.Version+".tar.gz")
+		pack := filepath.Join(g.Cfg.Root, "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
 		f, err := os.Create(pack)
 		if err != nil {
 			outs <- &gpmv1.InstallServiceResult{Error: err.Error()}
@@ -89,8 +89,8 @@ func (g *gpm) InstallService(
 			return
 		}
 
-		dir := service.Dir
-		root := dir + "_" + service.Version
+		dir := spec.Dir
+		root := dir + "_" + spec.Version
 		_ = os.MkdirAll(root, 0755)
 		_ = os.Remove(dir)
 		err = os.Symlink(root, dir)
@@ -130,14 +130,14 @@ func (g *gpm) InstallService(
 			file.Close()
 		}
 
-		_, err = g.CreateService(ctx, service)
+		_, err = g.CreateService(ctx, spec)
 		if err != nil {
 			outs <- &gpmv1.InstallServiceResult{Error: err.Error()}
 			return
 		}
 
 		outs <- &gpmv1.InstallServiceResult{IsOk: true}
-		log.Infof("install service %s@%s", service.Name, service.Version)
+		log.Infof("install service %s@%s", spec.Name, spec.Version)
 		return
 	}()
 
@@ -171,7 +171,7 @@ func (g *gpm) UpgradeService(
 
 	go func() {
 		_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages"), 0755)
-		pack := filepath.Join(g.Cfg.Root, "packages", name+"-"+version+".tar.gz")
+		pack := filepath.Join(g.Cfg.Root, "packages", name, name+"-"+version+".tar.gz")
 		f, err := os.Create(pack)
 		if err != nil {
 			outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}

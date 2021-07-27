@@ -44,15 +44,15 @@ type Gpm interface {
 	Init() error
 	ListService(context.Context) ([]*gpmv1.Service, int64, error)
 	GetService(context.Context, string) (*gpmv1.Service, error)
-	CreateService(context.Context, *gpmv1.Service) (*gpmv1.Service, error)
+	CreateService(context.Context, *gpmv1.ServiceSpec) (*gpmv1.Service, error)
 	StartService(context.Context, string) (*gpmv1.Service, error)
 	StopService(context.Context, string) (*gpmv1.Service, error)
 	RebootService(context.Context, string) (*gpmv1.Service, error)
 	DeleteService(context.Context, string) (*gpmv1.Service, error)
 	CatServiceLog(context.Context, string) ([]byte, error)
-	WatchServiceLog(context.Context, string) (<-chan *gpmv1.ProcLog, error)
+	WatchServiceLog(context.Context, string) (<-chan *gpmv1.ServiceLog, error)
 
-	InstallService(context.Context, *gpmv1.Service, <-chan *gpmv1.Package) (<-chan *gpmv1.InstallServiceResult, error)
+	InstallService(context.Context, *gpmv1.ServiceSpec, <-chan *gpmv1.Package) (<-chan *gpmv1.InstallServiceResult, error)
 	ListServiceVersions(context.Context, string) ([]*gpmv1.ServiceVersion, error)
 	UpgradeService(context.Context, string, string, <-chan *gpmv1.Package) (<-chan *gpmv1.UpgradeServiceResult, error)
 	RollbackService(context.Context, string, string) error
@@ -128,9 +128,21 @@ func (g *gpm) GetService(ctx context.Context, name string) (*gpmv1.Service, erro
 	return s, nil
 }
 
-func (g *gpm) CreateService(ctx context.Context, service *gpmv1.Service) (*gpmv1.Service, error) {
-	if v, _ := g.GetService(ctx, service.Name); v != nil {
-		return nil, verrs.Conflict(g.Name(), "service %s already exists", service.Name)
+func (g *gpm) CreateService(ctx context.Context, spec *gpmv1.ServiceSpec) (*gpmv1.Service, error) {
+	if v, _ := g.GetService(ctx, spec.Name); v != nil {
+		return nil, verrs.Conflict(g.Name(), "service %s already exists", spec.Name)
+	}
+
+	service := &gpmv1.Service{
+		Name:        spec.Name,
+		Bin:         spec.Bin,
+		Args:        spec.Args,
+		Dir:         spec.Dir,
+		Env:         spec.Env,
+		SysProcAttr: spec.SysProcAttr,
+		Log:         spec.Log,
+		Version:     spec.Version,
+		AutoRestart: spec.AutoRestart,
 	}
 
 	err := fillService(service)
@@ -313,14 +325,14 @@ func (g *gpm) CatServiceLog(ctx context.Context, name string) ([]byte, error) {
 	}
 }
 
-func (g *gpm) WatchServiceLog(ctx context.Context, name string) (<-chan *gpmv1.ProcLog, error) {
+func (g *gpm) WatchServiceLog(ctx context.Context, name string) (<-chan *gpmv1.ServiceLog, error) {
 	f := filepath.Join(g.Cfg.Root, "logs", name)
 	stat, _ := os.Stat(f)
 	if stat == nil {
 		return nil, verrs.NotFound(g.Name(), "service '%s' log not exists", name)
 	}
 
-	out := make(chan *gpmv1.ProcLog, 10)
+	out := make(chan *gpmv1.ServiceLog, 10)
 	ech := make(chan error, 1)
 
 	go func() {
@@ -340,7 +352,7 @@ func (g *gpm) WatchServiceLog(ctx context.Context, name string) (<-chan *gpmv1.P
 			case <-ctx.Done():
 				return
 			case line := <-t.Lines:
-				l := &gpmv1.ProcLog{
+				l := &gpmv1.ServiceLog{
 					Text:      line.Text,
 					Timestamp: line.Time.Unix(),
 				}

@@ -58,7 +58,39 @@ func (in *SysProcAttr) DeepCopyInto(out *SysProcAttr) {
 }
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *ServiceSpec) DeepCopyInto(out *ServiceSpec) {
+	*out = *in
+	if in.Args != nil {
+		in, out := &in.Args, &out.Args
+		*out = make([]string, len(*in))
+		copy(*out, *in)
+	}
+	if in.Env != nil {
+		in, out := &in.Env, &out.Env
+		*out = make(map[string]string, len(*in))
+		for key, val := range *in {
+			(*out)[key] = val
+		}
+	}
+	if in.SysProcAttr != nil {
+		in, out := &in.SysProcAttr, &out.SysProcAttr
+		*out = new(SysProcAttr)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Log != nil {
+		in, out := &in.Log, &out.Log
+		*out = new(ProcLog)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
 func (in *ProcLog) DeepCopyInto(out *ProcLog) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *ServiceLog) DeepCopyInto(out *ServiceLog) {
 	*out = *in
 }
 

@@ -29,22 +29,16 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+	"github.com/gpm2/gpm/pkg/runtime/client"
 	json "github.com/json-iterator/go"
+	"github.com/lack-io/cli"
 	"github.com/lack-io/pkg/unit"
+	vclient "github.com/lack-io/vine/core/client"
 	tw "github.com/olekukonko/tablewriter"
 	"gopkg.in/yaml.v3"
-
-	"github.com/lack-io/cli"
-	"github.com/lack-io/vine/core/client"
-	"github.com/lack-io/vine/core/client/grpc"
 )
 
 func getService(c *cli.Context) error {
-	conn := grpc.NewClient(client.Retries(0))
-	cc := pb.NewGpmService(runtime.GpmName, conn)
-
 	addr := c.String("host")
 	name := c.String("name")
 	output := c.String("output")
@@ -52,16 +46,16 @@ func getService(c *cli.Context) error {
 		return fmt.Errorf("missing name")
 	}
 
+	cc := client.New(addr)
+
 	ctx := context.Background()
 	outE := os.Stdout
 
-	in := &pb.GetServiceReq{Name: name}
-	rsp, err := cc.GetService(ctx, in, client.WithAddress(addr))
+	s, err := cc.GetService(ctx, name, vclient.WithAddress(addr))
 	if err != nil {
 		return err
 	}
 
-	s := rsp.Service
 	switch output {
 	case "wide":
 		t := tw.NewWriter(os.Stdout)
@@ -125,7 +119,7 @@ func getService(c *cli.Context) error {
 
 func GetServiceCmd() *cli.Command {
 	return &cli.Command{
-		Name:     "get-service",
+		Name:     "get",
 		Usage:    "get service by name",
 		Category: "service",
 		Action:   getService,

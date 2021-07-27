@@ -25,42 +25,46 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"log"
+	"os"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/gpm2/gpm/pkg/runtime/client"
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
 )
 
-func stop() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+func stopService(c *cli.Context) error {
+	addr := c.String("host")
+	name := c.String("name")
+	if len(name) == 0 {
+		return fmt.Errorf("missing name")
+	}
+
+	cc := client.New(addr)
 
 	ctx := context.Background()
+	outE := os.Stdout
 
-	//in := &pb.CreateServiceReq{
-	//	Name: "test",
-	//	Bin:  "/tmp/web",
-	//	Args: nil,
-	//	Dir:  "/tmp",
-	//	Env:  nil,
-	//	//SysProcAttr: ,
-	//	//Log:         nil,
-	//	//Version:     "",
-	//	AutoRestart: false,
-	//}
-	//
-	//rsp, err := client.CreateService(ctx, in)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//fmt.Println(rsp.Service)
-
-	rsp, err := cc.StopService(ctx, &pb.StopServiceReq{Name: "test"}, client.WithRetries(0))
+	s, err := cc.StopService(ctx, name, vclient.WithAddress(addr))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	fmt.Println(rsp.Service)
+
+	fmt.Fprintf(outE, "service '%s' %s\n", s.Name, s.Status)
+	return nil
+}
+
+func StopServiceCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "stop",
+		Usage:    "stop a service",
+		Category: "service",
+		Action:   stopService,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "specify the name of service",
+			},
+		},
+	}
 }

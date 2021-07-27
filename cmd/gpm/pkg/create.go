@@ -25,39 +25,125 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"log"
+	"os"
+	"strings"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/gpm2/gpm/pkg/runtime/client"
+	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
 )
 
-func main() {
-	app := vine.NewService()
+func createService(c *cli.Context) error {
 
-	cc := pb.NewGpmService(
-		runtime.GpmName, app.Client(),
-	)
+	addr := c.String("host")
 
-	ctx := context.Background()
-
-	in := &pb.CreateServiceReq{
-		Name: "test",
-		Bin:  "/tmp/web",
-		Args: nil,
-		Dir:  "/tmp",
-		Env:  nil,
-		//SysProcAttr: ,
-		//Log:         nil,
-		//Version:     "",
+	spec := &gpmv1.ServiceSpec{
+		Env:         map[string]string{},
+		SysProcAttr: &gpmv1.SysProcAttr{},
+		Log:         &gpmv1.ProcLog{},
 		AutoRestart: 1,
 	}
 
-	rsp, err := cc.CreateService(ctx, in, client.WithRetries(0))
-	if err != nil {
-		log.Fatal(err)
+	spec.Name = c.String("name")
+	spec.Bin = c.String("bin")
+	spec.Args = c.StringSlice("args")
+	spec.Dir = c.String("dir")
+	env := c.StringSlice("env")
+	spec.SysProcAttr.User = c.String("user")
+	spec.SysProcAttr.Group = c.String("group")
+	spec.Log.Expire = int32(c.Int("log-expire"))
+	spec.Log.MaxSize = c.Int64("log-max-size")
+	spec.Version = c.String("version")
+	autoRestart := c.Bool("auto-restart")
+	if err := spec.Validate(); err != nil {
+		return err
+	}
+	for _, item := range env {
+		parts := strings.Split(item, "=")
+		if len(parts) > 1 {
+			spec.Env[parts[0]] = parts[1]
+		}
+	}
+	if autoRestart {
+		spec.AutoRestart = 1
+	} else {
+		spec.AutoRestart = 0
 	}
 
-	fmt.Println(rsp.Service)
+	cc := client.New(addr)
+	ctx := context.Background()
+	outE := os.Stdout
+
+	s, err := cc.CreateService(ctx, spec, vclient.WithAddress(addr))
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(outE, "service '%s' %s\n", s.Name, s.Status)
+	return nil
+}
+
+func CreateServiceCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "create",
+		Usage:    "create a service",
+		Category: "service",
+		Action:   createService,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "specify the name for service",
+			},
+			&cli.StringFlag{
+				Name:    "bin",
+				Aliases: []string{"B"},
+				Usage:   "specify the bin for service",
+			},
+			&cli.StringSliceFlag{
+				Name:    "args",
+				Aliases: []string{"A"},
+				Usage:   "specify the args for service",
+			},
+			&cli.StringFlag{
+				Name:    "dir",
+				Aliases: []string{"D"},
+				Usage:   "specify the root directory for service",
+			},
+			&cli.StringSliceFlag{
+				Name:    "env",
+				Aliases: []string{"E"},
+				Usage:   "specify the env for service",
+			},
+			&cli.StringFlag{
+				Name:  "user",
+				Usage: "specify the user for service",
+			},
+			&cli.StringFlag{
+				Name:  "group",
+				Usage: "specify the group for service",
+			},
+			&cli.IntFlag{
+				Name:  "log-expire",
+				Usage: "specify the expire for service log",
+				Value: 30,
+			},
+			&cli.Int64Flag{
+				Name:  "log-max-size",
+				Usage: "specify the max size for service log",
+				Value: 1024 * 1024 * 1,
+			},
+			&cli.StringFlag{
+				Name:    "version",
+				Aliases: []string{"V"},
+				Usage:   "specify the version for service",
+			},
+			&cli.BoolFlag{
+				Name:  "auto-restart",
+				Usage: "Whether auto restart service when it crashing",
+				Value: true,
+			},
+		},
+	}
 }
