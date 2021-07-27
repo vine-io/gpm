@@ -30,7 +30,7 @@ import (
 
 	"github.com/gpm2/gpm/pkg/runtime/client"
 	"github.com/lack-io/pkg/unit"
-	"github.com/olekukonko/tablewriter"
+	twr "github.com/olekukonko/tablewriter"
 
 	"github.com/lack-io/cli"
 	vclient "github.com/lack-io/vine/core/client"
@@ -42,6 +42,7 @@ func listService(c *cli.Context) error {
 	cc := client.New(addr)
 
 	ctx := context.Background()
+	outE := os.Stdout
 
 	list, total, err := cc.ListService(ctx, vclient.WithAddress(addr))
 	if err != nil {
@@ -51,7 +52,7 @@ func listService(c *cli.Context) error {
 		return fmt.Errorf("no services")
 	}
 
-	tw := tablewriter.NewWriter(os.Stdout)
+	tw := twr.NewWriter(outE)
 	tw.SetHeader([]string{"Name", "User", "Pid", "CPU", "Memory", "Status", "Uptime"})
 
 	for _, item := range list {
@@ -70,8 +71,8 @@ func listService(c *cli.Context) error {
 		tw.Append(row)
 	}
 
-	tw.SetColumnColor(tablewriter.Colors{}, tablewriter.Colors{}, tablewriter.Colors{}, tablewriter.Colors{},
-		tablewriter.Colors{}, tablewriter.Colors{tablewriter.FgRedColor}, tablewriter.Colors{})
+	tw.SetColumnColor(twr.Colors{}, twr.Colors{}, twr.Colors{}, twr.Colors{},
+		twr.Colors{}, twr.Colors{twr.FgRedColor}, twr.Colors{})
 	tw.Render()
 	fmt.Fprintf(os.Stdout, "\nTotal: %d\n", total)
 

@@ -24,36 +24,95 @@ package pkg
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log"
+	"os"
+	"strings"
 
-	"github.com/gpm2/gpm/pkg/runtime"
+	"github.com/gpm2/gpm/pkg/runtime/client"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
+	"google.golang.org/grpc/status"
 )
 
-func exec() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+func execBash(c *cli.Context) error {
+
+	in := &gpmv1.ExecIn{}
+
+	addr := c.String("host")
+	in.Name = c.String("cmd")
+	in.Args = c.StringSlice("args")
+	env := c.StringSlice("env")
+	in.User = c.String("user")
+	in.Group = c.String("group")
+	if err := in.Validate(); err != nil {
+		return err
+	}
+	for _, item := range env {
+		parts := strings.Split(item, "=")
+		if len(parts) > 1 {
+			in.Env[parts[0]] = parts[1]
+		}
+	}
+
+	cc := client.New(addr)
 
 	ctx := context.Background()
+	outE := os.Stdout
 
-	rsp, err := cc.Exec(ctx, &pb.ExecReq{In: &gpmv1.ExecIn{
-		Name: "top",
-	}}, client.WithRetries(0))
+	s, err := cc.Exec(ctx, in, vclient.WithAddress(addr))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
 	for {
-		out, err := rsp.Recv()
+		b, err := s.Next()
 		if err != nil {
-			log.Fatal(err)
+			return errors.New(status.Convert(err).Message())
 		}
-		fmt.Println(out.Result.Result)
-		if out.Result.Finished {
+		if b.Error != "" {
+			return errors.New(b.Error)
+		}
+		fmt.Fprintln(outE, b.Result)
+		if b.Finished {
 			break
 		}
+	}
+
+	return nil
+}
+
+func ExecBashCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "exec",
+		Usage:    "execute command",
+		Category: "bash",
+		Action:   execBash,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "cmd",
+				Aliases: []string{"C"},
+				Usage:   "specify the command for exec",
+			},
+			&cli.StringSliceFlag{
+				Name:    "args",
+				Aliases: []string{"A"},
+				Usage:   "specify the args for exec",
+			},
+			&cli.StringSliceFlag{
+				Name:    "env",
+				Aliases: []string{"E"},
+				Usage:   "specify the env for exec",
+			},
+			&cli.StringFlag{
+				Name:  "user",
+				Usage: "specify the user for exec",
+			},
+			&cli.StringFlag{
+				Name:  "group",
+				Usage: "specify the group for exec",
+			},
+		},
 	}
 }

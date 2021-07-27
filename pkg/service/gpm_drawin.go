@@ -101,32 +101,47 @@ func injectSysProcAttr(cmd *exec.Cmd, attr *gpmv1.SysProcAttr) {
 	cmd.SysProcAttr = sysAttr
 }
 
-func execSysProcAttr(cmd *exec.Cmd, uid, gid int32) {
+func execSysProcAttr(cmd *exec.Cmd, in *gpmv1.ExecIn) {
+
 	sysAttr := &syscall.SysProcAttr{
 		Setpgid: true,
-		Credential: &syscall.Credential{
+	}
+
+	u, _ := user.Lookup(in.User)
+	group, _ := user.LookupGroup(in.Group)
+	if u != nil && group != nil {
+		uid, _ := strconv.ParseInt(u.Uid, 10, 64)
+		gid, _ := strconv.ParseInt(group.Gid, 10, 64)
+		sysAttr.Credential = &syscall.Credential{
 			Uid: uint32(uid),
 			Gid: uint32(gid),
-		},
+		}
 	}
 
 	cmd.SysProcAttr = sysAttr
 }
 
-func startTerminal(uid, gid int32, env map[string]string) *exec.Cmd {
+func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
 	cmd := exec.Command("/bin/bash")
 
 	sysAttr := &syscall.SysProcAttr{
 		Setpgid: true,
-		Credential: &syscall.Credential{
+	}
+
+	u, _ := user.Lookup(in.User)
+	group, _ := user.LookupGroup(in.Group)
+	if u != nil && group != nil {
+		uid, _ := strconv.ParseInt(u.Uid, 10, 64)
+		gid, _ := strconv.ParseInt(group.Gid, 10, 64)
+		sysAttr.Credential = &syscall.Credential{
 			Uid: uint32(uid),
 			Gid: uint32(gid),
-		},
+		}
 	}
 
 	cmd.SysProcAttr = sysAttr
 	cmd.Env = append(cmd.Env, os.Environ()...)
-	for k, v := range env {
+	for k, v := range in.Env {
 		cmd.Env = append(cmd.Env, k+"="+v)
 	}
 	home, err := os.UserHomeDir()

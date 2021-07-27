@@ -177,27 +177,6 @@ func (m *DeleteServiceRsp) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
-func (m *CatServiceLogReq) Validate() error {
-	return m.ValidateE("")
-}
-
-func (m *CatServiceLogReq) ValidateE(prefix string) error {
-	errs := make([]error, 0)
-	if len(m.Name) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
-	}
-	return is.MargeErr(errs...)
-}
-
-func (m *CatServiceLogRsp) Validate() error {
-	return m.ValidateE("")
-}
-
-func (m *CatServiceLogRsp) ValidateE(prefix string) error {
-	errs := make([]error, 0)
-	return is.MargeErr(errs...)
-}
-
 func (m *WatchServiceLogReq) Validate() error {
 	return m.ValidateE("")
 }

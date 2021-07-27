@@ -47,7 +47,15 @@ func main() {
 			pkg.StopServiceCmd(),
 			pkg.DeleteServiceCmd(),
 			pkg.RebootServiceCmd(),
+			pkg.TailServiceCmd(),
+
 			pkg.InstallServiceCmd(),
+			pkg.UpgradeServiceCmd(),
+			pkg.RollbackServiceCmd(),
+			pkg.VersionServiceCmd(),
+
+			pkg.LsBashCmd(),
+			pkg.ExecBashCmd(),
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -67,11 +75,9 @@ func main() {
 			},
 		},
 		EnableBashCompletion: true,
-		//Action: func(ctx *cli.Context) error {
-		//	fmt.Println(ctx.Generic("host"))
-		//	fmt.Println(ctx.Args())
-		//	return nil
-		//},
+		Action: func(ctx *cli.Context) error {
+			return nil
+		},
 		Authors: []*cli.Author{{
 			Name:  "lack",
 			Email: "598223084@qq.com",

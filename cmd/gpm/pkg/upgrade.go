@@ -24,80 +24,154 @@ package pkg
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"io"
-	"log"
 	"os"
+	"path/filepath"
 
-	"github.com/gpm2/gpm/pkg/runtime"
+	"github.com/gpm2/gpm/pkg/runtime/client"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
+	pbr "github.com/schollz/progressbar/v3"
+	"google.golang.org/grpc/status"
 )
 
-func upgrade() {
-	app := vine.NewService()
+func upgradeService(c *cli.Context) error {
 
-	cc := pb.NewGpmService(
-		runtime.GpmName, app.Client(),
+	addr := c.String("host")
+
+	pack := c.String("package")
+	if len(pack) == 0 {
+		return fmt.Errorf("missing package")
+	}
+
+	name := c.String("name")
+	v := c.String("version")
+	if name == "" {
+		return fmt.Errorf("missing name")
+	}
+	if v == "" {
+		return fmt.Errorf("missing version")
+	}
+
+	cc := client.New(addr)
+	ctx := context.Background()
+	ech := make(chan error, 1)
+	done := make(chan struct{}, 1)
+	buf := make([]byte, 1024*32)
+	outE := os.Stdout
+
+	svc, err := cc.GetService(ctx, name, vclient.WithAddress(addr))
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Open(pack)
+	if err != nil {
+		return err
+	}
+
+	s, err := cc.UpgradeService(ctx, name, v, vclient.WithAddress(addr))
+	if err != nil {
+		return err
+	}
+
+	pb := pbr.NewOptions(0,
+		pbr.OptionSetWriter(outE),
+		pbr.OptionSetDescription(fmt.Sprintf("upload [%s]", pack)),
+		pbr.OptionShowBytes(true),
+		pbr.OptionEnableColorCodes(true),
+		pbr.OptionOnCompletion(func() {
+			fmt.Fprintf(outE, "\n")
+		}),
 	)
 
-	ctx := context.Background()
-
-	in := &pb.UpgradeServiceReq{
-		Name:    "test",
-		Version: "v1.0.1",
-	}
-
-	rsp, err := cc.UpgradeService(ctx, client.WithRetries(0))
-	if err != nil {
-		log.Fatal(err)
-	}
-	f, err := os.Open("/tmp/web.tar.gz")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-	stat, _ := f.Stat()
-	pack := &gpmv1.Package{
-		Package: "/tmp/web.tar.gz",
-		Total:   stat.Size(),
-		Chunk:   nil,
-		IsOk:    false,
-	}
-
-	in.Pack = pack
 	go func() {
-		buf := make([]byte, 1024*32)
+		p := &gpmv1.Package{Package: filepath.Base(pack)}
+		stat, _ := file.Stat()
+		if stat != nil {
+			p.Total = stat.Size()
+		}
+		pb.ChangeMax64(p.Total)
 		for {
-			n, err := f.Read(buf)
-			if err != nil && err != io.EOF {
-				log.Fatal(err)
+			n, e := file.Read(buf)
+			if e != nil && e != io.EOF {
+				ech <- e
+				return
 			}
 
-			if err == io.EOF {
-				in.Pack.IsOk = true
+			if e == io.EOF {
+				p.IsOk = true
 			}
 
-			in.Pack.Chunk = buf[0:n]
-			rsp.Send(in)
+			_ = pb.Add(n)
 
-			if err == io.EOF {
+			p.Length = int64(n)
+			p.Chunk = buf[0:n]
+			e1 := s.Send(p)
+			if e1 != nil {
+				return
+			}
+
+			if e == io.EOF {
 				break
 			}
 		}
 	}()
 
-	for {
-		out, err := rsp.Recv()
-		if err != nil {
-			log.Fatal(err)
+	go func() {
+		for {
+			b, err := s.Recv()
+			if err != nil {
+				ech <- errors.New(status.Convert(err).Message())
+				return
+			}
+			if len(b.Error) != 0 {
+				ech <- errors.New(b.Error)
+				return
+			}
+			if b.IsOk {
+				done <- struct{}{}
+				return
+			}
 		}
-		if out.Result.Error != "" {
-			log.Fatal(out.Result.Error)
-		}
-		if out.Result.IsOk {
-			break
-		}
+	}()
+
+	select {
+	case e := <-ech:
+		_ = pb.Clear()
+		return e
+	case <-done:
+	}
+
+	fmt.Fprintf(outE, "upgrade service %s %s -> %s\n", name, svc.Version, v)
+	return nil
+}
+
+func UpgradeServiceCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "upgrade",
+		Usage:    "upgrade a service",
+		Category: "service",
+		Action:   upgradeService,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "package",
+				Aliases: []string{"P"},
+				Usage:   "specify the package for service",
+			},
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "specify the name for service",
+			},
+			&cli.StringFlag{
+				Name:    "version",
+				Aliases: []string{"V"},
+				Usage:   "specify the version for service",
+			},
+		},
 	}
 }

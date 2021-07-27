@@ -110,16 +110,12 @@ func (s *SimpleClient) DeleteService(ctx context.Context, name string, opts ...c
 	return rsp.Service, nil
 }
 
-func (s *SimpleClient) CatServiceLog(ctx context.Context, name string, opts ...client.CallOption) ([]byte, error) {
-	rsp, err := s.cc.CatServiceLog(ctx, &pb.CatServiceLogReq{Name: name}, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return rsp.Text, nil
-}
-
-func (s *SimpleClient) WatchServiceLog(ctx context.Context, name string, opts ...client.CallOption) (*ServiceLogWatcher, error) {
-	rsp, err := s.cc.WatchServiceLog(ctx, &pb.WatchServiceLogReq{Name: name}, opts...)
+func (s *SimpleClient) WatchServiceLog(ctx context.Context, name string, n int64, f bool, opts ...client.CallOption) (*ServiceLogWatcher, error) {
+	rsp, err := s.cc.WatchServiceLog(ctx, &pb.WatchServiceLogReq{
+		Name:   name,
+		Number: n,
+		Follow: f,
+	}, opts...)
 	if err != nil {
 		return nil, err
 	}

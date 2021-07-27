@@ -47,8 +47,6 @@ func terminal() {
 		In: &gpmv1.TerminalIn{
 			Command: "",
 			Env:     map[string]string{"a": "bbb"},
-			Uid:     0,
-			Gid:     0,
 		},
 	}
 

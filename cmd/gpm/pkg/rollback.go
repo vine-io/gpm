@@ -25,23 +25,59 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"log"
+	"os"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/gpm2/gpm/pkg/runtime/client"
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
 )
 
-func df() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
-
-	ctx := context.Background()
-
-	rsp, err := cc.RollBackService(ctx, &pb.RollbackServiceReq{Name: "test", Revision: "v1.0.0"}, client.WithRetries(0))
-	if err != nil {
-		log.Fatal(err)
+func rollbackService(c *cli.Context) error {
+	addr := c.String("host")
+	name := c.String("name")
+	revision := c.String("revision")
+	if len(name) == 0 {
+		return fmt.Errorf("missing name")
 	}
-	fmt.Println(rsp)
+	if len(revision) == 0 {
+		return fmt.Errorf("missing revision")
+	}
+
+	cc := client.New(addr)
+	ctx := context.Background()
+	outE := os.Stdout
+
+	s, err := cc.GetService(ctx, name, vclient.WithAddress(addr))
+	if err != nil {
+		return err
+	}
+
+	err = cc.RollBackService(ctx, name, revision, vclient.WithAddress(addr))
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(outE, "rollback %s %s -> %s\n", s.Name, s.Version, revision)
+	return nil
+}
+
+func RollbackServiceCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "rollback",
+		Usage:    "reboot a service",
+		Category: "service",
+		Action:   rollbackService,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "specify the name of service",
+			},
+			&cli.StringFlag{
+				Name:    "revision",
+				Aliases: []string{"R"},
+				Usage:   "specify the revision of service",
+			},
+		},
+	}
 }

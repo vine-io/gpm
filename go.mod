@@ -14,7 +14,9 @@ require (
 	github.com/lack-io/pkg/unit v0.2.0
 	github.com/lack-io/vine v0.20.4
 	github.com/olekukonko/tablewriter v0.0.5
+	github.com/schollz/progressbar/v3 v3.8.2
 	github.com/shirou/gopsutil v3.21.6+incompatible
 	github.com/tklauser/go-sysconf v0.3.7 // indirect
 	google.golang.org/grpc v1.38.0
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )

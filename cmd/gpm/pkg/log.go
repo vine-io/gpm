@@ -24,43 +24,72 @@ package pkg
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log"
+	"os"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/gpm2/gpm/pkg/runtime/client"
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
+	"google.golang.org/grpc/status"
 )
 
-func logs() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+func tailService(c *cli.Context) error {
+	addr := c.String("host")
+	name := c.String("name")
+	number := c.Int64("number")
+	follow := c.Bool("follow")
+	if len(name) == 0 {
+		return fmt.Errorf("missing name")
+	}
+
+	cc := client.New(addr)
 
 	ctx := context.Background()
+	outE := os.Stdout
 
-	//in := &pb.CreateServiceReq{
-	//	Name: "test",
-	//	Bin:  "/tmp/web",
-	//	Args: nil,
-	//	Dir:  "/tmp",
-	//	Env:  nil,
-	//	//SysProcAttr: ,
-	//	//Log:         nil,
-	//	//Version:     "",
-	//	AutoRestart: false,
-	//}
-	//
-	//rsp, err := client.CreateService(ctx, in)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//
-	//fmt.Println(rsp.Service)
-
-	rsp, err := cc.CatServiceLog(ctx, &pb.CatServiceLogReq{Name: "test"}, client.WithRetries(0))
+	s, err := cc.WatchServiceLog(ctx, name, number, follow, vclient.WithAddress(addr))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	fmt.Println(string(rsp.Text))
+
+	for {
+		b, err := s.Next()
+		if err != nil {
+			return errors.New(status.Convert(err).Message())
+		}
+		if b.Error != "" {
+			return errors.New(b.Error)
+		}
+		fmt.Fprintln(outE, b.Text)
+	}
+
+	return nil
+}
+
+func TailServiceCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "tail",
+		Usage:    "tail service logs",
+		Category: "service",
+		Action:   tailService,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "specify the name of service",
+			},
+			&cli.Int64Flag{
+				Name:    "number",
+				Aliases: []string{"n"},
+				Usage:   "specify the number of service log",
+				Value:   1024,
+			},
+			&cli.BoolFlag{
+				Name:    "follow",
+				Aliases: []string{"f"},
+				Usage:   "whether watching service log",
+			},
+		},
+	}
 }

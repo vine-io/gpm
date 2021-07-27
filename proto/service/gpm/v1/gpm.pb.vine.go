@@ -95,14 +95,6 @@ func NewGpmServiceEndpoints() []*apipb.Endpoint {
 			Handler:     "rpc",
 		},
 		&apipb.Endpoint{
-			Name:        "GpmService.CatServiceLog",
-			Description: "GpmService.CatServiceLog",
-			Path:        []string{"/api/v1/Service/{name}/logs"},
-			Method:      []string{"GET"},
-			Body:        "*",
-			Handler:     "rpc",
-		},
-		&apipb.Endpoint{
 			Name:        "GpmService.WatchServiceLog",
 			Description: "GpmService.WatchServiceLog",
 			Path:        []string{"/api/v1/Service/{name}/watchLogs"},
@@ -635,37 +627,6 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 					Security: []*openapi.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{name}/logs": &openapi.OpenAPIPath{
-				Get: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "查看服务日志",
-					Description: "GpmService CatServiceLog",
-					OperationId: "GpmServiceCatServiceLog",
-					Parameters: []*openapi.PathParameters{
-						&openapi.PathParameters{
-							Name:        "name",
-							In:          "path",
-							Description: "CatServiceLogReq field name",
-							Required:    true,
-							Explode:     true,
-							Schema: &openapi.Schema{
-								Type: "string",
-							},
-						},
-					},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.CatServiceLogRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
 			"/api/v1/Service/{name}/rollback": &openapi.OpenAPIPath{
 				Post: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
@@ -1068,21 +1029,6 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
-				"v1.CatServiceLogReq": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"name": &openapi.Schema{
-							Type: "string",
-						},
-					},
-					Required: []string{"name"},
-				},
-				"v1.CatServiceLogRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"text": &openapi.Schema{},
-					},
-				},
 				"v1.RollbackServiceReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -1148,6 +1094,13 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						"name": &openapi.Schema{
 							Type: "string",
 						},
+						"number": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
+						"follow": &openapi.Schema{
+							Type: "boolean",
+						},
 					},
 					Required: []string{"name"},
 				},
@@ -1173,13 +1126,11 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						"env": &openapi.Schema{
 							AdditionalProperties: &openapi.Schema{},
 						},
-						"uid": &openapi.Schema{
-							Type:   "integer",
-							Format: "int32",
+						"user": &openapi.Schema{
+							Type: "string",
 						},
-						"gid": &openapi.Schema{
-							Type:   "integer",
-							Format: "int32",
+						"group": &openapi.Schema{
+							Type: "string",
 						},
 					},
 					Required: []string{"name"},
@@ -1227,6 +1178,10 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 							Type: "string",
 						},
 						"chunk": &openapi.Schema{},
+						"length": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
 						"error": &openapi.Schema{
 							Type: "string",
 						},
@@ -1242,6 +1197,10 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 							Type: "string",
 						},
 						"chunk": &openapi.Schema{},
+						"length": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
 						"isOk": &openapi.Schema{
 							Type: "boolean",
 						},
@@ -1267,13 +1226,11 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						"env": &openapi.Schema{
 							AdditionalProperties: &openapi.Schema{},
 						},
-						"uid": &openapi.Schema{
-							Type:   "integer",
-							Format: "int32",
+						"user": &openapi.Schema{
+							Type: "string",
 						},
-						"gid": &openapi.Schema{
-							Type:   "integer",
-							Format: "int32",
+						"group": &openapi.Schema{
+							Type: "string",
 						},
 					},
 					Required: []string{"command"},
@@ -1390,7 +1347,7 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 							Format: "int32",
 						},
 					},
-					Required: []string{"name", "bin"},
+					Required: []string{"name", "bin", "version"},
 				},
 				"v1.Package": &openapi.Model{
 					Type: "object",
@@ -1403,6 +1360,10 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 							Format: "int64",
 						},
 						"chunk": &openapi.Schema{},
+						"length": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
 						"isOk": &openapi.Schema{
 							Type: "boolean",
 						},
@@ -1543,9 +1504,6 @@ type GpmService interface {
 	// +gen:summary=删除服务
 	// +gen:delete=/api/v1/Service/{name}
 	DeleteService(ctx context.Context, in *DeleteServiceReq, opts ...client.CallOption) (*DeleteServiceRsp, error)
-	// +gen:summary=查看服务日志
-	// +gen:get=/api/v1/Service/{name}/logs
-	CatServiceLog(ctx context.Context, in *CatServiceLogReq, opts ...client.CallOption) (*CatServiceLogRsp, error)
 	// +gen:summary=动态监听服务日志
 	// +gen:post=/api/v1/Service/{name}/watchLogs
 	WatchServiceLog(ctx context.Context, in *WatchServiceLogReq, opts ...client.CallOption) (GpmService_WatchServiceLogService, error)
@@ -1663,16 +1621,6 @@ func (c *gpmService) RebootService(ctx context.Context, in *RebootServiceReq, op
 func (c *gpmService) DeleteService(ctx context.Context, in *DeleteServiceReq, opts ...client.CallOption) (*DeleteServiceRsp, error) {
 	req := c.c.NewRequest(c.name, "GpmService.DeleteService", in)
 	out := new(DeleteServiceRsp)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *gpmService) CatServiceLog(ctx context.Context, in *CatServiceLogReq, opts ...client.CallOption) (*CatServiceLogRsp, error) {
-	req := c.c.NewRequest(c.name, "GpmService.CatServiceLog", in)
-	out := new(CatServiceLogRsp)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -2088,9 +2036,6 @@ type GpmServiceHandler interface {
 	// +gen:summary=删除服务
 	// +gen:delete=/api/v1/Service/{name}
 	DeleteService(context.Context, *DeleteServiceReq, *DeleteServiceRsp) error
-	// +gen:summary=查看服务日志
-	// +gen:get=/api/v1/Service/{name}/logs
-	CatServiceLog(context.Context, *CatServiceLogReq, *CatServiceLogRsp) error
 	// +gen:summary=动态监听服务日志
 	// +gen:post=/api/v1/Service/{name}/watchLogs
 	WatchServiceLog(context.Context, *WatchServiceLogReq, GpmService_WatchServiceLogStream) error
@@ -2133,7 +2078,6 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		StopService(ctx context.Context, in *StopServiceReq, out *StopServiceRsp) error
 		RebootService(ctx context.Context, in *RebootServiceReq, out *RebootServiceRsp) error
 		DeleteService(ctx context.Context, in *DeleteServiceReq, out *DeleteServiceRsp) error
-		CatServiceLog(ctx context.Context, in *CatServiceLogReq, out *CatServiceLogRsp) error
 		WatchServiceLog(ctx context.Context, stream server.Stream) error
 		InstallService(ctx context.Context, stream server.Stream) error
 		ListServiceVersions(ctx context.Context, in *ListServiceVersionsReq, out *ListServiceVersionsRsp) error
@@ -2210,14 +2154,6 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		Description: "GpmService.DeleteService",
 		Path:        []string{"/api/v1/Service/{name}"},
 		Method:      []string{"DELETE"},
-		Body:        "*",
-		Handler:     "rpc",
-	}))
-	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
-		Name:        "GpmService.CatServiceLog",
-		Description: "GpmService.CatServiceLog",
-		Path:        []string{"/api/v1/Service/{name}/logs"},
-		Method:      []string{"GET"},
 		Body:        "*",
 		Handler:     "rpc",
 	}))
@@ -2346,10 +2282,6 @@ func (h *gpmServiceHandler) RebootService(ctx context.Context, in *RebootService
 
 func (h *gpmServiceHandler) DeleteService(ctx context.Context, in *DeleteServiceReq, out *DeleteServiceRsp) error {
 	return h.GpmServiceHandler.DeleteService(ctx, in, out)
-}
-
-func (h *gpmServiceHandler) CatServiceLog(ctx context.Context, in *CatServiceLogReq, out *CatServiceLogRsp) error {
-	return h.GpmServiceHandler.CatServiceLog(ctx, in, out)
 }
 
 func (h *gpmServiceHandler) WatchServiceLog(ctx context.Context, stream server.Stream) error {

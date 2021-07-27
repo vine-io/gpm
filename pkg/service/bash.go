@@ -38,6 +38,10 @@ func (g *gpm) Ls(ctx context.Context, root string) ([]*gpmv1.FileInfo, error) {
 			return err
 		}
 
+		if root == path {
+			return nil
+		}
+
 		info, _ := d.Info()
 		if info != nil {
 			files = append(files, &gpmv1.FileInfo{
@@ -82,6 +86,7 @@ func (g *gpm) Pull(ctx context.Context, name string) (<-chan *gpmv1.PullResult, 
 				out <- &gpmv1.PullResult{
 					Name:     name,
 					Chunk:    buf[0:nr],
+					Length:   int64(nr),
 					Finished: false,
 				}
 			}
@@ -158,10 +163,12 @@ func (g *gpm) Push(ctx context.Context, dst string, in <-chan *gpmv1.PushIn) (<-
 					return
 				}
 
-				_, err = f.Write(b.Chunk)
-				if err != nil {
-					outs <- &gpmv1.PushResult{Error: err.Error()}
-					return
+				if b.Length > 0 {
+					_, err = f.Write(b.Chunk)
+					if err != nil {
+						outs <- &gpmv1.PushResult{Error: err.Error()}
+						return
+					}
 				}
 				if b.IsOk {
 					outs <- &gpmv1.PushResult{IsOk: true}
@@ -177,7 +184,7 @@ func (g *gpm) Push(ctx context.Context, dst string, in <-chan *gpmv1.PushIn) (<-
 func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (<-chan *gpmv1.ExecResult, error) {
 
 	cmd := exec.CommandContext(ctx, in.Name, in.Args...)
-	execSysProcAttr(cmd, in.Uid, in.Gid)
+	execSysProcAttr(cmd, in)
 
 	out := make(chan *gpmv1.ExecResult, 10)
 	ech := make(chan error, 1)
@@ -185,16 +192,16 @@ func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (<-chan *gpmv1.ExecRes
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, err
+		return nil, verrs.InternalServerError(g.Name(), err.Error())
 	}
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return nil, err
+		return nil, verrs.InternalServerError(g.Name(), err.Error())
 	}
 
 	if err = cmd.Start(); err != nil {
-		return nil, err
+		return nil, verrs.InternalServerError(g.Name(), err.Error())
 	}
 
 	buf := make([]byte, 1024*32)
@@ -220,7 +227,7 @@ func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (<-chan *gpmv1.ExecRes
 
 	go func() {
 		if err = cmd.Wait(); err != nil {
-			ech <- err
+			ech <- verrs.InternalServerError(g.Name(), err.Error())
 		} else {
 			done <- struct{}{}
 		}
@@ -240,7 +247,7 @@ func (g *gpm) Terminal(ctx context.Context, in <-chan *gpmv1.TerminalIn) (<-chan
 
 	outs := make(chan *gpmv1.TerminalResult, 10)
 
-	cmd := startTerminal(b.Uid, b.Gid, b.Env)
+	cmd := startTerminal(b)
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
 		return nil, verrs.InternalServerError(g.Name(), err.Error())

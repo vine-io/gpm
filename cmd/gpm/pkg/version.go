@@ -25,23 +25,64 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"log"
+	"os"
+	"time"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/gpm2/gpm/pkg/runtime/client"
+	"github.com/olekukonko/tablewriter"
+
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
 )
 
-func version() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+func versionService(c *cli.Context) error {
+
+	addr := c.String("host")
+	name := c.String("name")
+	if len(name) == 0 {
+		return fmt.Errorf("missing name")
+	}
+
+	cc := client.New(addr)
 
 	ctx := context.Background()
+	outE := os.Stdout
 
-	rsp, err := cc.ListServiceVersions(ctx, &pb.ListServiceVersionsReq{Name: "test"}, client.WithRetries(0))
+	list, err := cc.ListServiceVersions(ctx, name, vclient.WithAddress(addr))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	fmt.Println(rsp.Versions)
+
+	if len(list) > 0 {
+		tw := tablewriter.NewWriter(outE)
+		tw.SetHeader([]string{"Name", "Version", "Time"})
+
+		for _, item := range list {
+			row := make([]string, 0)
+			row = append(row, item.Name)
+			row = append(row, item.Version)
+			row = append(row, time.Unix(item.Timestamp, 0).String())
+			tw.Append(row)
+		}
+
+		tw.Render()
+	}
+
+	return nil
+}
+
+func VersionServiceCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "version",
+		Usage:    "list service history versions",
+		Category: "bash",
+		Action:   versionService,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "the specify the name for version",
+			},
+		},
+	}
 }

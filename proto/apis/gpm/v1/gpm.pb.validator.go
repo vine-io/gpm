@@ -62,6 +62,9 @@ func (m *ServiceSpec) ValidateE(prefix string) error {
 	if len(m.Bin) == 0 {
 		errs = append(errs, fmt.Errorf("field '%sbin' is required", prefix))
 	}
+	if len(m.Version) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sversion' is required", prefix))
+	}
 	return is.MargeErr(errs...)
 }
 
@@ -76,15 +79,6 @@ func (m *ProcLog) ValidateE(prefix string) error {
 	}
 	if int64(m.Expire) != 0 {
 	}
-	return is.MargeErr(errs...)
-}
-
-func (m *ServiceLog) Validate() error {
-	return m.ValidateE("")
-}
-
-func (m *ServiceLog) ValidateE(prefix string) error {
-	errs := make([]error, 0)
 	return is.MargeErr(errs...)
 }
 
@@ -135,6 +129,15 @@ func (m *UpgradeServiceResult) Validate() error {
 }
 
 func (m *UpgradeServiceResult) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *ServiceLog) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ServiceLog) ValidateE(prefix string) error {
 	errs := make([]error, 0)
 	return is.MargeErr(errs...)
 }

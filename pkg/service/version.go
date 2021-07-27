@@ -53,7 +53,7 @@ func (g *gpm) InstallService(
 	outs := make(chan *gpmv1.InstallServiceResult, 10)
 
 	go func() {
-		_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages"), 0755)
+		_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages", spec.Name), 0755)
 		pack := filepath.Join(g.Cfg.Root, "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
 		f, err := os.Create(pack)
 		if err != nil {
@@ -70,10 +70,12 @@ func (g *gpm) InstallService(
 				if !ok {
 					return
 				}
-				_, err = f.Write(p.Chunk)
-				if err != nil {
-					outs <- &gpmv1.InstallServiceResult{Error: err.Error()}
-					return
+				if p.Length > 0 {
+					_, err = f.Write(p.Chunk[0:p.Length])
+					if err != nil {
+						outs <- &gpmv1.InstallServiceResult{Error: err.Error()}
+						return
+					}
 				}
 				if p.IsOk {
 					goto CHUNKED
@@ -167,10 +169,14 @@ func (g *gpm) UpgradeService(
 		return nil, err
 	}
 
+	if service.Version == version {
+		return nil, verrs.Conflict(g.Name(), "version %s already exists", version)
+	}
+
 	outs := make(chan *gpmv1.UpgradeServiceResult, 10)
 
 	go func() {
-		_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages"), 0755)
+		_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages", name), 0755)
 		pack := filepath.Join(g.Cfg.Root, "packages", name, name+"-"+version+".tar.gz")
 		f, err := os.Create(pack)
 		if err != nil {
@@ -187,10 +193,12 @@ func (g *gpm) UpgradeService(
 				if !ok {
 					return
 				}
-				_, err = f.Write(p.Chunk)
-				if err != nil {
-					outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
-					return
+				if p.Length > 0 {
+					_, err = f.Write(p.Chunk[0:p.Length])
+					if err != nil {
+						outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
+						return
+					}
 				}
 				if p.IsOk {
 					goto CHUNKED

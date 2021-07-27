@@ -24,7 +24,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"io"
 	gruntime "runtime"
 
@@ -159,20 +158,12 @@ func (s *server) DeleteService(ctx context.Context, req *pb.DeleteServiceReq, rs
 	return
 }
 
-func (s *server) CatServiceLog(ctx context.Context, req *pb.CatServiceLogReq, rsp *pb.CatServiceLogRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	rsp.Text, err = s.H.CatServiceLog(ctx, req.Name)
-	return
-}
-
 func (s *server) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq, stream pb.GpmService_WatchServiceLogStream) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadGateway(s.Name(), err.Error())
 	}
 
-	outs, e := s.H.WatchServiceLog(ctx, req.Name)
+	outs, e := s.H.WatchServiceLog(ctx, req.Name, req.Number, req.Follow)
 	if e != nil {
 		err = e
 		return
@@ -203,8 +194,7 @@ func (s *server) InstallService(ctx context.Context, stream pb.GpmService_Instal
 	}
 
 	in := make(chan *gpmv1.Package, 10)
-	defer close(in)
-
+	in <- req.Pack
 	outs, e := s.H.InstallService(ctx, req.Spec, in)
 	if e != nil {
 		err = e
@@ -212,6 +202,7 @@ func (s *server) InstallService(ctx context.Context, stream pb.GpmService_Instal
 	}
 
 	go func() {
+		defer close(in)
 		for {
 			req, err = stream.Recv()
 			if err != nil {
@@ -227,7 +218,6 @@ func (s *server) InstallService(ctx context.Context, stream pb.GpmService_Instal
 		case <-ctx.Done():
 			return
 		case out, ok := <-outs:
-			fmt.Println(out, ok)
 			if !ok {
 				return
 			}

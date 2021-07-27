@@ -90,11 +90,6 @@ func (in *ProcLog) DeepCopyInto(out *ProcLog) {
 }
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
-func (in *ServiceLog) DeepCopyInto(out *ServiceLog) {
-	*out = *in
-}
-
-// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
 func (in *Stat) DeepCopyInto(out *Stat) {
 	*out = *in
 }
@@ -116,6 +111,11 @@ func (in *InstallServiceResult) DeepCopyInto(out *InstallServiceResult) {
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
 func (in *UpgradeServiceResult) DeepCopyInto(out *UpgradeServiceResult) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *ServiceLog) DeepCopyInto(out *ServiceLog) {
 	*out = *in
 }
 

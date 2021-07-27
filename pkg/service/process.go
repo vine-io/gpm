@@ -266,9 +266,9 @@ func (p *Process) stop() error {
 }
 
 func statProcess(s *gpmv1.Service) {
-	pr, err := proc.NewProcess(int32(s.Pid))
-	if err != nil {
-		return
+	var pr *proc.Process
+	if s.Pid > 0 {
+		pr, _ = proc.NewProcess(int32(s.Pid))
 	}
 	stat := &gpmv1.Stat{}
 	if pr != nil {

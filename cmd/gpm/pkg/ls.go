@@ -24,24 +24,65 @@ package pkg
 
 import (
 	"context"
-	"fmt"
-	"log"
+	"os"
+	"time"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/gpm2/gpm/pkg/runtime/client"
+	"github.com/lack-io/pkg/unit"
+	"github.com/olekukonko/tablewriter"
+
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
 )
 
-func ls() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+func lsBash(c *cli.Context) error {
 
+	addr := c.String("host")
+	path := c.String("path")
+
+	cc := client.New(addr)
 	ctx := context.Background()
+	outE := os.Stdout
+	if path != "" {
 
-	rsp, err := cc.Ls(ctx, &pb.LsReq{Path: "/"}, client.WithRetries(0))
-	if err != nil {
-		log.Fatal(err)
 	}
-	fmt.Println(rsp.Files)
+
+	list, err := cc.Ls(ctx, path, vclient.WithAddress(addr))
+	if err != nil {
+		return err
+	}
+
+	if len(list) > 0 {
+		tw := tablewriter.NewWriter(outE)
+		tw.SetHeader([]string{"Name", "Mode", "Size", "ModTime"})
+
+		for _, item := range list {
+			row := make([]string, 0)
+			row = append(row, item.Name)
+			row = append(row, item.Mode)
+			row = append(row, unit.ConvAuto(item.Size, 2))
+			row = append(row, time.Unix(item.ModTime, 0).String())
+			tw.Append(row)
+		}
+
+		tw.Render()
+	}
+
+	return nil
+}
+
+func LsBashCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "ls",
+		Usage:    "list remote directory",
+		Category: "bash",
+		Action:   lsBash,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "path",
+				Aliases: []string{"P"},
+				Usage:   "the specify the path for command",
+			},
+		},
+	}
 }

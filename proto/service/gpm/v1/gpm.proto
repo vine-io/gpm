@@ -33,9 +33,6 @@ service GpmService {
   // +gen:delete=/api/v1/Service/{name}
   rpc DeleteService(DeleteServiceReq) returns (DeleteServiceRsp);
 
-  // +gen:summary=查看服务日志
-  // +gen:get=/api/v1/Service/{name}/logs
-  rpc CatServiceLog(CatServiceLogReq) returns (CatServiceLogRsp);
   // +gen:summary=动态监听服务日志
   // +gen:post=/api/v1/Service/{name}/watchLogs
   rpc WatchServiceLog(WatchServiceLogReq) returns (stream WatchServiceLogRsp);
@@ -134,18 +131,11 @@ message DeleteServiceRsp {
   gpmv1.Service service = 1;
 }
 
-message CatServiceLogReq {
-  // +gen:required
-  string name = 1;
-}
-
-message CatServiceLogRsp {
-  bytes text = 1;
-}
-
 message WatchServiceLogReq {
   // +gen:required
   string name = 1;
+  int64 number = 2;
+  bool follow = 3;
 }
 
 message WatchServiceLogRsp {

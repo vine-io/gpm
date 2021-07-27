@@ -72,6 +72,7 @@ message ServiceSpec {
   // 服务日志配置
   gpmv1.ProcLog log = 7;
   // 服务版本
+  // +gen:required
   string version = 8;
   // 是否自启动, 默认为 false
   int32 autoRestart = 9;
@@ -83,12 +84,6 @@ message ProcLog {
   int32 expire = 1;
   // 日志最大容量，超过此容量则拆分日志
   int64 maxSize = 2;
-}
-
-message ServiceLog {
-  string text = 1;
-  string error = 2;
-  int64 timestamp = 3;
 }
 
 message Stat {
@@ -115,7 +110,8 @@ message Package {
   // +gen:required
   int64 total = 2;
   bytes chunk = 3;
-  bool isOk = 4;
+  int64 length = 4;
+  bool isOk = 5;
 }
 
 message InstallServiceResult {
@@ -126,6 +122,12 @@ message InstallServiceResult {
 message UpgradeServiceResult {
   bool isOk = 1;
   string error = 2;
+}
+
+message ServiceLog {
+  string text = 1;
+  string error = 2;
+  int64 timestamp = 3;
 }
 
 message ServiceVersion {
@@ -147,8 +149,8 @@ message ExecIn {
   string name = 1;
   repeated string args = 2;
   map<string, string> env = 3;
-  int32 uid = 4;
-  int32 gid = 5;
+  string user = 4;
+  string group = 5;
 }
 
 message ExecResult {
@@ -160,14 +162,16 @@ message ExecResult {
 message PullResult {
   string name = 1;
   bytes chunk = 2;
-  string error = 3;
-  bool finished = 4;
+  int64 length = 3;
+  string error = 4;
+  bool finished = 5;
 }
 
 message PushIn {
   string dst = 1;
   bytes chunk = 2;
-  bool isOk = 3;
+  int64 length = 3;
+  bool isOk = 4;
 }
 
 message PushResult {
@@ -179,8 +183,8 @@ message TerminalIn {
   // +gen:required
   string command = 1;
   map<string, string> env = 2;
-  int32 uid = 3;
-  int32 gid = 4;
+  string user = 3;
+  string group = 4;
 }
 
 message TerminalResult {

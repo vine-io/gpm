@@ -24,7 +24,6 @@ package service
 
 import (
 	"context"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sync"
@@ -35,7 +34,6 @@ import (
 	"github.com/gpm2/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	"github.com/hpcloud/tail"
-
 	"github.com/lack-io/vine"
 	verrs "github.com/lack-io/vine/proto/apis/errors"
 )
@@ -49,8 +47,7 @@ type Gpm interface {
 	StopService(context.Context, string) (*gpmv1.Service, error)
 	RebootService(context.Context, string) (*gpmv1.Service, error)
 	DeleteService(context.Context, string) (*gpmv1.Service, error)
-	CatServiceLog(context.Context, string) ([]byte, error)
-	WatchServiceLog(context.Context, string) (<-chan *gpmv1.ServiceLog, error)
+	WatchServiceLog(context.Context, string, int64, bool) (<-chan *gpmv1.ServiceLog, error)
 
 	InstallService(context.Context, *gpmv1.ServiceSpec, <-chan *gpmv1.Package) (<-chan *gpmv1.InstallServiceResult, error)
 	ListServiceVersions(context.Context, string) ([]*gpmv1.ServiceVersion, error)
@@ -293,40 +290,8 @@ func (g *gpm) DeleteService(ctx context.Context, name string) (*gpmv1.Service, e
 	return s, err
 }
 
-func (g *gpm) CatServiceLog(ctx context.Context, name string) ([]byte, error) {
-	f := filepath.Join(g.Cfg.Root, "logs", name)
-	stat, _ := os.Stat(f)
-	if stat == nil {
-		return nil, verrs.NotFound(g.Name(), "service '%s' log not exists", name)
-	}
-
-	var out []byte
-	ech := make(chan error, 1)
-	done := make(chan struct{}, 1)
-
-	go func() {
-		var err error
-		out, err = ioutil.ReadFile(filepath.Join(f, name+".log"))
-		if err != nil {
-			ech <- err
-			return
-		}
-
-		done <- struct{}{}
-	}()
-
-	select {
-	case <-ctx.Done():
-		return out, nil
-	case e := <-ech:
-		return nil, e
-	case <-done:
-		return out, nil
-	}
-}
-
-func (g *gpm) WatchServiceLog(ctx context.Context, name string) (<-chan *gpmv1.ServiceLog, error) {
-	f := filepath.Join(g.Cfg.Root, "logs", name)
+func (g *gpm) WatchServiceLog(ctx context.Context, name string, number int64, follow bool) (<-chan *gpmv1.ServiceLog, error) {
+	f := filepath.Join(g.Cfg.Root, "logs", name, name+".log")
 	stat, _ := os.Stat(f)
 	if stat == nil {
 		return nil, verrs.NotFound(g.Name(), "service '%s' log not exists", name)
@@ -338,10 +303,25 @@ func (g *gpm) WatchServiceLog(ctx context.Context, name string) (<-chan *gpmv1.S
 	go func() {
 		cfg := tail.Config{
 			Poll:   true,
-			Follow: true,
 		}
 
-		t, err := tail.TailFile(filepath.Join(f, name+".log"), cfg)
+		if number > 0 {
+			total := stat.Size()
+			if number > total {
+				total = number
+			}
+			offset := total - number
+			cfg.Location = &tail.SeekInfo{
+				Offset: offset,
+			}
+		}
+
+		if follow {
+			cfg.ReOpen = true
+			cfg.Follow = true
+		}
+
+		t, err := tail.TailFile(f, cfg)
 		if err != nil {
 			ech <- err
 			return
@@ -351,7 +331,10 @@ func (g *gpm) WatchServiceLog(ctx context.Context, name string) (<-chan *gpmv1.S
 			select {
 			case <-ctx.Done():
 				return
-			case line := <-t.Lines:
+			case line, ok := <-t.Lines:
+				if !ok {
+					continue
+				}
 				l := &gpmv1.ServiceLog{
 					Text:      line.Text,
 					Timestamp: line.Time.Unix(),
