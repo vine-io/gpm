@@ -161,17 +161,20 @@ message ExecResult {
 
 message PullResult {
   string name = 1;
-  bytes chunk = 2;
-  int64 length = 3;
-  string error = 4;
-  bool finished = 5;
+  int64 total = 2;
+  bytes chunk = 3;
+  int64 length = 4;
+  string error = 5;
+  bool finished = 6;
 }
 
 message PushIn {
-  string dst = 1;
-  bytes chunk = 2;
-  int64 length = 3;
-  bool isOk = 4;
+  string name = 1;
+  string dst = 2;
+  int64 total = 3;
+  bytes chunk = 4;
+  int64 length = 5;
+  bool isOk = 6;
 }
 
 message PushResult {

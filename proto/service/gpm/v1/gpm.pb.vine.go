@@ -1177,6 +1177,10 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						"name": &openapi.Schema{
 							Type: "string",
 						},
+						"total": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
 						"chunk": &openapi.Schema{},
 						"length": &openapi.Schema{
 							Type:   "integer",
@@ -1193,8 +1197,15 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 				"v1.PushIn": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
 						"dst": &openapi.Schema{
 							Type: "string",
+						},
+						"total": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
 						},
 						"chunk": &openapi.Schema{},
 						"length": &openapi.Schema{

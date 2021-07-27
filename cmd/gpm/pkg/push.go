@@ -24,71 +24,179 @@ package pkg
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
-	"log"
+	"io/fs"
 	"os"
+	"path/filepath"
+	"strings"
 
-	"github.com/gpm2/gpm/pkg/runtime"
+	"github.com/gpm2/gpm/pkg/runtime/client"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
+	pbr "github.com/schollz/progressbar/v3"
+	"google.golang.org/grpc/status"
 )
 
-func push() {
-	app := vine.NewService()
+func pushBash(c *cli.Context) error {
 
-	cc := pb.NewGpmService(
-		runtime.GpmName, app.Client(),
-	)
+	addr := c.String("host")
+	src := c.String("src")
+	dst := c.String("dst")
+	if src == "" {
+		return fmt.Errorf("missing src")
+	}
+	if dst == "" {
+		return fmt.Errorf("missing dst")
+	}
+
+	stat, _ := os.Stat(src)
+	if stat == nil {
+		return fmt.Errorf("src %s not exists", src)
+	}
 
 	ctx := context.Background()
+	outE := os.Stdout
+	pb := pbr.NewOptions(0,
+		pbr.OptionSetWriter(outE),
+		pbr.OptionShowBytes(true),
+		pbr.OptionEnableColorCodes(true),
+		pbr.OptionOnCompletion(func() {
+			fmt.Fprintf(outE, "\n")
+		}),
+	)
 
-	in := &gpmv1.PushIn{
-		Dst:   "/tmp/web.bbb",
-		Chunk: nil,
-		IsOk:  false,
+	var err error
+	if stat.IsDir() {
+		err = filepath.WalkDir(src, func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if src == path || d.IsDir() {
+				return nil
+			}
+
+			ddst := filepath.Join(dst, strings.TrimPrefix(path, src))
+			pb.Describe(fmt.Sprintf("push [%30s]", path))
+			pb.Reset()
+			return push(ctx, pb, addr, path, ddst)
+		})
+	} else {
+		err = push(ctx, pb, addr, src, dst)
 	}
 
-	rsp, err := cc.Push(ctx, client.WithRetries(0))
+	return err
+}
+
+func push(ctx context.Context, pb *pbr.ProgressBar, addr, src, dst string) error {
+	cc := client.New(addr)
+	ech := make(chan error, 1)
+	done := make(chan struct{}, 1)
+	buf := make([]byte, 1024*32)
+
+	stream, err := cc.Push(ctx, vclient.WithAddress(addr))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
-	f, err := os.Open("/tmp/web.tar.gz")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
 
 	go func() {
-		buf := make([]byte, 1024)
+		err = send(src, dst, pb, stream, buf)
+		if err != nil {
+			ech <- err
+			return
+		}
+
+		done <- struct{}{}
+	}()
+
+	go func() {
 		for {
-			n, err := f.Read(buf)
-			if err != nil && err != io.EOF {
-				log.Fatal(err)
+			b, err := stream.Recv()
+			if err != nil {
+				ech <- errors.New(status.Convert(err).Message())
+				return
 			}
-			fmt.Println(n)
-			if n > 0 {
-				in.Chunk = buf[0:n]
-				rsp.Send(&pb.PushReq{In: in})
+			if len(b.Error) != 0 {
+				ech <- errors.New(b.Error)
+				return
 			}
-			if err == io.EOF {
-				in.IsOk = true
-				rsp.Send(&pb.PushReq{In: in})
+			if b.IsOk {
+				done <- struct{}{}
 				return
 			}
 		}
 	}()
 
+	select {
+	case e := <-ech:
+		//_ = pb.Clear()
+		return e
+	case <-done:
+	}
+
+	return nil
+}
+
+func send(path, dst string, bar *pbr.ProgressBar, stream *client.PushStream, buf []byte) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	p := &gpmv1.PushIn{Dst: dst, Name: filepath.Base(path)}
+	stat, _ := file.Stat()
+	if stat != nil {
+		p.Total = stat.Size()
+	}
+	bar.ChangeMax64(p.Total)
 	for {
-		result, err := rsp.Recv()
-		if err != nil {
-			log.Fatal(err)
+		n, e := file.Read(buf)
+		if e != nil && e != io.EOF {
+			return e
 		}
-		fmt.Println(result)
-		if result.Result.IsOk {
-			return
+
+		if e == io.EOF {
+			p.IsOk = true
 		}
+
+		_ = bar.Add(n)
+
+		p.Length = int64(n)
+		p.Chunk = buf[0:n]
+		e1 := stream.Send(p)
+		if e1 != nil {
+			return e1
+		}
+
+		if e == io.EOF {
+			break
+		}
+	}
+
+	return nil
+}
+
+func PushBashCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "push",
+		Usage:    "push files",
+		Category: "bash",
+		Action:   pushBash,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "src",
+				Aliases: []string{"S"},
+				Usage:   "specify the source for push",
+			},
+			&cli.StringFlag{
+				Name:    "dst",
+				Aliases: []string{"D"},
+				Usage:   "specify the target for push",
+			},
+		},
 	}
 }

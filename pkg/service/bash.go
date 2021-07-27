@@ -131,10 +131,10 @@ func (g *gpm) Pull(ctx context.Context, name string) (<-chan *gpmv1.PullResult, 
 	return outs, nil
 }
 
-func (g *gpm) Push(ctx context.Context, dst string, in <-chan *gpmv1.PushIn) (<-chan *gpmv1.PushResult, error) {
+func (g *gpm) Push(ctx context.Context, dst, name string, in <-chan *gpmv1.PushIn) (<-chan *gpmv1.PushResult, error) {
 	stat, _ := os.Stat(dst)
 	if stat != nil && stat.IsDir() {
-		dst = filepath.Join(dst, filepath.Base(dst))
+		dst = filepath.Join(dst, name)
 	}
 	dir := filepath.Dir(dst)
 	stat, _ = os.Stat(dir)

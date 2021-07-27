@@ -250,7 +250,6 @@ func (s *server) UpgradeService(ctx context.Context, stream pb.GpmService_Upgrad
 	}
 
 	in := make(chan *gpmv1.Package, 10)
-	defer close(in)
 
 	in <- req.Pack
 	outs, e := s.H.UpgradeService(ctx, req.Name, req.Version, in)
@@ -260,6 +259,7 @@ func (s *server) UpgradeService(ctx context.Context, stream pb.GpmService_Upgrad
 	}
 
 	go func() {
+		defer close(in)
 		for {
 			req, err = stream.Recv()
 			if err != nil {
@@ -344,16 +344,16 @@ func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err
 	}
 
 	in := make(chan *gpmv1.PushIn, 10)
-	defer close(in)
 
 	in <- req.In
-	outs, e := s.H.Push(ctx, req.In.Dst, in)
+	outs, e := s.H.Push(ctx, req.In.Dst, req.In.Name, in)
 	if e != nil {
 		err = e
 		return
 	}
 
 	go func() {
+		defer close(in)
 		for {
 			req, err = stream.Recv()
 			if err != nil {
@@ -413,7 +413,6 @@ func (s *server) Terminal(ctx context.Context, stream pb.GpmService_TerminalStre
 	}
 
 	in := make(chan *gpmv1.TerminalIn, 10)
-	defer close(in)
 
 	in <- req.In
 	outs, e := s.H.Terminal(ctx, in)
@@ -423,6 +422,7 @@ func (s *server) Terminal(ctx context.Context, stream pb.GpmService_TerminalStre
 	}
 
 	go func() {
+		defer close(in)
 		for {
 			req, err = stream.Recv()
 			if err != nil {
