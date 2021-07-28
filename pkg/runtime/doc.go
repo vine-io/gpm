@@ -28,11 +28,10 @@ const Namespace = "go.vine"
 const GpmName = "go.vine.service.gpm"
 const GpmId = "12df4108-6176-4c93-ac58-bfa003d4ddb1"
 
-
 var (
-	GitTag    string
-	GitCommit string
-	BuildDate string
+	GitTag     = "51641c2a3e8d577e45a64149f1d104817197e4c0"
+	GitCommit  = "51641c2"
+	BuildDate  = "1627467404"
 	GetVersion = func() string {
 		v := GitTag
 		if GitCommit != "" {
