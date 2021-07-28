@@ -98,8 +98,13 @@ func (s *server) Init() error {
 	return err
 }
 
-func (s *server) Healthz(ctx context.Context, req *pb.Empty, rsp *pb.Empty) error {
+func (s *server) Healthz(ctx context.Context, _ *pb.Empty, _ *pb.Empty) error {
 	return nil
+}
+
+func (s *server) Info(ctx context.Context, _ *pb.InfoReq, rsp *pb.InfoRsp) (err error) {
+	rsp.Gpm, err = s.H.Info(ctx)
+	return
 }
 
 func (s *server) ListService(ctx context.Context, req *pb.ListServiceReq, rsp *pb.ListServiceRsp) (err error) {

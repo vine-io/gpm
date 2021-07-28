@@ -8,9 +8,12 @@ import "github.com/gpm2/gpm/proto/apis/gpm/v1/gpm.proto";
 
 // +gen:openapi
 service GpmService {
-  // +gne:summary=gpm 检测 gpm 服务状态
+  // +gen:summary=gpm 检测 gpm 服务状态
   // +gen:get=/api/healthz
   rpc Healthz(Empty) returns (Empty);
+  // +gen:summary=gpm 信息
+  // +gen:get=/api/info
+  rpc Info(InfoReq) returns (InfoRsp);
   // +gen:summary=查询所有服务
   // +gen:get=/api/v1/Service/
   rpc ListService(ListServiceReq) returns (ListServiceRsp);
@@ -68,6 +71,12 @@ service GpmService {
 }
 
 message Empty {}
+
+message InfoReq {}
+
+message InfoRsp {
+  gpmv1.GpmInfo gpm = 1;
+}
 
 message ListServiceReq {}
 

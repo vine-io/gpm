@@ -26,17 +26,13 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/gpm2/gpm/pkg/runtime/client"
-	"github.com/lack-io/pkg/unit"
-	twr "github.com/olekukonko/tablewriter"
-
 	"github.com/lack-io/cli"
 	vclient "github.com/lack-io/vine/core/client"
 )
 
-func listService(c *cli.Context) error {
+func healthService(c *cli.Context) error {
 
 	addr := c.String("host")
 	cc := client.New(addr)
@@ -44,46 +40,19 @@ func listService(c *cli.Context) error {
 	ctx := context.Background()
 	outE := os.Stdout
 
-	list, total, err := cc.ListService(ctx, vclient.WithAddress(addr))
+	err := cc.Healthz(ctx, vclient.WithAddress(addr))
 	if err != nil {
 		return err
 	}
-	if total == 0 {
-		return fmt.Errorf("no services")
-	}
 
-	tw := twr.NewWriter(outE)
-	tw.SetHeader([]string{"Name", "User", "Pid", "CPU", "Memory", "Status", "Uptime"})
-
-	for _, item := range list {
-		row := make([]string, 0)
-		row = append(row, item.Name)
-		if item.SysProcAttr != nil {
-			row = append(row, fmt.Sprintf("%s:%s", item.SysProcAttr.User, item.SysProcAttr.Group))
-		} else {
-			row = append(row, " ")
-		}
-		row = append(row, fmt.Sprintf("%d", item.Pid))
-		row = append(row, fmt.Sprintf("%.1f%%", item.Stat.CpuPercent))
-		row = append(row, fmt.Sprintf("%s/%.1f%%", unit.ConvAuto(int64(item.Stat.Memory), 1), item.Stat.MemPercent*100))
-		row = append(row, item.Status)
-		row = append(row, time.Now().Sub(time.Unix(item.StartTimestamp, 0)).String())
-		tw.Append(row)
-	}
-
-	tw.SetColumnColor(twr.Colors{}, twr.Colors{}, twr.Colors{}, twr.Colors{},
-		twr.Colors{}, twr.Colors{twr.FgRedColor}, twr.Colors{})
-	tw.Render()
-	fmt.Fprintf(os.Stdout, "\nTotal: %d\n", total)
-
+	fmt.Fprintf(outE, "OK\n")
 	return nil
 }
 
-func ListServicesCmd() *cli.Command {
+func HealthCmd() *cli.Command {
 	return &cli.Command{
-		Name:     "list",
-		Usage:    "list all local services",
-		Category: "service",
-		Action:   listService,
+		Name:   "health",
+		Usage:  "confirm gpmd status",
+		Action: healthService,
 	}
 }

@@ -39,6 +39,14 @@ func NewGpmServiceEndpoints() []*apipb.Endpoint {
 			Handler:     "rpc",
 		},
 		&apipb.Endpoint{
+			Name:        "GpmService.Info",
+			Description: "GpmService.Info",
+			Path:        []string{"/api/info"},
+			Method:      []string{"GET"},
+			Body:        "*",
+			Handler:     "rpc",
+		},
+		&apipb.Endpoint{
 			Name:        "GpmService.ListService",
 			Description: "GpmService.ListService",
 			Path:        []string{"/api/v1/Service/"},
@@ -204,6 +212,7 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 			"/api/healthz": &openapi.OpenAPIPath{
 				Get: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
+					Summary:     "gpm 检测 gpm 服务状态",
 					Description: "GpmService Healthz",
 					OperationId: "GpmServiceHealthz",
 					Parameters:  []*openapi.PathParameters{},
@@ -213,6 +222,26 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 							Content: &openapi.PathRequestBodyContent{
 								ApplicationJson: &openapi.ApplicationContent{
 									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.Empty"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
+			"/api/info": &openapi.OpenAPIPath{
+				Get: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "gpm 信息",
+					Description: "GpmService Info",
+					OperationId: "GpmServiceInfo",
+					Parameters:  []*openapi.PathParameters{},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.InfoRsp"},
 								},
 							},
 						},
@@ -789,6 +818,19 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 					Type:       "object",
 					Properties: map[string]*openapi.Schema{},
 				},
+				"v1.InfoReq": &openapi.Model{
+					Type:       "object",
+					Properties: map[string]*openapi.Schema{},
+				},
+				"v1.InfoRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"gpm": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.GpmInfo",
+						},
+					},
+				},
 				"v1.ExecReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -1116,6 +1158,35 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
+				"v1.GpmInfo": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"version": &openapi.Schema{
+							Type: "string",
+						},
+						"goos": &openapi.Schema{
+							Type: "string",
+						},
+						"arch": &openapi.Schema{
+							Type: "string",
+						},
+						"gov": &openapi.Schema{
+							Type: "string",
+						},
+						"pid": &openapi.Schema{
+							Type:   "integer",
+							Format: "int32",
+						},
+						"stat": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.Stat",
+						},
+						"upTime": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
+					},
+				},
 				"v1.ExecIn": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -1436,6 +1507,20 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
+				"v1.Stat": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"cpuPercent": &openapi.Schema{
+							Type:   "number",
+							Format: "double",
+						},
+						"memory": &openapi.Schema{},
+						"memPercent": &openapi.Schema{
+							Type:   "number",
+							Format: "float",
+						},
+					},
+				},
 				"v1.SysProcAttr": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -1472,20 +1557,6 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
-				"v1.Stat": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"cpuPercent": &openapi.Schema{
-							Type:   "number",
-							Format: "double",
-						},
-						"memory": &openapi.Schema{},
-						"memPercent": &openapi.Schema{
-							Type:   "number",
-							Format: "float",
-						},
-					},
-				},
 			},
 		},
 	}
@@ -1494,9 +1565,12 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 // Client API for GpmService service
 // +gen:openapi
 type GpmService interface {
-	// +gne:summary=gpm 检测 gpm 服务状态
+	// +gen:summary=gpm 检测 gpm 服务状态
 	// +gen:get=/api/healthz
 	Healthz(ctx context.Context, in *Empty, opts ...client.CallOption) (*Empty, error)
+	// +gen:summary=gpm 信息
+	// +gen:get=/api/info
+	Info(ctx context.Context, in *InfoReq, opts ...client.CallOption) (*InfoRsp, error)
 	// +gen:summary=查询所有服务
 	// +gen:get=/api/v1/Service/
 	ListService(ctx context.Context, in *ListServiceReq, opts ...client.CallOption) (*ListServiceRsp, error)
@@ -1565,6 +1639,16 @@ func NewGpmService(name string, c client.Client) GpmService {
 func (c *gpmService) Healthz(ctx context.Context, in *Empty, opts ...client.CallOption) (*Empty, error) {
 	req := c.c.NewRequest(c.name, "GpmService.Healthz", in)
 	out := new(Empty)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gpmService) Info(ctx context.Context, in *InfoReq, opts ...client.CallOption) (*InfoRsp, error) {
+	req := c.c.NewRequest(c.name, "GpmService.Info", in)
+	out := new(InfoRsp)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -2026,9 +2110,12 @@ func (x *gpmServiceTerminal) Recv() (*TerminalRsp, error) {
 // Server API for GpmService service
 // +gen:openapi
 type GpmServiceHandler interface {
-	// +gne:summary=gpm 检测 gpm 服务状态
+	// +gen:summary=gpm 检测 gpm 服务状态
 	// +gen:get=/api/healthz
 	Healthz(context.Context, *Empty, *Empty) error
+	// +gen:summary=gpm 信息
+	// +gen:get=/api/info
+	Info(context.Context, *InfoReq, *InfoRsp) error
 	// +gen:summary=查询所有服务
 	// +gen:get=/api/v1/Service/
 	ListService(context.Context, *ListServiceReq, *ListServiceRsp) error
@@ -2085,6 +2172,7 @@ type GpmServiceHandler interface {
 func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...server.HandlerOption) error {
 	type gpmServiceImpl interface {
 		Healthz(ctx context.Context, in *Empty, out *Empty) error
+		Info(ctx context.Context, in *InfoReq, out *InfoRsp) error
 		ListService(ctx context.Context, in *ListServiceReq, out *ListServiceRsp) error
 		GetService(ctx context.Context, in *GetServiceReq, out *GetServiceRsp) error
 		CreateService(ctx context.Context, in *CreateServiceReq, out *CreateServiceRsp) error
@@ -2111,6 +2199,14 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		Name:        "GpmService.Healthz",
 		Description: "GpmService.Healthz",
 		Path:        []string{"/api/healthz"},
+		Method:      []string{"GET"},
+		Body:        "*",
+		Handler:     "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
+		Name:        "GpmService.Info",
+		Description: "GpmService.Info",
+		Path:        []string{"/api/info"},
 		Method:      []string{"GET"},
 		Body:        "*",
 		Handler:     "rpc",
@@ -2268,6 +2364,10 @@ type gpmServiceHandler struct {
 
 func (h *gpmServiceHandler) Healthz(ctx context.Context, in *Empty, out *Empty) error {
 	return h.GpmServiceHandler.Healthz(ctx, in, out)
+}
+
+func (h *gpmServiceHandler) Info(ctx context.Context, in *InfoReq, out *InfoRsp) error {
+	return h.GpmServiceHandler.Info(ctx, in, out)
 }
 
 func (h *gpmServiceHandler) ListService(ctx context.Context, in *ListServiceReq, out *ListServiceRsp) error {

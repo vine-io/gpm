@@ -26,7 +26,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/gpm2/gpm/pkg/runtime/client"
@@ -38,20 +37,14 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func getService(c *cli.Context) error {
+func infoService(c *cli.Context) error {
 	addr := c.String("host")
-	name := c.String("name")
 	output := c.String("output")
-	if len(name) == 0 {
-		return fmt.Errorf("missing name")
-	}
-
 	cc := client.New(addr)
-
 	ctx := context.Background()
 	outE := os.Stdout
 
-	s, err := cc.GetService(ctx, name, vclient.WithAddress(addr))
+	s, err := cc.Info(ctx, vclient.WithAddress(addr))
 	if err != nil {
 		return err
 	}
@@ -64,41 +57,16 @@ func getService(c *cli.Context) error {
 		t.SetColWidth(200)
 		t.SetAlignment(0)
 
-		t.Append([]string{"Name", s.Name})
-		t.Append([]string{"Bin", s.Bin})
-		t.Append([]string{"Args", strings.Join(s.Args, " ")})
 		t.Append([]string{"Pid", fmt.Sprintf("# %d", s.Pid)})
-		t.Append([]string{"Dir", s.Dir})
-		env := make([]string, 0)
-		for k, v := range s.Env {
-			env = append(env, fmt.Sprintf("%s=%s", k, v))
-		}
-		t.Append([]string{"env", strings.Join(env, ",")})
-		if s.SysProcAttr != nil {
-			t.Append([]string{"User", fmt.Sprintf("user=%s, group=%s", s.SysProcAttr.User, s.SysProcAttr.Group)})
-		}
 		t.Append([]string{"Version", s.Version})
-		if s.AutoRestart > 0 {
-			t.Append([]string{"AutoRestart", "True"})
-		} else {
-			t.Append([]string{"AutoRestart", "False"})
-		}
+		t.Append([]string{"OS", s.Goos})
+		t.Append([]string{"Arch", s.Arch})
+		t.Append([]string{"Go version", s.Gov})
 		if s.Stat != nil {
 			t.Append([]string{"CPU", fmt.Sprintf("%.2f%%", s.Stat.CpuPercent)})
 			t.Append([]string{"Memory", fmt.Sprintf("%s/%.1f%%", unit.ConvAuto(int64(s.Stat.Memory), 2), s.Stat.MemPercent)})
 		}
-		if s.Log != nil {
-			t.Append([]string{"log expire", fmt.Sprintf("%d days", s.Log.Expire)})
-			t.Append([]string{"log chunk", fmt.Sprintf("%s", unit.ConvAuto(s.Log.MaxSize, 2))})
-		}
-		t.Append([]string{"CreationTimestamp", time.Unix(s.CreationTimestamp, 0).String()})
-		t.Append([]string{"UpdateTimestamp", time.Unix(s.UpdateTimestamp, 0).String()})
-		t.Append([]string{"StartTimestamp", time.Unix(s.StartTimestamp, 0).String()})
-		t.Append([]string{"Status", s.Status})
-		if s.Msg != "" {
-			t.Append([]string{"Message", s.Msg})
-		}
-
+		t.Append([]string{"UpTime", (time.Duration(s.UpTime)*time.Second).String()})
 		t.SetColumnColor(tw.Colors{tw.Bold}, tw.Colors{})
 		t.Render()
 	case "json":
@@ -120,18 +88,12 @@ func getService(c *cli.Context) error {
 	return nil
 }
 
-func GetServiceCmd() *cli.Command {
+func InfoServiceCmd() *cli.Command {
 	return &cli.Command{
-		Name:     "get",
-		Usage:    "get service by name",
-		Category: "service",
-		Action:   getService,
+		Name:   "info",
+		Usage:  "get the information of gpmd",
+		Action: infoService,
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name of service",
-			},
 			&cli.StringFlag{
 				Name:    "output",
 				Aliases: []string{"o"},

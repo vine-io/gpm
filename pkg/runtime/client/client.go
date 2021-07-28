@@ -54,6 +54,14 @@ func (s *SimpleClient) Healthz(ctx context.Context, opts ...client.CallOption) e
 	return err
 }
 
+func (s *SimpleClient) Info(ctx context.Context, opts ...client.CallOption) (*gpmv1.GpmInfo, error) {
+	rsp, err := s.cc.Info(ctx, &pb.InfoReq{}, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return rsp.Gpm, nil
+}
+
 func (s *SimpleClient) ListService(ctx context.Context, opts ...client.CallOption) ([]*gpmv1.Service, int64, error) {
 	rsp, err := s.cc.ListService(ctx, &pb.ListServiceReq{}, opts...)
 	if err != nil {

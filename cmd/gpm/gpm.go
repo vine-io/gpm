@@ -40,7 +40,9 @@ func main() {
 		Usage:   "package manage tools",
 		Version: runtime.GetVersion(),
 		Commands: []*cli.Command{
+			pkg.HealthCmd(),
 			pkg.ListServicesCmd(),
+			pkg.InfoServiceCmd(),
 			pkg.GetServiceCmd(),
 			pkg.CreateServiceCmd(),
 			pkg.StartServiceCmd(),

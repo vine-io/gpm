@@ -27,10 +27,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"syscall"
 	"time"
 
@@ -38,10 +40,13 @@ import (
 	"github.com/gpm2/gpm/pkg/runtime/config"
 	"github.com/gpm2/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	"github.com/lack-io/pkg/unit"
 	log "github.com/lack-io/vine/lib/logger"
 	"github.com/shirou/gopsutil/mem"
 	proc "github.com/shirou/gopsutil/process"
 )
+
+const timeFormat = "20060102150405"
 
 var (
 	ErrProcessNotFound = errors.New("process not found")
@@ -99,6 +104,9 @@ func (p *Process) Start() (int32, error) {
 	if p.AutoRestart > 0 {
 		go p.watching()
 	}
+	if p.Log != nil {
+		go p.rotating()
+	}
 
 	return pid, nil
 }
@@ -122,24 +130,14 @@ func (p *Process) run() (int32, error) {
 		injectSysProcAttr(cmd, p.SysProcAttr)
 	}
 
-	now := time.Now()
 	root := filepath.Join(p.cfg.Root, "logs", p.Name)
 	_ = os.MkdirAll(root, os.ModePerm)
-	flog := filepath.Join(root, fmt.Sprintf("%s.log-%s", p.Name, now.Format("20060102150405")))
 
-	err := ioutil.WriteFile(flog, []byte(""), os.ModePerm)
-	if err != nil {
-		return 0, nil
-	}
+	flog := filepath.Join(root, p.Name+".log")
+	_ = os.Rename(flog, filepath.Join(root, fmt.Sprintf("%s.log-%s", p.Name, time.Now().Format(timeFormat))))
 
-	link := filepath.Join(root, p.Name+".log")
-	_ = os.Remove(link)
-	err = os.Symlink(flog, link)
-	if err != nil {
-		return 0, fmt.Errorf("%w: create soft link", err)
-	}
-
-	p.lw, err = os.OpenFile(link, os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	var err error
+	p.lw, err = os.OpenFile(flog, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		return 0, err
 	}
@@ -167,12 +165,14 @@ func (p *Process) run() (int32, error) {
 }
 
 func (p *Process) watching() {
+	log.Infof("start service %s(%d) watching", p.Name, p.Pid)
 	timer := time.NewTicker(time.Second * 2)
 	defer timer.Stop()
 	for {
 		select {
 		case _, ok := <-p.done:
 			if !ok {
+				log.Infof("stop service %s(%d) watching", p.Name, p.Pid)
 				return
 			}
 		case <-timer.C:
@@ -191,6 +191,66 @@ func (p *Process) watching() {
 					log.Infof("reboot service(Z) %s at pid: %d", p.Name, pid)
 				}
 			}
+		}
+	}
+}
+
+func (p *Process) rotating() {
+	timer := time.NewTicker(time.Second * 2)
+	log.Infof("start service %s(%d) rotating", p.Name, p.Pid)
+	defer timer.Stop()
+	for {
+		select {
+		case _, ok := <-p.done:
+			if !ok {
+				log.Infof("stop service %s(%d) rotating", p.Name, p.Pid)
+				return
+			}
+		case <-timer.C:
+			now := time.Now()
+			param := p.Log
+			// 日志目录
+			root := filepath.Join(p.cfg.Root, "logs", p.Name)
+			// 当前日志文件
+			plog := filepath.Join(root, p.Name+".log")
+
+			stat, _ := os.Stat(plog)
+			// 日志大小超过额定值，进行日志切分
+			if stat != nil && stat.Size() > param.MaxSize {
+				log.Infof("log %s greater than %s, rotates it", plog, unit.ConvAuto(param.MaxSize, 2))
+				err := rotate(plog, stat.Size(), param.MaxSize)
+				if err != nil {
+					log.Errorf("%v", err)
+				}
+			}
+
+			// 遍历服务所有日志文件
+			filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
+				if err != nil {
+					return err
+				}
+
+				if d.IsDir() && root != path {
+					return filepath.SkipDir
+				}
+
+				if !d.Type().IsRegular() {
+					return nil
+				}
+
+				name := d.Name()
+				parts := strings.Split(name, "-")
+				if len(parts) > 1 {
+					logT, _ := time.Parse(timeFormat, parts[1])
+					// 删除过期的日志文件
+					if now.Sub(logT).Hours() > float64(param.Expire*24) {
+						_ = os.Remove(path)
+						log.Infof("remove expired log: %s", path)
+					}
+				}
+
+				return nil
+			})
 		}
 	}
 }
@@ -249,13 +309,8 @@ func (p *Process) stop() error {
 	if err != nil {
 		return err
 	}
-	_, err = pr.Wait()
-	if err != nil {
-		return err
-	}
-	if err = pr.Release(); err != nil {
-		return err
-	}
+	_, _ = pr.Wait()
+	_ = pr.Release()
 	p.Pid = 0
 	p.pr = nil
 
@@ -281,4 +336,38 @@ func statProcess(s *gpmv1.Service) {
 		stat.CpuPercent, _ = pr.CPUPercent()
 	}
 	s.Stat = stat
+}
+
+func rotate(rl string, total, size int64) error {
+	pf, e := os.OpenFile(rl, os.O_RDWR|os.O_SYNC, os.ModePerm)
+	if e != nil {
+		return fmt.Errorf("open log file %s: %v", rl, e)
+	}
+	defer pf.Close()
+
+	//_, e = pf.Seek(size, 0)
+	buf := make([]byte, size)
+	n, e := pf.Read(buf)
+	if e != nil {
+		return fmt.Errorf("open log file %s: %v", rl, e)
+	}
+
+	flog := rl + "-" + time.Now().Format(timeFormat)
+	e = ioutil.WriteFile(flog, buf[:n], os.ModePerm)
+	if e != nil {
+		return fmt.Errorf("write log %s: %v", flog, e)
+	}
+
+	buf1 := make([]byte, total-size)
+	n, e = pf.Read(buf1)
+	if e != nil {
+		return fmt.Errorf("open log file %s: %v", rl, e)
+	}
+
+	e = os.WriteFile(rl, buf1[:n], os.ModePerm)
+	if e != nil {
+		return fmt.Errorf("rewrite log file %s: %v", rl, e)
+	}
+
+	return nil
 }

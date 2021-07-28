@@ -31,6 +31,24 @@ func (m *Empty) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
+func (m *InfoReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *InfoReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *InfoRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *InfoRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
 func (m *ListServiceReq) Validate() error {
 	return m.ValidateE("")
 }

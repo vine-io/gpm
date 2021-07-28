@@ -24,22 +24,28 @@ package service
 
 import (
 	"context"
+	"io"
 	"os"
 	"path/filepath"
+	gruntime "runtime"
 	"sync"
 	"time"
 
 	"github.com/gpm2/gpm/pkg/dao"
+	"github.com/gpm2/gpm/pkg/runtime"
 	"github.com/gpm2/gpm/pkg/runtime/config"
 	"github.com/gpm2/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	"github.com/hpcloud/tail"
 	"github.com/lack-io/vine"
 	verrs "github.com/lack-io/vine/proto/apis/errors"
+	"github.com/shirou/gopsutil/mem"
+	proc "github.com/shirou/gopsutil/process"
 )
 
 type Gpm interface {
 	Init() error
+	Info(context.Context) (*gpmv1.GpmInfo, error)
 	ListService(context.Context) ([]*gpmv1.Service, int64, error)
 	GetService(context.Context, string) (*gpmv1.Service, error)
 	CreateService(context.Context, *gpmv1.ServiceSpec) (*gpmv1.Service, error)
@@ -73,6 +79,7 @@ type gpm struct {
 	Cfg *config.Config `inject:""`
 	DB  *dao.DB        `inject:""`
 
+	up time.Time
 	sync.RWMutex
 	ps map[string]*Process
 }
@@ -98,7 +105,34 @@ func (g *gpm) Init() error {
 		g.ps[item.Name] = p
 	}
 
+	g.up = time.Now()
 	return nil
+}
+
+func (g *gpm) Info(ctx context.Context) (*gpmv1.GpmInfo, error) {
+	info := &gpmv1.GpmInfo{
+		Version: runtime.GetVersion(),
+		Goos:    gruntime.GOOS,
+		Arch:    gruntime.GOARCH,
+		Gov:     gruntime.Version(),
+		Pid:     int32(os.Getpid()),
+	}
+
+	stat := &gpmv1.Stat{}
+	pr, _ := proc.NewProcess(info.Pid)
+	if pr != nil {
+		percent, _ := pr.MemoryPercent()
+		stat.MemPercent = percent
+		m, _ := mem.VirtualMemory()
+		if m != nil {
+			stat.Memory = uint64(float64(percent) / 100 * float64(m.Total))
+		}
+		stat.CpuPercent, _ = pr.CPUPercent()
+	}
+	info.Stat = stat
+	info.UpTime = time.Now().Unix() - g.up.Unix()
+
+	return info, nil
 }
 
 func (g *gpm) ListService(ctx context.Context) ([]*gpmv1.Service, int64, error) {
@@ -302,17 +336,15 @@ func (g *gpm) WatchServiceLog(ctx context.Context, name string, number int64, fo
 
 	go func() {
 		cfg := tail.Config{
-			Poll:   true,
+			Poll: true,
 		}
 
 		if number > 0 {
 			total := stat.Size()
 			if number > total {
-				total = number
-			}
-			offset := total - number
-			cfg.Location = &tail.SeekInfo{
-				Offset: offset,
+				cfg.Location = &tail.SeekInfo{Offset: 0, Whence: io.SeekStart}
+			} else {
+				cfg.Location = &tail.SeekInfo{Offset: -1 * number, Whence: io.SeekEnd}
 			}
 		}
 

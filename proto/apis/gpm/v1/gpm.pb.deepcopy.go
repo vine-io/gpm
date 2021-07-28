@@ -97,6 +97,11 @@ func (in *Stat) DeepCopyInto(out *Stat) {
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
 func (in *GpmInfo) DeepCopyInto(out *GpmInfo) {
 	*out = *in
+	if in.Stat != nil {
+		in, out := &in.Stat, &out.Stat
+		*out = new(Stat)
+		(*in).DeepCopyInto(*out)
+	}
 }
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.

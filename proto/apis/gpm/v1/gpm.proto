@@ -97,11 +97,12 @@ message Stat {
 
 message GpmInfo {
   string version = 1;
-  string gitCommit = 2;
-  int64 buildTime = 3;
   string goos = 4;
   string arch = 5;
   string gov = 6;
+  int32 pid = 7;
+  Stat stat = 8;
+  int64 upTime = 9;
 }
 
 message Package {
