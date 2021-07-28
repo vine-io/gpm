@@ -55,7 +55,7 @@ type Gpm interface {
 	RollbackService(context.Context, string, string) error
 
 	Ls(context.Context, string) ([]*gpmv1.FileInfo, error)
-	Pull(context.Context, string) (<-chan *gpmv1.PullResult, error)
+	Pull(context.Context, string, bool) (<-chan *gpmv1.PullResult, error)
 	Push(context.Context, string, string, <-chan *gpmv1.PushIn) (<-chan *gpmv1.PushResult, error)
 	Exec(context.Context, *gpmv1.ExecIn) (<-chan *gpmv1.ExecResult, error)
 	Terminal(context.Context, <-chan *gpmv1.TerminalIn) (<-chan *gpmv1.TerminalResult, error)

@@ -24,33 +24,151 @@ package pkg
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log"
+	"os"
+	"path/filepath"
+	"strings"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/gpm2/gpm/pkg/runtime/client"
+	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	"github.com/lack-io/cli"
+	"github.com/lack-io/pkg/unit"
+	vclient "github.com/lack-io/vine/core/client"
+	pbr "github.com/schollz/progressbar/v3"
+	"google.golang.org/grpc/status"
 )
 
-func pull() {
-	app := vine.NewService()
-	cc := pb.NewGpmService(runtime.GpmName, app.Client())
+func pullBash(c *cli.Context) error {
+
+	addr := c.String("host")
+	src := c.String("src")
+	regular := c.Bool("regular")
+	dst := c.String("dst")
+	if src == "" {
+		return fmt.Errorf("missing src")
+	}
+	if dst == "" {
+		return fmt.Errorf("missing dst")
+	}
+
+	dir := dst
+	if !regular {
+		dir = filepath.Dir(dst)
+	}
+	stat, _ := os.Stat(dir)
+	if stat == nil {
+		return fmt.Errorf("invalid dst, local directory %s not exists", dir)
+	}
 
 	ctx := context.Background()
+	outE := os.Stdout
+	cc := client.New(addr)
+	pb := pbr.NewOptions(0,
+		pbr.OptionSetWriter(outE),
+		pbr.OptionShowBytes(true),
+		pbr.OptionEnableColorCodes(true),
+		pbr.OptionOnCompletion(func() {
+			fmt.Fprintf(outE, "\n")
+		}),
+	)
 
-	rsp, err := cc.Pull(ctx, &pb.PullReq{Name: "/opt/gpm/logs"}, client.WithRetries(0))
+	stream, err := cc.Pull(ctx, src, regular, vclient.WithAddress(addr))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	var name string
+	var file *os.File
 	for {
-		out, err := rsp.Recv()
+		var b *gpmv1.PullResult
+		b, err = stream.Next()
 		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(out.Result)
-		if out.Result.Finished {
+			err = errors.New(status.Convert(err).Message())
 			break
 		}
+		if b.Error != "" {
+			err = errors.New(b.Error)
+			break
+		}
+		if b.Name != name && b.Name != "" {
+			name = b.Name
+			pb.Reset()
+			if file != nil {
+				_ = file.Close()
+			}
+			pb.ChangeMax64(b.Total)
+			pbn := b.Name
+			if len(pbn) > 16 {
+				pbn = "..." + pbn[len(pbn)-13:]
+			}
+			pb.Describe(fmt.Sprintf("download [%16s] [total: %8s]", pbn, unit.ConvAuto(b.Total, 2)))
+
+			if regular {
+				t := strings.TrimPrefix(b.Name, src)
+				if strings.Contains(t, "/") || strings.Contains(t, "\\") {
+					t = strings.ReplaceAll(t, "\\", "/")
+					newDir := filepath.Join(dst, filepath.Dir(t))
+					_ = os.MkdirAll(newDir, os.ModePerm)
+				}
+				file, err = os.Create(filepath.Join(dst, t))
+			} else {
+				file, err = os.Create(dst)
+			}
+			if err != nil {
+				break
+			}
+		}
+
+		if b.Length > 0 {
+			var n int
+			n, err = file.Write(b.Chunk[0:b.Length])
+			if err != nil {
+				err = fmt.Errorf("write %s failed: %v", file.Name(), err)
+				break
+			}
+
+			_ = pb.Add(n)
+		}
+
+		if b.Finished {
+			err = nil
+			break
+		}
+	}
+	if file != nil {
+		_ = file.Close()
+	}
+	if err != nil {
+		_ = pb.Clear()
+		return err
+	}
+
+	return nil
+}
+
+func PullBashCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "pull",
+		Usage:    "pull file from service",
+		Category: "bash",
+		Action:   pullBash,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "src",
+				Aliases: []string{"S"},
+				Usage:   "specify the source for pull",
+			},
+			&cli.BoolFlag{
+				Name:    "regular",
+				Aliases: []string{"R"},
+				Usage:   "whether pull all files",
+			},
+			&cli.StringFlag{
+				Name:    "dst",
+				Aliases: []string{"D"},
+				Usage:   "specify the target for pull",
+			},
+		},
 	}
 }

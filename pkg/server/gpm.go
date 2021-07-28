@@ -309,7 +309,7 @@ func (s *server) Pull(ctx context.Context, req *pb.PullReq, stream pb.GpmService
 	if err = req.Validate(); err != nil {
 		return verrs.BadGateway(s.Name(), err.Error())
 	}
-	outs, e := s.H.Pull(ctx, req.Name)
+	outs, e := s.H.Pull(ctx, req.Name, req.Dir)
 	if e != nil {
 		err = e
 		return

@@ -132,7 +132,7 @@ func push(ctx context.Context, pb *pbr.ProgressBar, addr, src, dst string) error
 
 	select {
 	case e := <-ech:
-		//_ = pb.Clear()
+		_ = pb.Clear()
 		return e
 	case <-done:
 	}

@@ -200,6 +200,7 @@ message LsRsp {
 
 message PullReq {
   string name = 1;
+  bool dir = 2;
 }
 
 message PullRsp {

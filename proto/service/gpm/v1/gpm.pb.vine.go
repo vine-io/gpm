@@ -832,6 +832,9 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						"name": &openapi.Schema{
 							Type: "string",
 						},
+						"dir": &openapi.Schema{
+							Type: "boolean",
+						},
 					},
 				},
 				"v1.PullRsp": &openapi.Model{

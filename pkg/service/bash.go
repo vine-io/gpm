@@ -63,10 +63,10 @@ func (g *gpm) Ls(ctx context.Context, root string) ([]*gpmv1.FileInfo, error) {
 	return files, nil
 }
 
-func (g *gpm) Pull(ctx context.Context, name string) (<-chan *gpmv1.PullResult, error) {
-	ts := func(name string, buf []byte, out chan<- *gpmv1.PullResult) {
+func (g *gpm) Pull(ctx context.Context, name string, isDir bool) (<-chan *gpmv1.PullResult, error) {
+	ts := func(name string, total int64, buf []byte, out chan<- *gpmv1.PullResult) {
 		var err error
-		var f io.ReadCloser
+		var f *os.File
 
 		defer func() {
 			if err != nil {
@@ -85,6 +85,7 @@ func (g *gpm) Pull(ctx context.Context, name string) (<-chan *gpmv1.PullResult, 
 			if nr > 0 {
 				out <- &gpmv1.PullResult{
 					Name:     name,
+					Total:    total,
 					Chunk:    buf[0:nr],
 					Length:   int64(nr),
 					Finished: false,
@@ -105,22 +106,31 @@ func (g *gpm) Pull(ctx context.Context, name string) (<-chan *gpmv1.PullResult, 
 	if stat == nil {
 		return nil, verrs.NotFound(g.Name(), "%s not exist", name)
 	}
+	if stat.IsDir() && !isDir {
+		return nil, verrs.BadRequest(g.Name(), "%s is a directory", name)
+	}
+	if !stat.IsDir() && isDir {
+		return nil, verrs.BadRequest(g.Name(), "%s is not a directory", name)
+	}
 
 	buf := make([]byte, 1024*32)
 	outs := make(chan *gpmv1.PullResult, 10)
 
 	go func() {
 		if !stat.IsDir() {
-			ts(name, buf, outs)
+			ts(name, stat.Size(), buf, outs)
 		} else {
 			_ = filepath.Walk(name, func(path string, info fs.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
 				if info.IsDir() {
 					return nil
 				}
 				if !info.Mode().IsRegular() {
 					return nil
 				}
-				ts(path, buf, outs)
+				ts(path, info.Size(), buf, outs)
 				return nil
 			})
 		}

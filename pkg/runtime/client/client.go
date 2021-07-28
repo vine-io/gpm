@@ -162,8 +162,8 @@ func (s *SimpleClient) Ls(ctx context.Context, path string, opts ...client.CallO
 	return rsp.Files, nil
 }
 
-func (s *SimpleClient) Pull(ctx context.Context, in *pb.PullReq, opts ...client.CallOption) (*PullWatcher, error) {
-	stream, err := s.cc.Pull(ctx, &pb.PullReq{Name: in.Name}, opts...)
+func (s *SimpleClient) Pull(ctx context.Context, name string, isDir bool, opts ...client.CallOption) (*PullWatcher, error) {
+	stream, err := s.cc.Pull(ctx, &pb.PullReq{Name: name, Dir: isDir}, opts...)
 	if err != nil {
 		return nil, err
 	}
