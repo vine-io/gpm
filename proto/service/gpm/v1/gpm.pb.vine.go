@@ -31,17 +31,9 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 func NewGpmServiceEndpoints() []*apipb.Endpoint {
 	return []*apipb.Endpoint{
 		&apipb.Endpoint{
-			Name:        "GpmService.Healthz",
-			Description: "GpmService.Healthz",
-			Path:        []string{"/api/healthz"},
-			Method:      []string{"GET"},
-			Body:        "*",
-			Handler:     "rpc",
-		},
-		&apipb.Endpoint{
 			Name:        "GpmService.Info",
 			Description: "GpmService.Info",
-			Path:        []string{"/api/info"},
+			Path:        []string{"/api/v1/info"},
 			Method:      []string{"GET"},
 			Body:        "*",
 			Handler:     "rpc",
@@ -49,7 +41,7 @@ func NewGpmServiceEndpoints() []*apipb.Endpoint {
 		&apipb.Endpoint{
 			Name:        "GpmService.ListService",
 			Description: "GpmService.ListService",
-			Path:        []string{"/api/v1/Service/"},
+			Path:        []string{"/api/v1/Service"},
 			Method:      []string{"GET"},
 			Body:        "*",
 			Handler:     "rpc",
@@ -65,7 +57,7 @@ func NewGpmServiceEndpoints() []*apipb.Endpoint {
 		&apipb.Endpoint{
 			Name:        "GpmService.CreateService",
 			Description: "GpmService.CreateService",
-			Path:        []string{"/api/v1/Service/"},
+			Path:        []string{"/api/v1/Service"},
 			Method:      []string{"POST"},
 			Body:        "*",
 			Handler:     "rpc",
@@ -209,46 +201,6 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 			},
 		},
 		Paths: map[string]*openapi.OpenAPIPath{
-			"/api/healthz": &openapi.OpenAPIPath{
-				Get: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "gpm 检测 gpm 服务状态",
-					Description: "GpmService Healthz",
-					OperationId: "GpmServiceHealthz",
-					Parameters:  []*openapi.PathParameters{},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.Empty"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
-			"/api/info": &openapi.OpenAPIPath{
-				Get: &openapi.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "gpm 信息",
-					Description: "GpmService Info",
-					OperationId: "GpmServiceInfo",
-					Parameters:  []*openapi.PathParameters{},
-					Responses: map[string]*openapi.PathResponse{
-						"200": &openapi.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapi.PathRequestBodyContent{
-								ApplicationJson: &openapi.ApplicationContent{
-									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.InfoRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapi.PathSecurity{},
-				},
-			},
 			"/api/v1/Action/exec": &openapi.OpenAPIPath{
 				Post: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
@@ -397,7 +349,7 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 					Security: []*openapi.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/": &openapi.OpenAPIPath{
+			"/api/v1/Service": &openapi.OpenAPIPath{
 				Get: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "查询所有服务",
@@ -810,27 +762,30 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 					Security: []*openapi.PathSecurity{},
 				},
 			},
+			"/api/v1/info": &openapi.OpenAPIPath{
+				Get: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "gpm 信息",
+					Description: "GpmService Info",
+					OperationId: "GpmServiceInfo",
+					Parameters:  []*openapi.PathParameters{},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.InfoRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
 		},
 		Components: &openapi.OpenAPIComponents{
 			SecuritySchemes: &openapi.SecuritySchemes{},
 			Schemas: map[string]*openapi.Model{
-				"v1.Empty": &openapi.Model{
-					Type:       "object",
-					Properties: map[string]*openapi.Schema{},
-				},
-				"v1.InfoReq": &openapi.Model{
-					Type:       "object",
-					Properties: map[string]*openapi.Schema{},
-				},
-				"v1.InfoRsp": &openapi.Model{
-					Type: "object",
-					Properties: map[string]*openapi.Schema{
-						"gpm": &openapi.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/v1.GpmInfo",
-						},
-					},
-				},
 				"v1.ExecReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -1158,32 +1113,16 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
-				"v1.GpmInfo": &openapi.Model{
+				"v1.InfoReq": &openapi.Model{
+					Type:       "object",
+					Properties: map[string]*openapi.Schema{},
+				},
+				"v1.InfoRsp": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
-						"version": &openapi.Schema{
-							Type: "string",
-						},
-						"goos": &openapi.Schema{
-							Type: "string",
-						},
-						"arch": &openapi.Schema{
-							Type: "string",
-						},
-						"gov": &openapi.Schema{
-							Type: "string",
-						},
-						"pid": &openapi.Schema{
-							Type:   "integer",
-							Format: "int32",
-						},
-						"stat": &openapi.Schema{
+						"gpm": &openapi.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.Stat",
-						},
-						"upTime": &openapi.Schema{
-							Type:   "integer",
-							Format: "int64",
+							Ref:  "#/components/schemas/v1.GpmInfo",
 						},
 					},
 				},
@@ -1507,17 +1446,32 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
-				"v1.Stat": &openapi.Model{
+				"v1.GpmInfo": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
-						"cpuPercent": &openapi.Schema{
-							Type:   "number",
-							Format: "double",
+						"version": &openapi.Schema{
+							Type: "string",
 						},
-						"memory": &openapi.Schema{},
-						"memPercent": &openapi.Schema{
-							Type:   "number",
-							Format: "float",
+						"goos": &openapi.Schema{
+							Type: "string",
+						},
+						"arch": &openapi.Schema{
+							Type: "string",
+						},
+						"gov": &openapi.Schema{
+							Type: "string",
+						},
+						"pid": &openapi.Schema{
+							Type:   "integer",
+							Format: "int32",
+						},
+						"stat": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.Stat",
+						},
+						"upTime": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
 						},
 					},
 				},
@@ -1557,6 +1511,20 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						},
 					},
 				},
+				"v1.Stat": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"cpuPercent": &openapi.Schema{
+							Type:   "number",
+							Format: "double",
+						},
+						"memory": &openapi.Schema{},
+						"memPercent": &openapi.Schema{
+							Type:   "number",
+							Format: "float",
+						},
+					},
+				},
 			},
 		},
 	}
@@ -1565,20 +1533,19 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 // Client API for GpmService service
 // +gen:openapi
 type GpmService interface {
-	// +gen:summary=gpm 检测 gpm 服务状态
-	// +gen:get=/api/healthz
+	// gpm 检测 gpm 服务状态
 	Healthz(ctx context.Context, in *Empty, opts ...client.CallOption) (*Empty, error)
 	// +gen:summary=gpm 信息
-	// +gen:get=/api/info
+	// +gen:get=/api/v1/info
 	Info(ctx context.Context, in *InfoReq, opts ...client.CallOption) (*InfoRsp, error)
 	// +gen:summary=查询所有服务
-	// +gen:get=/api/v1/Service/
+	// +gen:get=/api/v1/Service
 	ListService(ctx context.Context, in *ListServiceReq, opts ...client.CallOption) (*ListServiceRsp, error)
 	// +gen:summary=查询单个服务
 	// +gen:get=/api/v1/Service/{name}
 	GetService(ctx context.Context, in *GetServiceReq, opts ...client.CallOption) (*GetServiceRsp, error)
 	// +gen:summary=新建服务
-	// +gen:post=/api/v1/Service/
+	// +gen:post=/api/v1/Service
 	CreateService(ctx context.Context, in *CreateServiceReq, opts ...client.CallOption) (*CreateServiceRsp, error)
 	// +gen:summary=启动服务
 	// +gen:patch=/api/v1/Service/{name}/action/start
@@ -2110,20 +2077,19 @@ func (x *gpmServiceTerminal) Recv() (*TerminalRsp, error) {
 // Server API for GpmService service
 // +gen:openapi
 type GpmServiceHandler interface {
-	// +gen:summary=gpm 检测 gpm 服务状态
-	// +gen:get=/api/healthz
+	// gpm 检测 gpm 服务状态
 	Healthz(context.Context, *Empty, *Empty) error
 	// +gen:summary=gpm 信息
-	// +gen:get=/api/info
+	// +gen:get=/api/v1/info
 	Info(context.Context, *InfoReq, *InfoRsp) error
 	// +gen:summary=查询所有服务
-	// +gen:get=/api/v1/Service/
+	// +gen:get=/api/v1/Service
 	ListService(context.Context, *ListServiceReq, *ListServiceRsp) error
 	// +gen:summary=查询单个服务
 	// +gen:get=/api/v1/Service/{name}
 	GetService(context.Context, *GetServiceReq, *GetServiceRsp) error
 	// +gen:summary=新建服务
-	// +gen:post=/api/v1/Service/
+	// +gen:post=/api/v1/Service
 	CreateService(context.Context, *CreateServiceReq, *CreateServiceRsp) error
 	// +gen:summary=启动服务
 	// +gen:patch=/api/v1/Service/{name}/action/start
@@ -2196,17 +2162,9 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 	}
 	h := &gpmServiceHandler{hdlr}
 	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
-		Name:        "GpmService.Healthz",
-		Description: "GpmService.Healthz",
-		Path:        []string{"/api/healthz"},
-		Method:      []string{"GET"},
-		Body:        "*",
-		Handler:     "rpc",
-	}))
-	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
 		Name:        "GpmService.Info",
 		Description: "GpmService.Info",
-		Path:        []string{"/api/info"},
+		Path:        []string{"/api/v1/info"},
 		Method:      []string{"GET"},
 		Body:        "*",
 		Handler:     "rpc",
@@ -2214,7 +2172,7 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
 		Name:        "GpmService.ListService",
 		Description: "GpmService.ListService",
-		Path:        []string{"/api/v1/Service/"},
+		Path:        []string{"/api/v1/Service"},
 		Method:      []string{"GET"},
 		Body:        "*",
 		Handler:     "rpc",
@@ -2230,7 +2188,7 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
 		Name:        "GpmService.CreateService",
 		Description: "GpmService.CreateService",
-		Path:        []string{"/api/v1/Service/"},
+		Path:        []string{"/api/v1/Service"},
 		Method:      []string{"POST"},
 		Body:        "*",
 		Handler:     "rpc",

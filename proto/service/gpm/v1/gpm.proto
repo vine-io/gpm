@@ -8,20 +8,19 @@ import "github.com/gpm2/gpm/proto/apis/gpm/v1/gpm.proto";
 
 // +gen:openapi
 service GpmService {
-  // +gen:summary=gpm 检测 gpm 服务状态
-  // +gen:get=/api/healthz
+  // gpm 检测 gpm 服务状态
   rpc Healthz(Empty) returns (Empty);
   // +gen:summary=gpm 信息
-  // +gen:get=/api/info
+  // +gen:get=/api/v1/info
   rpc Info(InfoReq) returns (InfoRsp);
   // +gen:summary=查询所有服务
-  // +gen:get=/api/v1/Service/
+  // +gen:get=/api/v1/Service
   rpc ListService(ListServiceReq) returns (ListServiceRsp);
   // +gen:summary=查询单个服务
   // +gen:get=/api/v1/Service/{name}
   rpc GetService(GetServiceReq) returns (GetServiceRsp);
   // +gen:summary=新建服务
-  // +gen:post=/api/v1/Service/
+  // +gen:post=/api/v1/Service
   rpc CreateService(CreateServiceReq) returns (CreateServiceRsp);
   // +gen:summary=启动服务
   // +gen:patch=/api/v1/Service/{name}/action/start

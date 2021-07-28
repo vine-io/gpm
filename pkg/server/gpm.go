@@ -23,8 +23,7 @@
 package server
 
 import (
-	"context"
-	"io"
+	"mime"
 	gruntime "runtime"
 
 	"github.com/gpm2/gpm/pkg/dao"
@@ -32,15 +31,68 @@ import (
 	"github.com/gpm2/gpm/pkg/runtime/config"
 	"github.com/gpm2/gpm/pkg/runtime/inject"
 	"github.com/gpm2/gpm/pkg/service"
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/lack-io/cli"
 	"github.com/lack-io/vine"
-	verrs "github.com/lack-io/vine/proto/apis/errors"
+	ahandler "github.com/lack-io/vine/lib/api/handler"
+	"github.com/lack-io/vine/lib/api/handler/openapi"
+	arpc "github.com/lack-io/vine/lib/api/handler/rpc"
+	"github.com/lack-io/vine/lib/api/resolver"
+	"github.com/lack-io/vine/lib/api/resolver/grpc"
+	"github.com/lack-io/vine/lib/api/router"
+	regRouter "github.com/lack-io/vine/lib/api/router/registry"
+	apihttp "github.com/lack-io/vine/lib/api/server"
+	httpapi "github.com/lack-io/vine/lib/api/server/http"
+	log "github.com/lack-io/vine/lib/logger"
+	"github.com/lack-io/vine/util/helper"
+	"github.com/lack-io/vine/util/namespace"
+	"github.com/rakyll/statik/fs"
+
+	_ "github.com/lack-io/vine/lib/api/handler/openapi/statik"
+)
+
+var (
+	Address       = ":7800"
+	Handler       = "rpc"
+	Type          = "api"
+	APIPath       = "/"
+	enableOpenAPI = false
+
+	flags = []cli.Flag{
+		&cli.StringFlag{
+			Name:    "root",
+			Usage:   "gpmd root directory",
+			EnvVars: []string{"GPMD_ROOT"},
+		},
+		&cli.StringFlag{
+			Name:        "api-address",
+			Usage:       "The specify for api address",
+			EnvVars:     []string{"VINE_API_ADDRESS"},
+			Value:       Address,
+			Destination: &Address,
+		},
+		&cli.BoolFlag{
+			Name:    "enable-openapi",
+			Usage:   "Enable OpenAPI3",
+			EnvVars: []string{"VINE_ENABLE_OPENAPI"},
+			Value:   true,
+		},
+		&cli.BoolFlag{
+			Name:    "enable-cors",
+			Usage:   "Enable CORS, allowing the API to be called by frontend applications",
+			EnvVars: []string{"VINE_API_ENABLE_CORS"},
+			Value:   true,
+		},
+	}
 )
 
 type server struct {
 	vine.Service
+
+	api apihttp.Server
 
 	H service.Gpm `inject:""`
 }
@@ -48,20 +100,19 @@ type server struct {
 func (s *server) Init() error {
 	var err error
 
+	// Init API
+	var aopts []apihttp.Option
+
 	opts := []vine.Option{
 		vine.Name(runtime.GpmName),
 		vine.Id(runtime.GpmId),
 		vine.Version(runtime.GetVersion()),
 		vine.Metadata(map[string]string{
-			"namespace": runtime.Namespace,
+			"api-address": Address,
+			"namespace":   runtime.Namespace,
 		}),
-		vine.Flags(&cli.StringFlag{
-			Name:    "root",
-			Usage:   "gpmd root directory",
-			EnvVars: []string{"GPMD_ROOT"},
-		}),
+		vine.Flags(flags...),
 		vine.Action(func(c *cli.Context) error {
-
 			cfg := &config.Config{}
 			cfg.Root = c.String("root")
 			if cfg.Root == "" {
@@ -72,11 +123,72 @@ func (s *server) Init() error {
 				}
 			}
 
+			enableOpenAPI = c.Bool("enable-openapi")
+
+			if c.Bool("enable-tls") {
+				cfg, err := helper.TLSConfig(c)
+				if err != nil {
+					log.Errorf(err.Error())
+					return err
+				}
+
+				aopts = append(aopts, apihttp.EnableTLS(true))
+				aopts = append(aopts, apihttp.TLSConfig(cfg))
+			}
 			return inject.Provide(cfg)
 		}),
 	}
 
 	s.Service.Init(opts...)
+
+	aopts = append(aopts, apihttp.EnableCORS(true))
+
+	// create the router
+	app := fiber.New(fiber.Config{DisableStartupMessage: true})
+
+	if enableOpenAPI {
+		openAPI := openapi.New(s.Service)
+		_ = mime.AddExtensionType(".svg", "image/svg+xml")
+		sfs, err := fs.New()
+		if err != nil {
+			log.Fatalf("Starting OpenAPI: %v", err)
+		}
+		prefix := "/openapi-ui/"
+		app.All(prefix, openAPI.OpenAPIHandler)
+		app.Use(prefix, filesystem.New(filesystem.Config{Root: sfs}))
+		app.Get("/openapi.json", openAPI.OpenAPIJOSNHandler)
+		app.Get("/services", openAPI.OpenAPIServiceHandler)
+		log.Infof("Starting OpenAPI at %v", prefix)
+	}
+
+	// create the namespace resolver
+	nsResolver := namespace.NewResolver(Type, runtime.Namespace)
+	// resolver options
+	ropts := []resolver.Option{
+		resolver.WithNamespace(nsResolver.ResolveWithType),
+		resolver.WithHandler(Handler),
+	}
+
+	log.Infof("Registering API RPC Handler at %s", APIPath)
+	rr := grpc.NewResolver(ropts...)
+	rt := regRouter.NewRouter(
+		router.WithHandler(arpc.Handler),
+		router.WithResolver(rr),
+		router.WithRegistry(s.Options().Registry),
+	)
+	rp := arpc.NewHandler(
+		ahandler.WithNamespace(runtime.Namespace),
+		ahandler.WithRouter(rt),
+		ahandler.WithClient(s.Client()),
+	)
+	app.Group(APIPath, rp.Handle)
+
+	api := httpapi.NewServer(Address)
+	if err = api.Init(aopts...); err != nil {
+		return err
+	}
+	api.Handle("/", app)
+	s.api = api
 
 	db := new(dao.DB)
 	if err = inject.Provide(s.Service, s.Client(), s, db); err != nil {
@@ -98,362 +210,20 @@ func (s *server) Init() error {
 	return err
 }
 
-func (s *server) Healthz(ctx context.Context, _ *pb.Empty, _ *pb.Empty) error {
+func (s *server) Run() error {
+	if err := s.api.Start(); err != nil {
+		return err
+	}
+
+	if err := s.Service.Run(); err != nil {
+		return err
+	}
+
+	if err := s.api.Stop(); err != nil {
+		return err
+	}
+
 	return nil
-}
-
-func (s *server) Info(ctx context.Context, _ *pb.InfoReq, rsp *pb.InfoRsp) (err error) {
-	rsp.Gpm, err = s.H.Info(ctx)
-	return
-}
-
-func (s *server) ListService(ctx context.Context, req *pb.ListServiceReq, rsp *pb.ListServiceRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	rsp.Services, rsp.Total, err = s.H.ListService(ctx)
-	return
-}
-
-func (s *server) GetService(ctx context.Context, req *pb.GetServiceReq, rsp *pb.GetServiceRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	rsp.Service, err = s.H.GetService(ctx, req.Name)
-	return
-}
-
-func (s *server) CreateService(ctx context.Context, req *pb.CreateServiceReq, rsp *pb.CreateServiceRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	rsp.Service, err = s.H.CreateService(ctx, req.Spec)
-	return
-}
-
-func (s *server) StartService(ctx context.Context, req *pb.StartServiceReq, rsp *pb.StartServiceRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	rsp.Service, err = s.H.StartService(ctx, req.Name)
-	return
-}
-
-func (s *server) StopService(ctx context.Context, req *pb.StopServiceReq, rsp *pb.StopServiceRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	rsp.Service, err = s.H.StopService(ctx, req.Name)
-	return
-}
-
-func (s *server) RebootService(ctx context.Context, req *pb.RebootServiceReq, rsp *pb.RebootServiceRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	rsp.Service, err = s.H.RebootService(ctx, req.Name)
-	return
-}
-
-func (s *server) DeleteService(ctx context.Context, req *pb.DeleteServiceReq, rsp *pb.DeleteServiceRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	rsp.Service, err = s.H.DeleteService(ctx, req.Name)
-	return
-}
-
-func (s *server) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq, stream pb.GpmService_WatchServiceLogStream) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-
-	outs, e := s.H.WatchServiceLog(ctx, req.Name, req.Number, req.Follow)
-	if e != nil {
-		err = e
-		return
-	}
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case out := <-outs:
-			rsp := &pb.WatchServiceLogRsp{Log: out}
-			e = stream.Send(rsp)
-			if e != nil && e != io.EOF {
-				return e
-			}
-		}
-	}
-}
-
-func (s *server) InstallService(ctx context.Context, stream pb.GpmService_InstallServiceStream) (err error) {
-	req, err := stream.Recv()
-	if err != nil {
-		return verrs.InternalServerError(s.Name(), err.Error())
-	}
-
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-
-	in := make(chan *gpmv1.Package, 10)
-	in <- req.Pack
-	outs, e := s.H.InstallService(ctx, req.Spec, in)
-	if e != nil {
-		err = e
-		return
-	}
-
-	go func() {
-		defer close(in)
-		for {
-			req, err = stream.Recv()
-			if err != nil {
-				return
-			}
-
-			in <- req.Pack
-		}
-	}()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case out, ok := <-outs:
-			if !ok {
-				return
-			}
-			rsp := &pb.InstallServiceRsp{Result: out}
-			_ = stream.Send(rsp)
-			if out.IsOk {
-				err = nil
-				return
-			}
-		}
-	}
-}
-
-func (s *server) ListServiceVersions(ctx context.Context, req *pb.ListServiceVersionsReq, rsp *pb.ListServiceVersionsRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	rsp.Versions, err = s.H.ListServiceVersions(ctx, req.Name)
-	return
-}
-
-func (s *server) UpgradeService(ctx context.Context, stream pb.GpmService_UpgradeServiceStream) (err error) {
-	req, err := stream.Recv()
-	if err != nil {
-		return verrs.InternalServerError(s.Name(), err.Error())
-	}
-
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-
-	in := make(chan *gpmv1.Package, 10)
-
-	in <- req.Pack
-	outs, e := s.H.UpgradeService(ctx, req.Name, req.Version, in)
-	if e != nil {
-		err = e
-		return
-	}
-
-	go func() {
-		defer close(in)
-		for {
-			req, err = stream.Recv()
-			if err != nil {
-				return
-			}
-
-			in <- req.Pack
-		}
-	}()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case out := <-outs:
-			if out.Error != "" {
-				return verrs.InternalServerError(s.Name(), out.Error)
-			}
-			rsp := &pb.UpgradeServiceRsp{Result: out}
-			_ = stream.Send(rsp)
-			if out.IsOk {
-				err = nil
-				return
-			}
-		}
-	}
-}
-
-func (s *server) RollBackService(ctx context.Context, req *pb.RollbackServiceReq, rsp *pb.RollbackServiceRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	err = s.H.RollbackService(ctx, req.Name, req.Revision)
-	return
-}
-
-func (s *server) Ls(ctx context.Context, req *pb.LsReq, rsp *pb.LsRsp) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-
-	rsp.Files, err = s.H.Ls(ctx, req.Path)
-	return
-}
-
-func (s *server) Pull(ctx context.Context, req *pb.PullReq, stream pb.GpmService_PullStream) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	outs, e := s.H.Pull(ctx, req.Name, req.Dir)
-	if e != nil {
-		err = e
-		return
-	}
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case result := <-outs:
-			rsp := &pb.PullRsp{Result: result}
-			e = stream.Send(rsp)
-			if e != nil && e != io.EOF {
-				err = e
-				return
-			}
-			if result.Finished {
-				return
-			}
-		}
-	}
-}
-
-func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err error) {
-	req, err := stream.Recv()
-	if err != nil {
-		return verrs.InternalServerError(s.Name(), err.Error())
-	}
-
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-
-	in := make(chan *gpmv1.PushIn, 10)
-
-	in <- req.In
-	outs, e := s.H.Push(ctx, req.In.Dst, req.In.Name, in)
-	if e != nil {
-		err = e
-		return
-	}
-
-	go func() {
-		defer close(in)
-		for {
-			req, err = stream.Recv()
-			if err != nil {
-				return
-			}
-
-			in <- req.In
-		}
-	}()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case out := <-outs:
-			stream.Send(&pb.PushRsp{Result: out})
-		}
-	}
-}
-
-func (s *server) Exec(ctx context.Context, req *pb.ExecReq, stream pb.GpmService_ExecStream) (err error) {
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-	outs, e := s.H.Exec(ctx, req.In)
-	if e != nil {
-		err = e
-		return
-	}
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case out := <-outs:
-			rsp := &pb.ExecRsp{Result: out}
-			e = stream.Send(rsp)
-			if e != nil && e != io.EOF {
-				err = e
-				return
-			}
-			if out.Finished {
-				return
-			}
-		}
-	}
-}
-
-func (s *server) Terminal(ctx context.Context, stream pb.GpmService_TerminalStream) (err error) {
-	req, err := stream.Recv()
-	if err != nil {
-		return verrs.InternalServerError(s.Name(), err.Error())
-	}
-
-	if err = req.Validate(); err != nil {
-		return verrs.BadGateway(s.Name(), err.Error())
-	}
-
-	in := make(chan *gpmv1.TerminalIn, 10)
-
-	in <- req.In
-	outs, e := s.H.Terminal(ctx, in)
-	if e != nil {
-		err = e
-		return
-	}
-
-	go func() {
-		defer close(in)
-		for {
-			req, err = stream.Recv()
-			if err != nil {
-				return
-			}
-
-			in <- req.In
-		}
-	}()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case out := <-outs:
-			rsp := &pb.TerminalRsp{Result: out}
-			e = stream.Send(rsp)
-			if e != nil {
-				err = e
-				return
-			}
-			if out.IsOk {
-				return
-			}
-		}
-	}
 }
 
 func New(opts ...vine.Option) *server {

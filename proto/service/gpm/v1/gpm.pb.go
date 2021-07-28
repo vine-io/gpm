@@ -6608,20 +6608,19 @@ var (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type GpmServiceClient interface {
-	// +gen:summary=gpm 检测 gpm 服务状态
-	// +gen:get=/api/healthz
+	// gpm 检测 gpm 服务状态
 	Healthz(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Empty, error)
 	// +gen:summary=gpm 信息
-	// +gen:get=/api/info
+	// +gen:get=/api/v1/info
 	Info(ctx context.Context, in *InfoReq, opts ...grpc.CallOption) (*InfoRsp, error)
 	// +gen:summary=查询所有服务
-	// +gen:get=/api/v1/Service/
+	// +gen:get=/api/v1/Service
 	ListService(ctx context.Context, in *ListServiceReq, opts ...grpc.CallOption) (*ListServiceRsp, error)
 	// +gen:summary=查询单个服务
 	// +gen:get=/api/v1/Service/{name}
 	GetService(ctx context.Context, in *GetServiceReq, opts ...grpc.CallOption) (*GetServiceRsp, error)
 	// +gen:summary=新建服务
-	// +gen:post=/api/v1/Service/
+	// +gen:post=/api/v1/Service
 	CreateService(ctx context.Context, in *CreateServiceReq, opts ...grpc.CallOption) (*CreateServiceRsp, error)
 	// +gen:summary=启动服务
 	// +gen:patch=/api/v1/Service/{name}/action/start
@@ -7005,20 +7004,19 @@ func (x *gpmServiceTerminalClient) Recv() (*TerminalRsp, error) {
 
 // GpmServiceServer is the server API for GpmService service.
 type GpmServiceServer interface {
-	// +gen:summary=gpm 检测 gpm 服务状态
-	// +gen:get=/api/healthz
+	// gpm 检测 gpm 服务状态
 	Healthz(context.Context, *Empty) (*Empty, error)
 	// +gen:summary=gpm 信息
-	// +gen:get=/api/info
+	// +gen:get=/api/v1/info
 	Info(context.Context, *InfoReq) (*InfoRsp, error)
 	// +gen:summary=查询所有服务
-	// +gen:get=/api/v1/Service/
+	// +gen:get=/api/v1/Service
 	ListService(context.Context, *ListServiceReq) (*ListServiceRsp, error)
 	// +gen:summary=查询单个服务
 	// +gen:get=/api/v1/Service/{name}
 	GetService(context.Context, *GetServiceReq) (*GetServiceRsp, error)
 	// +gen:summary=新建服务
-	// +gen:post=/api/v1/Service/
+	// +gen:post=/api/v1/Service
 	CreateService(context.Context, *CreateServiceReq) (*CreateServiceRsp, error)
 	// +gen:summary=启动服务
 	// +gen:patch=/api/v1/Service/{name}/action/start
