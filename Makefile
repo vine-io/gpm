@@ -11,9 +11,23 @@ build-tag:
 	sed -i "" "s/BuildDate  = ".*"/BuildDate  = \"$(BUILD_DATE)\"/g" pkg/runtime/doc.go
 
 install:
+	go mod vendor
 
-build:
+build-darwin:
+	mkdir -p cmd/gpm/pkg/testdata
+	GOOS=darwin GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
+	GOOS=darwin GOARCH=amd64 go build -o _output/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
+
+build-windows:
+
+build-linux:
+	mkdir -p cmd/gpm/pkg/testdata
+	GOOS=darwin GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
+	GOOS=darwin GOARCH=amd64 go build -o _output/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
+
+build: build-darwin
 
 clean:
+	rm -fr vendor
 
-.PHONY: build-tag install build clean
+.PHONY: build-tag install build-darwin build-windows build-linux build clean

@@ -41,6 +41,11 @@ func main() {
 		Version: runtime.GetVersion(),
 		Commands: []*cli.Command{
 			pkg.HealthCmd(),
+			pkg.DeployCmd(),
+			pkg.UpdateCmd(),
+			pkg.RunCmd(),
+			pkg.ShutdownCmd(),
+
 			pkg.ListServicesCmd(),
 			pkg.InfoServiceCmd(),
 			pkg.GetServiceCmd(),
@@ -80,7 +85,7 @@ func main() {
 		},
 		EnableBashCompletion: true,
 		Action: func(ctx *cli.Context) error {
-			return nil
+			return fmt.Errorf("invalid subcommand")
 		},
 		Authors: []*cli.Author{{
 			Name:  "lack",
@@ -91,6 +96,7 @@ func main() {
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
 
+	app.Version = runtime.GitTag
 	err := app.Run(os.Args)
 	if err != nil {
 		fmt.Println(verrs.FromErr(err).Detail)

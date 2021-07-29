@@ -17,5 +17,8 @@ vendor/
 
 testdata
 
+_output
+
 .idea
 .vscode
+extract/data

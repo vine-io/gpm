@@ -196,7 +196,7 @@ func (p *Process) watching() {
 }
 
 func (p *Process) rotating() {
-	timer := time.NewTicker(time.Second * 2)
+	timer := time.NewTicker(time.Hour * 1)
 	log.Infof("start service %s(%d) rotating", p.Name, p.Pid)
 	defer timer.Stop()
 	for {

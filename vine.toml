@@ -9,9 +9,9 @@ type = "service"
 version = "latest"
 main = "cmd/gpmd/main.go"
 dir = "github.com/gpm2/gpm"
-output = "_output/gpmd"
+output = "_output/gpmd.exe"
 flags = [
-	"-a", "-installsuffix", "cgo", "-ldflags \"-s -w\"", 
+	"GOOS=windows", "-a", "-installsuffix", "cgo", "-ldflags \"-s -w\"",
 ]
 
 [[proto]]

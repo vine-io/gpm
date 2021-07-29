@@ -23,20 +23,27 @@
 package server
 
 import (
+	"fmt"
 	"mime"
+	"os"
+	"path/filepath"
 	gruntime "runtime"
 
 	"github.com/gpm2/gpm/pkg/dao"
 	"github.com/gpm2/gpm/pkg/runtime"
 	"github.com/gpm2/gpm/pkg/runtime/config"
 	"github.com/gpm2/gpm/pkg/runtime/inject"
+	"github.com/gpm2/gpm/pkg/runtime/ssl"
 	"github.com/gpm2/gpm/pkg/service"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+	"github.com/lack-io/plugins/logger/zap"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/lack-io/cli"
 	"github.com/lack-io/vine"
+	grpcClient "github.com/lack-io/vine/core/client/grpc"
+	grpcServer "github.com/lack-io/vine/core/server/grpc"
 	ahandler "github.com/lack-io/vine/lib/api/handler"
 	"github.com/lack-io/vine/lib/api/handler/openapi"
 	arpc "github.com/lack-io/vine/lib/api/handler/rpc"
@@ -62,10 +69,10 @@ var (
 	enableOpenAPI = false
 
 	flags = []cli.Flag{
-		&cli.StringFlag{
-			Name:    "root",
-			Usage:   "gpmd root directory",
-			EnvVars: []string{"GPMD_ROOT"},
+		&cli.BoolFlag{
+			Name:        "enable-log",
+			Usage:       "write log to file",
+			EnvVars:     []string{"VINE_LOG"},
 		},
 		&cli.StringFlag{
 			Name:        "api-address",
@@ -103,6 +110,33 @@ func (s *server) Init() error {
 	// Init API
 	var aopts []apihttp.Option
 
+	cfg := &config.Config{}
+	if cfg.Root == "" {
+		if gruntime.GOOS == "windows" {
+			cfg.Root = "C:\\opt\\gpm"
+		} else {
+			cfg.Root = "/opt/gpm"
+		}
+		_ = os.MkdirAll(filepath.Join(cfg.Root, "logs"), os.ModePerm)
+		_ = os.MkdirAll(filepath.Join(cfg.Root, "services"), os.ModePerm)
+		_ = os.MkdirAll(filepath.Join(cfg.Root, "packages"), os.ModePerm)
+	}
+	if err = inject.Provide(cfg); err != nil {
+		return err
+	}
+
+	gh, err := ssl.GetSSL(cfg.Root)
+	if err != nil {
+		return fmt.Errorf("load server tls: %v", err)
+	}
+	tls, err := ssl.GetTLS()
+	if err != nil {
+		return fmt.Errorf("load client tls: %v", err)
+	}
+
+	ghTLSOption := func() vine.Option { return func(o *vine.Options) { _ = o.Server.Init(grpcServer.GrpcToHttp(gh)) } }
+	cliTLSOption := func() vine.Option { return func(o *vine.Options) { _ = o.Client.Init(grpcClient.AuthTLS(tls)) } }
+
 	opts := []vine.Option{
 		vine.Name(runtime.GpmName),
 		vine.Id(runtime.GpmId),
@@ -111,17 +145,10 @@ func (s *server) Init() error {
 			"api-address": Address,
 			"namespace":   runtime.Namespace,
 		}),
+		ghTLSOption(),
+		cliTLSOption(),
 		vine.Flags(flags...),
 		vine.Action(func(c *cli.Context) error {
-			cfg := &config.Config{}
-			cfg.Root = c.String("root")
-			if cfg.Root == "" {
-				if gruntime.GOOS == "windows" {
-					cfg.Root = "C:\\opt\\gpm"
-				} else {
-					cfg.Root = "/opt/gpm"
-				}
-			}
 
 			enableOpenAPI = c.Bool("enable-openapi")
 
@@ -135,7 +162,23 @@ func (s *server) Init() error {
 				aopts = append(aopts, apihttp.EnableTLS(true))
 				aopts = append(aopts, apihttp.TLSConfig(cfg))
 			}
-			return inject.Provide(cfg)
+
+			if c.Bool("enable-log") {
+				l, err := zap.New(zap.WithFileWriter(zap.FileWriter{
+					FileName:   filepath.Join(cfg.Root, "logs", "gpmd.log"),
+					MaxSize:    1,
+					MaxBackups: 5,
+					MaxAge:     30,
+					Compress:   false,
+				}))
+				if err != nil {
+					return err
+				}
+				defer l.Sync()
+				log.DefaultLogger = l
+			}
+
+			return nil
 		}),
 	}
 

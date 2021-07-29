@@ -26,6 +26,7 @@ import (
 	"context"
 
 	"github.com/gpm2/gpm/pkg/runtime"
+	"github.com/gpm2/gpm/pkg/runtime/ssl"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
 	"github.com/lack-io/vine/core/client"
@@ -43,7 +44,9 @@ func New(addr string) *SimpleClient {
 		addr: addr,
 	}
 
-	conn := grpc.NewClient(client.Retries(0))
+	tls, _ := ssl.GetTLS()
+
+	conn := grpc.NewClient(client.Retries(0), grpc.AuthTLS(tls))
 	sc.cc = pb.NewGpmService(runtime.GpmName, conn)
 
 	return sc

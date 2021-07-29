@@ -20,7 +20,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// +build windows
+
 package pkg
 
-func init() {
+import (
+	"embed"
+	"os"
+
+	"github.com/lack-io/cli"
+)
+
+//go:embed testdata/nssm.exe
+//go:embed testdata/gpmd.exe
+var f embed.FS
+
+func deploy(c *cli.Context) error {
+
+	gopath := os.Getenv("GOPATH")
+
+
+	outE := os.Stdout
+
+	return nil
+}
+
+func DeployCmd() *cli.Command {
+	return &cli.Command{
+		Name:   "deploy",
+		Usage:  "deploy gpmd and gpm",
+		Action: deploy,
+	}
 }
