@@ -28,7 +28,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	gruntime "runtime"
 	"time"
 
 	"github.com/gpm2/gpm/pkg/runtime"
@@ -41,6 +40,8 @@ import (
 )
 
 func update(c *cli.Context) error {
+
+	pack := c.String("package")
 
 	opts := getCallOptions(c)
 	ctx := context.Background()
@@ -55,14 +56,9 @@ func update(c *cli.Context) error {
 	)
 
 	cc := client.New()
-	info, err := cc.Info(ctx, opts...)
-	if err != nil {
-		return err
+	if pack == "" {
+		pack = os.Args[0]
 	}
-	if info.Goos != gruntime.GOOS {
-		return fmt.Errorf("different operation system")
-	}
-
 	file, err := os.Open(os.Args[0])
 	if err != nil {
 		return err
@@ -142,7 +138,8 @@ func update(c *cli.Context) error {
 
 	time.Sleep(time.Second * 2)
 
-	timeout := time.After(time.Second * 20)
+	timeout := time.After(time.Second * 30)
+	var n int
 	for {
 		select {
 		case <-timeout:
@@ -151,9 +148,10 @@ func update(c *cli.Context) error {
 		}
 		cc = client.New()
 		err := cc.Healthz(ctx, opts...)
-		if err == nil {
+		if err == nil && n > 3 {
 			break
 		}
+		n += 1
 		time.Sleep(time.Second * 2)
 	}
 
@@ -166,5 +164,12 @@ func UpdateCmd() *cli.Command {
 		Name:   "update",
 		Usage:  "update gpm and gpmd",
 		Action: update,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "package",
+				Aliases: []string{"P"},
+				Usage:   "specify the package for update",
+			},
+		},
 	}
 }

@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// +build !windows
+// +build windows
 
 package service
 
@@ -90,11 +90,11 @@ func (g *gpm) UpdateSelf(ctx context.Context, version string, in <-chan *gpmv1.U
 		}
 		shell := fmt.Sprintf(`%s %s`, dst, strings.Join(args, " "))
 		log.Infof("starting upgrade gpmd and gpm, %s", shell)
-		script := filepath.Join(os.TempDir(), "start.sh")
+		script := filepath.Join(os.TempDir(), "start.bat")
 
-		_ = ioutil.WriteFile(script, []byte(fmt.Sprintf(`#! /bin/bash
-nohup %s &`, shell)), 0777)
-		cmd := exec.Command("/bin/bash", "-c", shell)
+		_ = ioutil.WriteFile(script, []byte(fmt.Sprintf(`@echo off
+%s`, shell)), 0777)
+		cmd := exec.Command("cmd", "/C", shell)
 		adminCmd(cmd)
 		err = cmd.Start()
 		if err != nil {

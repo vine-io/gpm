@@ -25,6 +25,8 @@
 package pkg
 
 import (
+	"bytes"
+	"context"
 	"embed"
 	"fmt"
 	"io"
@@ -33,8 +35,10 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gpm2/gpm/pkg/runtime"
+	"github.com/gpm2/gpm/pkg/runtime/client"
 	"github.com/lack-io/cli"
 )
 
@@ -54,12 +58,11 @@ func deploy(c *cli.Context) error {
 	args := c.StringSlice("args")
 
 	outE := os.Stdout
-	vv, err := exec.Command("gpm", "-v").CombinedOutput()
+	_, err := exec.Command(root+"\\bin\\"+"gpm", "-v").CombinedOutput()
 	if err == nil {
 		fmt.Fprintln(outE, "gpm already exists")
 		_ = shutdown(c)
 	}
-	v := strings.ReplaceAll(string(vv), "\n", "")
 
 	dirs := []string{
 		root,
@@ -97,7 +100,7 @@ func deploy(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("create gpm link: %v", err)
 	}
-	if v != "" && v != runtime.GitTag {
+	if filepath.Base(link) != "gpm" + "-" +runtime.GitTag+".exe" {
 		os.Remove(link)
 		fmt.Fprintf(outE, "remove old version: %v\n", link)
 	}
@@ -120,39 +123,53 @@ func deploy(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("create gpmd link: %v", err)
 	}
-	if v != "" && v != runtime.GitTag {
+	if filepath.Base(link) != "gpmd" + "-" +runtime.GitTag+".exe" {
 		os.Remove(link)
 		fmt.Fprintf(outE, "remove old version: %v\n", link)
 	}
 
 	// 安装 nssm.exe
-	buf, err = f.ReadFile("testdata/nssm.exe")
-	if err != nil {
-		return fmt.Errorf("get nssm binary: %v", err)
+	stat, _ := os.Stat(root+"\\bin\\nssm.exe")
+	if stat == nil {
+		buf, err = f.ReadFile("testdata/nssm.exe")
+		if err != nil {
+			return fmt.Errorf("get nssm binary: %v", err)
+		}
+		fname = filepath.Join(root, "bin", "nssm.exe")
+		err = ioutil.WriteFile(fname, buf, 0777)
+		if err != nil {
+			return fmt.Errorf("install nssm: %v", err)
+		}
+		_ = os.Chmod(fname, 0777)
 	}
-	fname = filepath.Join(root, "bin", "nssm.exe")
-	err = ioutil.WriteFile(fname, buf, 0777)
-	if err != nil {
-		return fmt.Errorf("install nssm: %v", err)
-	}
-	_ = os.Chmod(fname, 0777)
 
 	fmt.Fprintf(outE, "install gpm %s successfully!\n", runtime.GitTag)
 
+	bb := bytes.NewBuffer([]byte("@echo off\r\n\r\n"))
 	path := os.Getenv("Path")
 	if path != "" {
 		if !strings.Contains(path, root+"\\bin") {
-			_, err = exec.Command("setx", "Path", `%Path%;`+root+"\\bin", "/m").CombinedOutput()
+			bb.WriteString(fmt.Sprintf(`setx "Path" "%s;%s" /m`, root+"\\bin", path))
 		}
 	}
 
 	// TODO: 设置 nssm
+	nssmShell := fmt.Sprintf("\r\n\r\n%s\\bin\\nssm.exe install gpmd %s\\bin\\gpmd", root, root)
 	if len(args) > 0 {
-
+		nssmShell += " " + strings.Join(args, " ")
+	}
+	bb.WriteString(fmt.Sprintf("\r\n\r\n%s\\bin\\nssm.exe remove gpmd confirm\r\n", root))
+	bb.WriteString(nssmShell)
+	startBat := filepath.Join(os.TempDir(), "start.bat")
+	defer os.Remove(startBat)
+	_ = ioutil.WriteFile(startBat, bb.Bytes(), 0777)
+	_, err = exec.Command("cmd", "/C", startBat).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("execute %s: %v", startBat, err)
 	}
 
 	if isRun {
-		cmd := exec.Command("nssm.exe", "start", "gpmd")
+		cmd := exec.Command(root+"\\bin\\"+"nssm.exe", "start", "gpmd")
 		if _, err = cmd.CombinedOutput(); err != nil {
 			return fmt.Errorf("gpmd start: %v", err)
 		}
@@ -187,10 +204,24 @@ func run(c *cli.Context) error {
 
 	outE := os.Stdout
 	args := c.StringSlice("args")
-	if len(args) != 0 {
 
+	bb := bytes.NewBuffer([]byte("@echo off\r\n\r\n"))
+	// TODO: 设置 nssm
+	nssmShell := fmt.Sprintf("\r\n\r\n%s\\bin\\nssm.exe install gpmd %s\\bin\\gpmd", root, root)
+	if len(args) > 0 {
+		nssmShell += " " + strings.Join(args, " ")
 	}
-	cmd := exec.Command("nssm.exe", "start", "gpmd")
+	bb.WriteString(fmt.Sprintf("\r\n\r\n%s\\bin\\nssm.exe remove gpmd confirm\r\n", root))
+	bb.WriteString(nssmShell)
+	startBat := filepath.Join(os.TempDir(), "start.bat")
+	defer os.Remove(startBat)
+	_ = ioutil.WriteFile(startBat, bb.Bytes(), 0777)
+	_, err := exec.Command("cmd", "/C", startBat).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("execute %s: %v", startBat, err)
+	}
+
+	cmd := exec.Command(root+"\\bin\\"+"nssm.exe", "start", "gpmd")
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("gpmd start: %v", err)
 	}
@@ -217,9 +248,19 @@ func RunCmd() *cli.Command {
 func shutdown(c *cli.Context) error {
 
 	outE := os.Stdout
-	_, err := exec.Command("nssm.exe", "stop", "gpmd").CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("get gpmd failed: %v", err)
+	n := 0
+	for {
+		_, _ = exec.Command(root+"\\bin\\"+"nssm.exe", "stop", "gpmd").CombinedOutput()
+		ctx := context.Background()
+		cc := client.New()
+		if err := cc.Healthz(ctx, getCallOptions(c)...); err != nil {
+			break
+		}
+		if n > 3 {
+			return fmt.Errorf("shutdown gpmd timeout")
+		}
+		time.Sleep(time.Second * 1)
+		n += 1
 	}
 
 	fmt.Fprintf(outE, "shutdown gpmd successfully!\n")

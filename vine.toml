@@ -11,7 +11,7 @@ main = "cmd/gpmd/main.go"
 dir = "github.com/gpm2/gpm"
 output = "_output/gpmd.exe"
 flags = [
-	"GOOS=windows", "-a", "-installsuffix", "cgo", "-ldflags \"-s -w\"",
+	"-a", "-installsuffix", "cgo", "-ldflags \"-s -w\"",
 ]
 
 [[proto]]

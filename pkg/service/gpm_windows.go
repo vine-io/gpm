@@ -59,6 +59,7 @@ func adminCmd(cmd *exec.Cmd) {
 		HideWindow: true,
 	}
 
+	cmd.Env = os.Environ()
 	cmd.SysProcAttr = sysAttr
 }
 
