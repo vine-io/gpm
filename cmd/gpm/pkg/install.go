@@ -34,15 +34,13 @@ import (
 	"github.com/gpm2/gpm/pkg/runtime/client"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	"github.com/lack-io/cli"
-	vclient "github.com/lack-io/vine/core/client"
 	pbr "github.com/schollz/progressbar/v3"
 	"google.golang.org/grpc/status"
 )
 
 func installService(c *cli.Context) error {
 
-	addr := c.String("host")
-
+	opts := getCallOptions(c)
 	spec := &gpmv1.ServiceSpec{
 		Env:         map[string]string{},
 		SysProcAttr: &gpmv1.SysProcAttr{},
@@ -81,7 +79,7 @@ func installService(c *cli.Context) error {
 		spec.AutoRestart = 0
 	}
 
-	cc := client.New(addr)
+	cc := client.New()
 	ctx := context.Background()
 	ech := make(chan error, 1)
 	done := make(chan struct{}, 1)
@@ -93,7 +91,7 @@ func installService(c *cli.Context) error {
 		return err
 	}
 
-	s, err := cc.InstallService(ctx, spec, vclient.WithAddress(addr))
+	s, err := cc.InstallService(ctx, spec, opts...)
 	if err != nil {
 		return err
 	}

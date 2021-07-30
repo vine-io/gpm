@@ -31,6 +31,24 @@ func (m *Empty) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
+func (m *UpdateSelfReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *UpdateSelfReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *UpdateSelfRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *UpdateSelfRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
 func (m *InfoReq) Validate() error {
 	return m.ValidateE("")
 }

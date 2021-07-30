@@ -68,19 +68,23 @@ func main() {
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:      "host",
-				Aliases:   []string{"H"},
-				Usage:     "the ip address of gpmd",
-				EnvVars:   []string{"GPM_HOST"},
-				TakesFile: false,
-				Value:     "127.0.0.1:7700",
+				Name:    "host",
+				Aliases: []string{"H"},
+				Usage:   "the ip address of gpmd",
+				EnvVars: []string{"GPM_HOST"},
+				Value:   "127.0.0.1:7700",
+			},
+			&cli.DurationFlag{
+				Name:    "dial-timeout",
+				Usage:   "specify dial timeout for call option",
+				EnvVars: []string{"GPM_DIAL_TIMEOUT"},
+				Value:   time.Second * 30,
 			},
 			&cli.DurationFlag{
 				Name:    "request-timeout",
-				Aliases: []string{"R"},
 				Usage:   "specify request timeout for call option",
 				EnvVars: []string{"GPM_REQUEST_TIMEOUT"},
-				Value:   time.Second * 15,
+				Value:   time.Second * 30,
 			},
 		},
 		EnableBashCompletion: true,
@@ -99,6 +103,6 @@ func main() {
 	app.Version = runtime.GitTag
 	err := app.Run(os.Args)
 	if err != nil {
-		fmt.Println(verrs.FromErr(err).Detail)
+		fmt.Fprintf(os.Stdout, "gpm exec: %s\n", verrs.FromErr(err).Detail)
 	}
 }

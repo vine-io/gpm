@@ -32,6 +32,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/gpm2/gpm/pkg/runtime"
 	"github.com/lack-io/cli"
@@ -40,14 +42,33 @@ import (
 //go:embed testdata/gpmd
 var f embed.FS
 
+const (
+	gpm           = "/usr/local/sbin/gpm"
+	gpmd          = "/usr/local/sbin/gpmd"
+	autoStartFile = "/etc/rc.d/init.d/gpmd"
+)
+
+var gpmdTmp = `#! /bin/bash
+# =======================
+# start gpmd process by gpm
+# =======================
+
+gpm run --server-address=0.0.0.0:7700 --enable-log
+`
+
 func deploy(c *cli.Context) error {
+
+	isRun := c.Bool("run")
+	args := c.StringSlice("args")
 
 	outE := os.Stdout
 	root := "/opt/gpm"
-	_, err := exec.Command("gpm", "-v").CombinedOutput()
+	vv, err := exec.Command("gpm", "-v").CombinedOutput()
 	if err == nil {
-		return fmt.Errorf("gpm installed")
+		fmt.Fprintln(outE, "gpm already exists")
+		_ = shutdown(c)
 	}
+	v := strings.ReplaceAll(string(vv), "\n", "")
 
 	dirs := []string{
 		root,
@@ -58,7 +79,7 @@ func deploy(c *cli.Context) error {
 	}
 
 	for _, dir := range dirs {
-		_ = os.MkdirAll(dir, os.ModePerm)
+		_ = os.MkdirAll(dir, 0777)
 	}
 
 	// 安装 gpm
@@ -78,9 +99,16 @@ func deploy(c *cli.Context) error {
 		return fmt.Errorf("install gpm: %v", err)
 	}
 	_ = dst.Chmod(0777)
-	err = os.Symlink(fname, "/usr/local/sbin/gpm")
+
+	link, _ := os.Readlink(gpm)
+	_ = os.Remove(gpm)
+	err = os.Symlink(fname, gpm)
 	if err != nil {
 		return fmt.Errorf("create gpm link: %v", err)
+	}
+	if v != "" && v != runtime.GitTag {
+		os.Remove(link)
+		fmt.Fprintf(outE, "remove old version: %v\n", link)
 	}
 
 	// 安装 gpmd
@@ -93,10 +121,31 @@ func deploy(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("install gpmd: %v", err)
 	}
-	err = os.Symlink(fname, "/usr/local/sbin/gpmd")
+	_ = os.Chmod(fname, 0777)
+
+	link, _ = os.Readlink(gpmd)
+	_ = os.Remove(gpmd)
+	err = os.Symlink(fname, gpmd)
 	if err != nil {
 		return fmt.Errorf("create gpmd link: %v", err)
 	}
+	if v != "" && v != runtime.GitTag {
+		os.Remove(link)
+		fmt.Fprintf(outE, "remove old version: %v\n", link)
+	}
+
+	fmt.Fprintf(outE, "install gpm %s successfully!\n", runtime.GitTag)
+
+	if isRun {
+		cmd := exec.Command("gpmd", args...)
+		if err := cmd.Start(); err != nil {
+			return fmt.Errorf("gpmd start: %v", err)
+		}
+
+		fmt.Fprintf(outE, "start gpmd successfully!\n")
+	}
+
+	_ = ioutil.WriteFile(autoStartFile, []byte(gpmdTmp), 0777)
 
 	fmt.Fprintf(outE, "install gpm successfully!\n")
 	return nil
@@ -107,20 +156,88 @@ func DeployCmd() *cli.Command {
 		Name:   "deploy",
 		Usage:  "deploy gpmd and gpm",
 		Action: deploy,
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:  "run",
+				Usage: "run gpmd after deployed",
+			},
+			&cli.StringSliceFlag{
+				Name:    "args",
+				Aliases: []string{"-A"},
+				Usage:   "the specify args for gpmd",
+			},
+		},
 	}
 }
 
-func update(c *cli.Context) error {
+func run(c *cli.Context) error {
 
-	fmt.Println(os.Args[0])
+	outE := os.Stdout
+	args := c.StringSlice("args")
+	cmd := exec.Command("gpmd", args...)
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("gpmd start: %v", err)
+	}
+
+	stat, _ := os.Stat(autoStartFile)
+	if stat != nil {
+		text := "gpm run "
+		for _, arg := range args {
+			text += fmt.Sprintf(`--args "%s" `, arg)
+		}
+		shell := fmt.Sprintf(`sed -i s'/gpm run.*/%s/' %s`, text, autoStartFile)
+		exec.Command("/bin/bash", "-c", shell).CombinedOutput()
+	}
+
+	fmt.Fprintf(outE, "start gpmd successfully!\n")
 	return nil
 }
 
-func UpdateCmd() *cli.Command {
+func RunCmd() *cli.Command {
 	return &cli.Command{
-		Name:   "update",
-		Usage:  "update gpmd and gpm",
-		Action: update,
+		Name:   "run",
+		Usage:  "run gpmd process",
+		Action: run,
+		Flags: []cli.Flag{
+			&cli.StringSliceFlag{
+				Name:    "args",
+				Aliases: []string{"-A"},
+				Usage:   "the specify args for gpmd",
+			},
+		},
 	}
 }
 
+func shutdown(c *cli.Context) error {
+
+	outE := os.Stdout
+	b, err := exec.Command("sh", "-c", `ps aux|grep "gpmd" | grep -v "grep" |  awk -F' ' '{print $2}'`).CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("get gpmd failed: %v", err)
+	}
+	pid := strings.ReplaceAll(string(b), "\n", "")
+
+	fmt.Fprintf(outE, "gpmd pid=%s\n", pid)
+	Pid, _ := strconv.ParseInt(pid, 10, 64)
+
+	p, err := os.FindProcess(int(Pid))
+	if err != nil {
+		return fmt.Errorf("get gpmd failed: %v", err)
+	}
+	defer p.Wait()
+
+	if err = p.Kill(); err != nil {
+		return err
+	}
+
+	fmt.Fprintf(outE, "shutdown gpmd successfully!\n")
+	return nil
+}
+
+func ShutdownCmd() *cli.Command {
+	return &cli.Command{
+		Name:   "shutdown",
+		Usage:  "stop gpmd process",
+		Action: shutdown,
+	}
+}

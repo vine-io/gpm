@@ -29,6 +29,38 @@ import (
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
 )
 
+type UpdateStream struct {
+	s       pb.GpmService_UpdateSelfService
+	version string
+}
+
+func NewUpdateStream(s pb.GpmService_UpdateSelfService) *UpdateStream {
+	return &UpdateStream{s: s}
+}
+
+func (s *UpdateStream) Context() context.Context {
+	return s.s.Context()
+}
+
+func (s *UpdateStream) Send(in *gpmv1.UpdateIn) error {
+	err := s.s.Send(&pb.UpdateSelfReq{
+		In: in,
+	})
+	return err
+}
+
+func (s *UpdateStream) Recv() (*gpmv1.UpdateResult, error) {
+	rsp, err := s.s.Recv()
+	if err != nil {
+		return nil, err
+	}
+	return rsp.Result, nil
+}
+
+func (s *UpdateStream) Close() error {
+	return s.s.Close()
+}
+
 type ServiceLogWatcher struct {
 	s pb.GpmService_WatchServiceLogService
 }
@@ -190,7 +222,6 @@ func (s *PushStream) Recv() (*gpmv1.PushResult, error) {
 func (s *PushStream) Close() error {
 	return s.s.Close()
 }
-
 
 type TerminalStream struct {
 	s pb.GpmService_TerminalService

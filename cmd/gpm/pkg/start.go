@@ -29,23 +29,21 @@ import (
 
 	"github.com/gpm2/gpm/pkg/runtime/client"
 	"github.com/lack-io/cli"
-	vclient "github.com/lack-io/vine/core/client"
 )
 
 func startService(c *cli.Context) error {
 
-	addr := c.String("host")
 	name := c.String("name")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
 
-	cc := client.New(addr)
-
+	opts := getCallOptions(c)
+	cc := client.New()
 	ctx := context.Background()
 	outE := os.Stdout
 
-	s, err := cc.StartService(ctx, name, vclient.WithAddress(addr))
+	s, err := cc.StartService(ctx, name, opts...)
 	if err != nil {
 		return err
 	}

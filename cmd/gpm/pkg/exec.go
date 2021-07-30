@@ -32,15 +32,17 @@ import (
 	"github.com/gpm2/gpm/pkg/runtime/client"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	"github.com/lack-io/cli"
-	vclient "github.com/lack-io/vine/core/client"
 	"google.golang.org/grpc/status"
 )
 
 func execBash(c *cli.Context) error {
 
-	in := &gpmv1.ExecIn{}
+	opts := getCallOptions(c)
+	cc := client.New()
+	ctx := context.Background()
+	outE := os.Stdout
 
-	addr := c.String("host")
+	in := &gpmv1.ExecIn{}
 	in.Name = c.String("cmd")
 	in.Args = c.StringSlice("args")
 	env := c.StringSlice("env")
@@ -56,12 +58,7 @@ func execBash(c *cli.Context) error {
 		}
 	}
 
-	cc := client.New(addr)
-
-	ctx := context.Background()
-	outE := os.Stdout
-
-	s, err := cc.Exec(ctx, in, vclient.WithAddress(addr))
+	s, err := cc.Exec(ctx, in, opts...)
 	if err != nil {
 		return err
 	}

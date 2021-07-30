@@ -24,6 +24,7 @@ package pkg
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -32,22 +33,21 @@ import (
 	"github.com/olekukonko/tablewriter"
 
 	"github.com/lack-io/cli"
-	vclient "github.com/lack-io/vine/core/client"
 )
 
 func lsBash(c *cli.Context) error {
 
-	addr := c.String("host")
 	path := c.String("path")
-
-	cc := client.New(addr)
-	ctx := context.Background()
-	outE := os.Stdout
 	if path != "" {
-
+		return fmt.Errorf("missing path")
 	}
 
-	list, err := cc.Ls(ctx, path, vclient.WithAddress(addr))
+	opts := getCallOptions(c)
+	cc := client.New()
+	ctx := context.Background()
+	outE := os.Stdout
+
+	list, err := cc.Ls(ctx, path, opts...)
 	if err != nil {
 		return err
 	}

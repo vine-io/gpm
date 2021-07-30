@@ -172,6 +172,30 @@ func (m *ExecIn) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
+func (m *UpdateIn) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *UpdateIn) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	if len(m.Version) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sversion' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *UpdateResult) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *UpdateResult) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
 func (m *ExecResult) Validate() error {
 	return m.ValidateE("")
 }

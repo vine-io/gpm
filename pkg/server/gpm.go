@@ -62,24 +62,25 @@ import (
 )
 
 var (
-	Address       = ":7800"
+	APIAddress    = ":7800"
 	Handler       = "rpc"
 	Type          = "api"
 	APIPath       = "/"
 	enableOpenAPI = false
+	Address       = ":7700"
 
 	flags = []cli.Flag{
 		&cli.BoolFlag{
-			Name:        "enable-log",
-			Usage:       "write log to file",
-			EnvVars:     []string{"VINE_LOG"},
+			Name:    "enable-log",
+			Usage:   "write log to file",
+			EnvVars: []string{"VINE_LOG"},
 		},
 		&cli.StringFlag{
 			Name:        "api-address",
 			Usage:       "The specify for api address",
 			EnvVars:     []string{"VINE_API_ADDRESS"},
-			Value:       Address,
-			Destination: &Address,
+			Value:       APIAddress,
+			Destination: &APIAddress,
 		},
 		&cli.BoolFlag{
 			Name:    "enable-openapi",
@@ -117,12 +118,9 @@ func (s *server) Init() error {
 		} else {
 			cfg.Root = "/opt/gpm"
 		}
-		_ = os.MkdirAll(filepath.Join(cfg.Root, "logs"), os.ModePerm)
-		_ = os.MkdirAll(filepath.Join(cfg.Root, "services"), os.ModePerm)
-		_ = os.MkdirAll(filepath.Join(cfg.Root, "packages"), os.ModePerm)
-	}
-	if err = inject.Provide(cfg); err != nil {
-		return err
+		_ = os.MkdirAll(filepath.Join(cfg.Root, "logs"), 0777)
+		_ = os.MkdirAll(filepath.Join(cfg.Root, "services"), 0777)
+		_ = os.MkdirAll(filepath.Join(cfg.Root, "packages"), 0777)
 	}
 
 	gh, err := ssl.GetSSL(cfg.Root)
@@ -141,8 +139,9 @@ func (s *server) Init() error {
 		vine.Name(runtime.GpmName),
 		vine.Id(runtime.GpmId),
 		vine.Version(runtime.GetVersion()),
+		vine.Address(Address),
 		vine.Metadata(map[string]string{
-			"api-address": Address,
+			"api-address": APIAddress,
 			"namespace":   runtime.Namespace,
 		}),
 		ghTLSOption(),
@@ -163,7 +162,12 @@ func (s *server) Init() error {
 				aopts = append(aopts, apihttp.TLSConfig(cfg))
 			}
 
+			Address = c.String("server-address")
+			cfg.Address = Address
+
 			if c.Bool("enable-log") {
+				cfg.EnableLog = true
+
 				l, err := zap.New(zap.WithFileWriter(zap.FileWriter{
 					FileName:   filepath.Join(cfg.Root, "logs", "gpmd.log"),
 					MaxSize:    1,
@@ -226,12 +230,16 @@ func (s *server) Init() error {
 	)
 	app.Group(APIPath, rp.Handle)
 
-	api := httpapi.NewServer(Address)
+	api := httpapi.NewServer(APIAddress)
 	if err = api.Init(aopts...); err != nil {
 		return err
 	}
 	api.Handle("/", app)
 	s.api = api
+
+	if err = inject.Provide(cfg); err != nil {
+		return err
+	}
 
 	db := new(dao.DB)
 	if err = inject.Provide(s.Service, s.Client(), s, db); err != nil {

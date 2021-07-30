@@ -33,25 +33,23 @@ import (
 	json "github.com/json-iterator/go"
 	"github.com/lack-io/cli"
 	"github.com/lack-io/pkg/unit"
-	vclient "github.com/lack-io/vine/core/client"
 	tw "github.com/olekukonko/tablewriter"
 	"gopkg.in/yaml.v3"
 )
 
 func getService(c *cli.Context) error {
-	addr := c.String("host")
 	name := c.String("name")
 	output := c.String("output")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
 
-	cc := client.New(addr)
-
+	opts := getCallOptions(c)
+	cc := client.New()
 	ctx := context.Background()
 	outE := os.Stdout
 
-	s, err := cc.GetService(ctx, name, vclient.WithAddress(addr))
+	s, err := cc.GetService(ctx, name, opts...)
 	if err != nil {
 		return err
 	}

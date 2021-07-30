@@ -54,6 +54,14 @@ func execSysProcAttr(cmd *exec.Cmd, in *gpmv1.ExecIn) {
 	cmd.SysProcAttr = sysAttr
 }
 
+func adminCmd(cmd *exec.Cmd) {
+	sysAttr := &syscall.SysProcAttr{
+		HideWindow: true,
+	}
+
+	cmd.SysProcAttr = sysAttr
+}
+
 func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
 	cmd := exec.Command("/bin/bash")
 

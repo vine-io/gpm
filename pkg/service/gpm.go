@@ -46,6 +46,7 @@ import (
 type Gpm interface {
 	Init() error
 	Info(context.Context) (*gpmv1.GpmInfo, error)
+	UpdateSelf(context.Context, string, <-chan *gpmv1.UpdateIn) (<-chan *gpmv1.UpdateResult, error)
 	ListService(context.Context) ([]*gpmv1.Service, int64, error)
 	GetService(context.Context, string) (*gpmv1.Service, error)
 	CreateService(context.Context, *gpmv1.ServiceSpec) (*gpmv1.Service, error)
@@ -87,7 +88,7 @@ type gpm struct {
 func (g *gpm) Init() error {
 	var err error
 
-	if err = os.MkdirAll(filepath.Join(g.Cfg.Root, "services"), os.ModePerm); err != nil {
+	if err = os.MkdirAll(filepath.Join(g.Cfg.Root, "services"), 0777); err != nil {
 		return err
 	}
 	ctx := context.Background()

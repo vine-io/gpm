@@ -23,47 +23,15 @@
 package pkg
 
 import (
-	"context"
-	"fmt"
-	"os"
-
-	"github.com/gpm2/gpm/pkg/runtime/client"
 	"github.com/lack-io/cli"
+	vclient "github.com/lack-io/vine/core/client"
 )
 
-func deleteService(c *cli.Context) error {
-
-	cc := client.New()
-	ctx := context.Background()
-	outE := os.Stdout
-	opts := getCallOptions(c)
-
-	name := c.String("name")
-	if len(name) == 0 {
-		return fmt.Errorf("missing name")
-	}
-
-	s, err := cc.DeleteService(ctx, name, opts...)
-	if err != nil {
-		return err
-	}
-
-	fmt.Fprintf(outE, "service '%s' deleted\n", s.Name)
-	return nil
-}
-
-func DeleteServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "delete",
-		Usage:    "delete a service",
-		Category: "service",
-		Action:   deleteService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name of service",
-			},
-		},
+func getCallOptions(c *cli.Context) []vclient.CallOption {
+	return []vclient.CallOption{
+		vclient.WithAddress(c.String("host")),
+		vclient.WithDialTimeout(c.Duration("dial-timeout")),
+		vclient.WithRequestTimeout(c.Duration("request-timeout")),
+		vclient.WithStreamTimeout(c.Duration("request-timeout")),
 	}
 }

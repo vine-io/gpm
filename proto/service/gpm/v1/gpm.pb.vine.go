@@ -31,6 +31,15 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 func NewGpmServiceEndpoints() []*apipb.Endpoint {
 	return []*apipb.Endpoint{
 		&apipb.Endpoint{
+			Name:        "GpmService.UpdateSelf",
+			Description: "GpmService.UpdateSelf",
+			Path:        []string{"/api/update"},
+			Method:      []string{"POST"},
+			Body:        "*",
+			Stream:      true,
+			Handler:     "rpc",
+		},
+		&apipb.Endpoint{
 			Name:        "GpmService.Info",
 			Description: "GpmService.Info",
 			Path:        []string{"/api/v1/info"},
@@ -201,6 +210,35 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 			},
 		},
 		Paths: map[string]*openapi.OpenAPIPath{
+			"/api/update": &openapi.OpenAPIPath{
+				Post: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "gpm 升级",
+					Description: "GpmService UpdateSelf",
+					OperationId: "GpmServiceUpdateSelf",
+					RequestBody: &openapi.PathRequestBody{
+						Description: "UpdateSelf UpdateSelfReq",
+						Content: &openapi.PathRequestBodyContent{
+							ApplicationJson: &openapi.ApplicationContent{
+								Schema: &openapi.Schema{
+									Ref: "#/components/schemas/v1.UpdateSelfReq",
+								},
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.UpdateSelfRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
 			"/api/v1/Action/exec": &openapi.OpenAPIPath{
 				Post: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
@@ -786,6 +824,24 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 		Components: &openapi.OpenAPIComponents{
 			SecuritySchemes: &openapi.SecuritySchemes{},
 			Schemas: map[string]*openapi.Model{
+				"v1.UpdateSelfReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"in": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.UpdateIn",
+						},
+					},
+				},
+				"v1.UpdateSelfRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"result": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.UpdateResult",
+						},
+					},
+				},
 				"v1.ExecReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -1123,6 +1179,44 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						"gpm": &openapi.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/v1.GpmInfo",
+						},
+					},
+				},
+				"v1.UpdateIn": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+						"version": &openapi.Schema{
+							Type: "string",
+						},
+						"total": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
+						"chunk": &openapi.Schema{},
+						"length": &openapi.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
+						"isOk": &openapi.Schema{
+							Type: "boolean",
+						},
+						"deploySignal": &openapi.Schema{
+							Type: "boolean",
+						},
+					},
+					Required: []string{"name", "version"},
+				},
+				"v1.UpdateResult": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"error": &openapi.Schema{
+							Type: "string",
+						},
+						"isOk": &openapi.Schema{
+							Type: "boolean",
 						},
 					},
 				},
@@ -1535,6 +1629,9 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 type GpmService interface {
 	// gpm 检测 gpm 服务状态
 	Healthz(ctx context.Context, in *Empty, opts ...client.CallOption) (*Empty, error)
+	// +gen:summary=gpm 升级
+	// +gen:post=/api/update
+	UpdateSelf(ctx context.Context, opts ...client.CallOption) (GpmService_UpdateSelfService, error)
 	// +gen:summary=gpm 信息
 	// +gen:get=/api/v1/info
 	Info(ctx context.Context, in *InfoReq, opts ...client.CallOption) (*InfoRsp, error)
@@ -1611,6 +1708,57 @@ func (c *gpmService) Healthz(ctx context.Context, in *Empty, opts ...client.Call
 		return nil, err
 	}
 	return out, nil
+}
+
+func (c *gpmService) UpdateSelf(ctx context.Context, opts ...client.CallOption) (GpmService_UpdateSelfService, error) {
+	req := c.c.NewRequest(c.name, "GpmService.UpdateSelf", &UpdateSelfReq{})
+	stream, err := c.c.Stream(ctx, req, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &gpmServiceUpdateSelf{stream}, nil
+}
+
+type GpmService_UpdateSelfService interface {
+	Context() context.Context
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+	Send(*UpdateSelfReq) error
+	Recv() (*UpdateSelfRsp, error)
+}
+
+type gpmServiceUpdateSelf struct {
+	stream client.Stream
+}
+
+func (x *gpmServiceUpdateSelf) Close() error {
+	return x.stream.Close()
+}
+
+func (x *gpmServiceUpdateSelf) Context() context.Context {
+	return x.stream.Context()
+}
+
+func (x *gpmServiceUpdateSelf) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *gpmServiceUpdateSelf) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (x *gpmServiceUpdateSelf) Send(m *UpdateSelfReq) error {
+	return x.stream.Send(m)
+}
+
+func (x *gpmServiceUpdateSelf) Recv() (*UpdateSelfRsp, error) {
+	m := new(UpdateSelfRsp)
+	err := x.stream.Recv(m)
+	if err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *gpmService) Info(ctx context.Context, in *InfoReq, opts ...client.CallOption) (*InfoRsp, error) {
@@ -2079,6 +2227,9 @@ func (x *gpmServiceTerminal) Recv() (*TerminalRsp, error) {
 type GpmServiceHandler interface {
 	// gpm 检测 gpm 服务状态
 	Healthz(context.Context, *Empty, *Empty) error
+	// +gen:summary=gpm 升级
+	// +gen:post=/api/update
+	UpdateSelf(context.Context, GpmService_UpdateSelfStream) error
 	// +gen:summary=gpm 信息
 	// +gen:get=/api/v1/info
 	Info(context.Context, *InfoReq, *InfoRsp) error
@@ -2138,6 +2289,7 @@ type GpmServiceHandler interface {
 func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...server.HandlerOption) error {
 	type gpmServiceImpl interface {
 		Healthz(ctx context.Context, in *Empty, out *Empty) error
+		UpdateSelf(ctx context.Context, stream server.Stream) error
 		Info(ctx context.Context, in *InfoReq, out *InfoRsp) error
 		ListService(ctx context.Context, in *ListServiceReq, out *ListServiceRsp) error
 		GetService(ctx context.Context, in *GetServiceReq, out *GetServiceRsp) error
@@ -2161,6 +2313,15 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		gpmServiceImpl
 	}
 	h := &gpmServiceHandler{hdlr}
+	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
+		Name:        "GpmService.UpdateSelf",
+		Description: "GpmService.UpdateSelf",
+		Path:        []string{"/api/update"},
+		Method:      []string{"POST"},
+		Body:        "*",
+		Stream:      true,
+		Handler:     "rpc",
+	}))
 	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
 		Name:        "GpmService.Info",
 		Description: "GpmService.Info",
@@ -2322,6 +2483,51 @@ type gpmServiceHandler struct {
 
 func (h *gpmServiceHandler) Healthz(ctx context.Context, in *Empty, out *Empty) error {
 	return h.GpmServiceHandler.Healthz(ctx, in, out)
+}
+
+func (h *gpmServiceHandler) UpdateSelf(ctx context.Context, stream server.Stream) error {
+	return h.GpmServiceHandler.UpdateSelf(ctx, &gpmServiceUpdateSelfStream{stream})
+}
+
+type GpmService_UpdateSelfStream interface {
+	Context() context.Context
+	SendMsg(interface{}) error
+	RecvMsg(interface{}) error
+	Close() error
+	Send(*UpdateSelfRsp) error
+	Recv() (*UpdateSelfReq, error)
+}
+
+type gpmServiceUpdateSelfStream struct {
+	stream server.Stream
+}
+
+func (x *gpmServiceUpdateSelfStream) Close() error {
+	return x.stream.Close()
+}
+
+func (x *gpmServiceUpdateSelfStream) Context() context.Context {
+	return x.stream.Context()
+}
+
+func (x *gpmServiceUpdateSelfStream) SendMsg(m interface{}) error {
+	return x.stream.Send(m)
+}
+
+func (x *gpmServiceUpdateSelfStream) RecvMsg(m interface{}) error {
+	return x.stream.Recv(m)
+}
+
+func (x *gpmServiceUpdateSelfStream) Send(m *UpdateSelfRsp) error {
+	return x.stream.Send(m)
+}
+
+func (x *gpmServiceUpdateSelfStream) Recv() (*UpdateSelfReq, error) {
+	m := new(UpdateSelfReq)
+	if err := x.stream.Recv(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (h *gpmServiceHandler) Info(ctx context.Context, in *InfoReq, out *InfoRsp) error {

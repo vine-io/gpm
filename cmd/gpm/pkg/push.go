@@ -42,7 +42,6 @@ import (
 
 func pushBash(c *cli.Context) error {
 
-	addr := c.String("host")
 	src := c.String("src")
 	dst := c.String("dst")
 	if src == "" {
@@ -57,6 +56,7 @@ func pushBash(c *cli.Context) error {
 		return fmt.Errorf("src %s not exists", src)
 	}
 
+	opts := getCallOptions(c)
 	ctx := context.Background()
 	outE := os.Stdout
 	pb := pbr.NewOptions(0,
@@ -82,22 +82,22 @@ func pushBash(c *cli.Context) error {
 			ddst := filepath.Join(dst, strings.TrimPrefix(path, src))
 			pb.Describe(fmt.Sprintf("push [%30s]", path))
 			pb.Reset()
-			return push(ctx, pb, addr, path, ddst)
+			return push(ctx, pb, path, ddst, opts...)
 		})
 	} else {
-		err = push(ctx, pb, addr, src, dst)
+		err = push(ctx, pb, src, dst, opts...)
 	}
 
 	return err
 }
 
-func push(ctx context.Context, pb *pbr.ProgressBar, addr, src, dst string) error {
-	cc := client.New(addr)
+func push(ctx context.Context, pb *pbr.ProgressBar, src, dst string, opts ...vclient.CallOption) error {
+	cc := client.New()
 	ech := make(chan error, 1)
 	done := make(chan struct{}, 1)
 	buf := make([]byte, 1024*32)
 
-	stream, err := cc.Push(ctx, vclient.WithAddress(addr))
+	stream, err := cc.Push(ctx, opts...)
 	if err != nil {
 		return err
 	}

@@ -39,10 +39,8 @@ type SimpleClient struct {
 	addr string
 }
 
-func New(addr string) *SimpleClient {
-	sc := &SimpleClient{
-		addr: addr,
-	}
+func New() *SimpleClient {
+	sc := &SimpleClient{}
 
 	tls, _ := ssl.GetTLS()
 
@@ -63,6 +61,14 @@ func (s *SimpleClient) Info(ctx context.Context, opts ...client.CallOption) (*gp
 		return nil, err
 	}
 	return rsp.Gpm, nil
+}
+
+func (s *SimpleClient) Update(ctx context.Context, opts ...client.CallOption) (*UpdateStream, error) {
+	stream, err := s.cc.UpdateSelf(ctx, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return NewUpdateStream(stream), nil
 }
 
 func (s *SimpleClient) ListService(ctx context.Context, opts ...client.CallOption) ([]*gpmv1.Service, int64, error) {

@@ -31,13 +31,14 @@ import (
 	"github.com/gpm2/gpm/pkg/runtime/client"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	"github.com/lack-io/cli"
-	vclient "github.com/lack-io/vine/core/client"
 )
 
 func createService(c *cli.Context) error {
 
-	addr := c.String("host")
-
+	opts := getCallOptions(c)
+	cc := client.New()
+	ctx := context.Background()
+	outE := os.Stdout
 	spec := &gpmv1.ServiceSpec{
 		Env:         map[string]string{},
 		SysProcAttr: &gpmv1.SysProcAttr{},
@@ -71,11 +72,7 @@ func createService(c *cli.Context) error {
 		spec.AutoRestart = 0
 	}
 
-	cc := client.New(addr)
-	ctx := context.Background()
-	outE := os.Stdout
-
-	s, err := cc.CreateService(ctx, spec, vclient.WithAddress(addr))
+	s, err := cc.CreateService(ctx, spec, opts...)
 	if err != nil {
 		return err
 	}

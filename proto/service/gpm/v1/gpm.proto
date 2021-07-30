@@ -10,6 +10,9 @@ import "github.com/gpm2/gpm/proto/apis/gpm/v1/gpm.proto";
 service GpmService {
   // gpm 检测 gpm 服务状态
   rpc Healthz(Empty) returns (Empty);
+  // +gen:summary=gpm 升级
+  // +gen:post=/api/update
+  rpc UpdateSelf(stream UpdateSelfReq) returns (stream UpdateSelfRsp);
   // +gen:summary=gpm 信息
   // +gen:get=/api/v1/info
   rpc Info(InfoReq) returns (InfoRsp);
@@ -70,6 +73,14 @@ service GpmService {
 }
 
 message Empty {}
+
+message UpdateSelfReq {
+  gpmv1.UpdateIn in = 1;
+}
+
+message UpdateSelfRsp {
+  gpmv1.UpdateResult result = 2;
+}
 
 message InfoReq {}
 
@@ -193,9 +204,7 @@ message RollbackServiceReq {
   string revision = 2;
 }
 
-message RollbackServiceRsp {
-
-}
+message RollbackServiceRsp {}
 
 message LsReq {
   // +gen:required

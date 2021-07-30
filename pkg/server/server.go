@@ -36,6 +36,47 @@ func (s *server) Healthz(ctx context.Context, _ *pb.Empty, rsp *pb.Empty) error 
 	return nil
 }
 
+func (s *server) UpdateSelf(ctx context.Context, stream pb.GpmService_UpdateSelfStream) (err error) {
+	req, err := stream.Recv()
+	if err != nil {
+		return verrs.InternalServerError(s.Name(), err.Error())
+	}
+
+	if err = req.Validate(); err != nil {
+		return verrs.BadRequest(s.Name(), err.Error())
+	}
+
+	in := make(chan *gpmv1.UpdateIn, 10)
+
+	in <- req.In
+	outs, e := s.H.UpdateSelf(ctx, req.In.Version, in)
+	if e != nil {
+		err = e
+		return
+	}
+
+	go func() {
+		defer close(in)
+		for {
+			req, err = stream.Recv()
+			if err != nil {
+				return
+			}
+
+			in <- req.In
+		}
+	}()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case out := <-outs:
+			_ = stream.Send(&pb.UpdateSelfRsp{Result: out})
+		}
+	}
+}
+
 func (s *server) Info(ctx context.Context, _ *pb.InfoReq, rsp *pb.InfoRsp) (err error) {
 	rsp.Gpm, err = s.H.Info(ctx)
 	return

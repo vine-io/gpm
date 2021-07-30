@@ -32,19 +32,18 @@ import (
 	json "github.com/json-iterator/go"
 	"github.com/lack-io/cli"
 	"github.com/lack-io/pkg/unit"
-	vclient "github.com/lack-io/vine/core/client"
 	tw "github.com/olekukonko/tablewriter"
 	"gopkg.in/yaml.v3"
 )
 
 func infoService(c *cli.Context) error {
-	addr := c.String("host")
+	opts := getCallOptions(c)
 	output := c.String("output")
-	cc := client.New(addr)
+	cc := client.New()
 	ctx := context.Background()
 	outE := os.Stdout
 
-	s, err := cc.Info(ctx, vclient.WithAddress(addr))
+	s, err := cc.Info(ctx, opts...)
 	if err != nil {
 		return err
 	}

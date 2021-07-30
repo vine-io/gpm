@@ -262,7 +262,7 @@ func (g *gpm) UpgradeService(
 		}
 
 		vf := service.Version + "@" + time.Now().Format("20060102150405")
-		_ = ioutil.WriteFile(filepath.Join(g.Cfg.Root, "services", name, "versions", vf), []byte(""), os.ModePerm)
+		_ = ioutil.WriteFile(filepath.Join(g.Cfg.Root, "services", name, "versions", vf), []byte(""), 0777)
 
 		service.Version = version
 		g.DB.UpdateService(ctx, service)

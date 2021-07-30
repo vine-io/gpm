@@ -33,18 +33,16 @@ import (
 	twr "github.com/olekukonko/tablewriter"
 
 	"github.com/lack-io/cli"
-	vclient "github.com/lack-io/vine/core/client"
 )
 
 func listService(c *cli.Context) error {
 
-	addr := c.String("host")
-	cc := client.New(addr)
-
+	opts := getCallOptions(c)
+	cc := client.New()
 	ctx := context.Background()
 	outE := os.Stdout
 
-	list, total, err := cc.ListService(ctx, vclient.WithAddress(addr))
+	list, total, err := cc.ListService(ctx, opts...)
 	if err != nil {
 		return err
 	}

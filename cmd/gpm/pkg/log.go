@@ -30,12 +30,11 @@ import (
 
 	"github.com/gpm2/gpm/pkg/runtime/client"
 	"github.com/lack-io/cli"
-	vclient "github.com/lack-io/vine/core/client"
 	"google.golang.org/grpc/status"
 )
 
 func tailService(c *cli.Context) error {
-	addr := c.String("host")
+	opts := getCallOptions(c)
 	name := c.String("name")
 	number := c.Int64("number")
 	follow := c.Bool("follow")
@@ -43,12 +42,11 @@ func tailService(c *cli.Context) error {
 		return fmt.Errorf("missing name")
 	}
 
-	cc := client.New(addr)
-
+	cc := client.New()
 	ctx := context.Background()
 	outE := os.Stdout
 
-	s, err := cc.WatchServiceLog(ctx, name, number, follow, vclient.WithAddress(addr))
+	s, err := cc.WatchServiceLog(ctx, name, number, follow, opts...)
 	if err != nil {
 		return err
 	}

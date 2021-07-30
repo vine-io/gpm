@@ -154,6 +154,23 @@ message ExecIn {
   string group = 5;
 }
 
+message UpdateIn {
+  // +gen:required
+  string name = 1;
+  // +gen:required
+  string version = 2;
+  int64 total = 3;
+  bytes chunk = 4;
+  int64 length = 5;
+  bool isOk = 6;
+  bool deploySignal = 7;
+}
+
+message UpdateResult {
+  string error = 1;
+  bool isOk = 2;
+}
+
 message ExecResult {
   string result = 1;
   string error = 2;

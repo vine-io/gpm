@@ -29,18 +29,16 @@ import (
 
 	"github.com/gpm2/gpm/pkg/runtime/client"
 	"github.com/lack-io/cli"
-	vclient "github.com/lack-io/vine/core/client"
 )
 
 func healthService(c *cli.Context) error {
 
-	addr := c.String("host")
-	cc := client.New(addr)
-
+	opts := getCallOptions(c)
+	cc := client.New()
 	ctx := context.Background()
 	outE := os.Stdout
 
-	err := cc.Healthz(ctx, vclient.WithAddress(addr))
+	err := cc.Healthz(ctx, opts...)
 	if err != nil {
 		return err
 	}

@@ -28,57 +28,25 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
+	gruntime "runtime"
+	"time"
 
+	"github.com/gpm2/gpm/pkg/runtime"
 	"github.com/gpm2/gpm/pkg/runtime/client"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	"google.golang.org/grpc/status"
+
 	"github.com/lack-io/cli"
 	pbr "github.com/schollz/progressbar/v3"
-	"google.golang.org/grpc/status"
 )
 
-func upgradeService(c *cli.Context) error {
-
-	pack := c.String("package")
-	if len(pack) == 0 {
-		return fmt.Errorf("missing package")
-	}
-
-	name := c.String("name")
-	v := c.String("version")
-	if name == "" {
-		return fmt.Errorf("missing name")
-	}
-	if v == "" {
-		return fmt.Errorf("missing version")
-	}
+func update(c *cli.Context) error {
 
 	opts := getCallOptions(c)
-	cc := client.New()
 	ctx := context.Background()
-	ech := make(chan error, 1)
-	done := make(chan struct{}, 1)
-	buf := make([]byte, 1024*32)
 	outE := os.Stdout
-
-	svc, err := cc.GetService(ctx, name, opts...)
-	if err != nil {
-		return err
-	}
-
-	file, err := os.Open(pack)
-	if err != nil {
-		return err
-	}
-
-	s, err := cc.UpgradeService(ctx, name, v, opts...)
-	if err != nil {
-		return err
-	}
-
 	pb := pbr.NewOptions(0,
 		pbr.OptionSetWriter(outE),
-		pbr.OptionSetDescription(fmt.Sprintf("upload [%s]", pack)),
 		pbr.OptionShowBytes(true),
 		pbr.OptionEnableColorCodes(true),
 		pbr.OptionOnCompletion(func() {
@@ -86,42 +54,40 @@ func upgradeService(c *cli.Context) error {
 		}),
 	)
 
-	go func() {
-		p := &gpmv1.Package{Package: filepath.Base(pack)}
-		stat, _ := file.Stat()
-		if stat != nil {
-			p.Total = stat.Size()
-		}
-		pb.ChangeMax64(p.Total)
-		for {
-			n, e := file.Read(buf)
-			if e != nil && e != io.EOF {
-				ech <- e
-				return
-			}
+	cc := client.New()
+	info, err := cc.Info(ctx, opts...)
+	if err != nil {
+		return err
+	}
+	if info.Goos != gruntime.GOOS {
+		return fmt.Errorf("different operation system")
+	}
 
-			if e == io.EOF {
-				p.IsOk = true
-			}
+	file, err := os.Open(os.Args[0])
+	if err != nil {
+		return err
+	}
+	defer file.Close()
 
-			_ = pb.Add(n)
+	ech := make(chan error, 1)
+	done := make(chan struct{}, 1)
+	buf := make([]byte, 1024*32)
 
-			p.Length = int64(n)
-			p.Chunk = buf[0:n]
-			e1 := s.Send(p)
-			if e1 != nil {
-				return
-			}
+	stream, err := cc.Update(ctx, opts...)
+	if err != nil {
+		return err
+	}
 
-			if e == io.EOF {
-				break
-			}
-		}
-	}()
+	p := &gpmv1.UpdateIn{Version: runtime.GitTag}
+	stat, _ := file.Stat()
+	if stat != nil {
+		p.Total = stat.Size()
+	}
+	pb.ChangeMax64(p.Total)
 
 	go func() {
 		for {
-			b, err := s.Recv()
+			b, err := stream.Recv()
 			if err != nil {
 				ech <- errors.New(status.Convert(err).Message())
 				return
@@ -137,6 +103,30 @@ func upgradeService(c *cli.Context) error {
 		}
 	}()
 
+	for {
+		n, e := file.Read(buf)
+		if e != nil && e != io.EOF {
+			return e
+		}
+
+		if e == io.EOF {
+			p.IsOk = true
+		}
+
+		_ = pb.Add(n)
+
+		p.Length = int64(n)
+		p.Chunk = buf[0:n]
+		e1 := stream.Send(p)
+		if e1 != nil {
+			return e1
+		}
+
+		if e == io.EOF {
+			break
+		}
+	}
+
 	select {
 	case e := <-ech:
 		_ = pb.Clear()
@@ -144,32 +134,37 @@ func upgradeService(c *cli.Context) error {
 	case <-done:
 	}
 
-	fmt.Fprintf(outE, "upgrade service %s %s -> %s\n", name, svc.Version, v)
+	p.DeploySignal = true
+	err = stream.Send(p)
+	if err != nil {
+		return fmt.Errorf("send start signal: %v", err)
+	}
+
+	time.Sleep(time.Second * 2)
+
+	timeout := time.After(time.Second * 20)
+	for {
+		select {
+		case <-timeout:
+			return fmt.Errorf("waitting for gpmd timeout")
+		default:
+		}
+		cc = client.New()
+		err := cc.Healthz(ctx, opts...)
+		if err == nil {
+			break
+		}
+		time.Sleep(time.Second * 2)
+	}
+
+	fmt.Fprintf(outE, "gpm update successfully!\n")
 	return nil
 }
 
-func UpgradeServiceCmd() *cli.Command {
+func UpdateCmd() *cli.Command {
 	return &cli.Command{
-		Name:     "upgrade",
-		Usage:    "upgrade a service",
-		Category: "service",
-		Action:   upgradeService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "package",
-				Aliases: []string{"P"},
-				Usage:   "specify the package for service",
-			},
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name for service",
-			},
-			&cli.StringFlag{
-				Name:    "version",
-				Aliases: []string{"V"},
-				Usage:   "specify the version for service",
-			},
-		},
+		Name:   "update",
+		Usage:  "update gpm and gpmd",
+		Action: update,
 	}
 }

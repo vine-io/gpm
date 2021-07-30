@@ -23,5 +23,7 @@
 package config
 
 type Config struct {
-	Root string
+	Root      string
+	Address   string
+	EnableLog bool
 }

@@ -152,6 +152,16 @@ func (in *ExecIn) DeepCopyInto(out *ExecIn) {
 }
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *UpdateIn) DeepCopyInto(out *UpdateIn) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *UpdateResult) DeepCopyInto(out *UpdateResult) {
+	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
 func (in *ExecResult) DeepCopyInto(out *ExecResult) {
 	*out = *in
 }

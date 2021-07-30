@@ -34,14 +34,12 @@ import (
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	"github.com/lack-io/cli"
 	"github.com/lack-io/pkg/unit"
-	vclient "github.com/lack-io/vine/core/client"
 	pbr "github.com/schollz/progressbar/v3"
 	"google.golang.org/grpc/status"
 )
 
 func pullBash(c *cli.Context) error {
 
-	addr := c.String("host")
 	src := c.String("src")
 	regular := c.Bool("regular")
 	dst := c.String("dst")
@@ -61,9 +59,10 @@ func pullBash(c *cli.Context) error {
 		return fmt.Errorf("invalid dst, local directory %s not exists", dir)
 	}
 
+	opts := getCallOptions(c)
 	ctx := context.Background()
 	outE := os.Stdout
-	cc := client.New(addr)
+	cc := client.New()
 	pb := pbr.NewOptions(0,
 		pbr.OptionSetWriter(outE),
 		pbr.OptionShowBytes(true),
@@ -73,7 +72,7 @@ func pullBash(c *cli.Context) error {
 		}),
 	)
 
-	stream, err := cc.Pull(ctx, src, regular, vclient.WithAddress(addr))
+	stream, err := cc.Pull(ctx, src, regular, opts...)
 	if err != nil {
 		return err
 	}
@@ -109,7 +108,7 @@ func pullBash(c *cli.Context) error {
 				if strings.Contains(t, "/") || strings.Contains(t, "\\") {
 					t = strings.ReplaceAll(t, "\\", "/")
 					newDir := filepath.Join(dst, filepath.Dir(t))
-					_ = os.MkdirAll(newDir, os.ModePerm)
+					_ = os.MkdirAll(newDir, 0777)
 				}
 				file, err = os.Create(filepath.Join(dst, t))
 			} else {
