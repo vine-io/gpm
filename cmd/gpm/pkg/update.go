@@ -59,7 +59,7 @@ func update(c *cli.Context) error {
 	if pack == "" {
 		pack = os.Args[0]
 	}
-	file, err := os.Open(os.Args[0])
+	file, err := os.Open(pack)
 	if err != nil {
 		return err
 	}

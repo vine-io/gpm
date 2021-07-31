@@ -15,19 +15,22 @@ install:
 
 build-darwin:
 	mkdir -p cmd/gpm/pkg/testdata
+	mkdir -p _output/darwin
 	GOOS=darwin GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
-	GOOS=darwin GOARCH=amd64 go build -o _output/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
+	GOOS=darwin GOARCH=amd64 go build -o _output/darwin/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
 
 build-windows:
 	mkdir -p cmd/gpm/pkg/testdata
+	mkdir -p _output/windows
 	cp nssm.exe cmd/gpm/pkg/testdata/nssm.exe
 	GOOS=windows GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd.exe -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
-	GOOS=windows GOARCH=amd64 go build -o _output/gpm.exe -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
+	GOOS=windows GOARCH=amd64 go build -o _output/windows/gpm.exe -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
 
 build-linux:
 	mkdir -p cmd/gpm/pkg/testdata
+	mkdir -p _output/linux
 	GOOS=linux GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
-	GOOS=linux GOARCH=amd64 go build -o _output/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
+	GOOS=linux GOARCH=amd64 go build -o _output/linux/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
 
 build: build-darwin
 

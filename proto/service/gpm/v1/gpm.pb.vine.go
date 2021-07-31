@@ -190,6 +190,14 @@ func NewGpmServiceEndpoints() []*apipb.Endpoint {
 			Stream:      true,
 			Handler:     "rpc",
 		},
+		&apipb.Endpoint{
+			Name:        "GpmService.GetPage",
+			Description: "GpmService.GetPage",
+			Path:        []string{"/api/page/{id}/{name}"},
+			Method:      []string{"GET"},
+			Body:        "*",
+			Handler:     "rpc",
+		},
 	}
 }
 
@@ -210,6 +218,70 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 			},
 		},
 		Paths: map[string]*openapi.OpenAPIPath{
+			"/api/page/{id}/{name}": &openapi.OpenAPIPath{
+				Get: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Description: "GpmService GetPage",
+					OperationId: "GpmServiceGetPage",
+					Parameters: []*openapi.PathParameters{
+						&openapi.PathParameters{
+							Name:        "id",
+							In:          "path",
+							Description: "GetPageReq field id",
+							Required:    true,
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type: "string",
+							},
+						},
+						&openapi.PathParameters{
+							Name:        "name",
+							In:          "path",
+							Description: "GetPageReq field name",
+							Required:    true,
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type: "string",
+							},
+						},
+						&openapi.PathParameters{
+							Name:        "page",
+							In:          "query",
+							Description: "GetPageReq field page",
+							Style:       "form",
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type:    "integer",
+								Format:  "int32",
+								Default: "1",
+							},
+						},
+						&openapi.PathParameters{
+							Name:        "size",
+							In:          "query",
+							Description: "GetPageReq field size",
+							Style:       "form",
+							Explode:     true,
+							Schema: &openapi.Schema{
+								Type:    "integer",
+								Format:  "int32",
+								Default: "10",
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.GetPageRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
 			"/api/update": &openapi.OpenAPIPath{
 				Post: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
@@ -824,6 +896,29 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 		Components: &openapi.OpenAPIComponents{
 			SecuritySchemes: &openapi.SecuritySchemes{},
 			Schemas: map[string]*openapi.Model{
+				"v1.GetPageReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"id": &openapi.Schema{
+							Type: "string",
+						},
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+						"meta": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.PageMeta",
+						},
+					},
+				},
+				"v1.GetPageRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"result": &openapi.Schema{
+							Type: "string",
+						},
+					},
+				},
 				"v1.UpdateSelfReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -1179,6 +1274,21 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						"gpm": &openapi.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/v1.GpmInfo",
+						},
+					},
+				},
+				"v1.PageMeta": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"page": &openapi.Schema{
+							Type:    "integer",
+							Format:  "int32",
+							Default: "1",
+						},
+						"size": &openapi.Schema{
+							Type:    "integer",
+							Format:  "int32",
+							Default: "10",
 						},
 					},
 				},
@@ -1686,6 +1796,8 @@ type GpmService interface {
 	// +gen:summary=远程命令行交互
 	// +gen:post=/api/v1/Action/terminal
 	Terminal(ctx context.Context, opts ...client.CallOption) (GpmService_TerminalService, error)
+	// +gen:get=/api/page/{id}/{name}
+	GetPage(ctx context.Context, in *GetPageReq, opts ...client.CallOption) (*GetPageRsp, error)
 }
 
 type gpmService struct {
@@ -2222,6 +2334,16 @@ func (x *gpmServiceTerminal) Recv() (*TerminalRsp, error) {
 	return m, nil
 }
 
+func (c *gpmService) GetPage(ctx context.Context, in *GetPageReq, opts ...client.CallOption) (*GetPageRsp, error) {
+	req := c.c.NewRequest(c.name, "GpmService.GetPage", in)
+	out := new(GetPageRsp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for GpmService service
 // +gen:openapi
 type GpmServiceHandler interface {
@@ -2284,6 +2406,8 @@ type GpmServiceHandler interface {
 	// +gen:summary=远程命令行交互
 	// +gen:post=/api/v1/Action/terminal
 	Terminal(context.Context, GpmService_TerminalStream) error
+	// +gen:get=/api/page/{id}/{name}
+	GetPage(context.Context, *GetPageReq, *GetPageRsp) error
 }
 
 func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...server.HandlerOption) error {
@@ -2308,6 +2432,7 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		Push(ctx context.Context, stream server.Stream) error
 		Exec(ctx context.Context, stream server.Stream) error
 		Terminal(ctx context.Context, stream server.Stream) error
+		GetPage(ctx context.Context, in *GetPageReq, out *GetPageRsp) error
 	}
 	type GpmService struct {
 		gpmServiceImpl
@@ -2471,6 +2596,14 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		Method:      []string{"POST"},
 		Body:        "*",
 		Stream:      true,
+		Handler:     "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
+		Name:        "GpmService.GetPage",
+		Description: "GpmService.GetPage",
+		Path:        []string{"/api/page/{id}/{name}"},
+		Method:      []string{"GET"},
+		Body:        "*",
 		Handler:     "rpc",
 	}))
 	opts = append(opts, server.OpenAPIHandler(NewGpmServiceOpenAPI()))
@@ -2872,4 +3005,8 @@ func (x *gpmServiceTerminalStream) Recv() (*TerminalReq, error) {
 		return nil, err
 	}
 	return m, nil
+}
+
+func (h *gpmServiceHandler) GetPage(ctx context.Context, in *GetPageReq, out *GetPageRsp) error {
+	return h.GpmServiceHandler.GetPage(ctx, in, out)
 }

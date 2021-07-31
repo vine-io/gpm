@@ -22,6 +22,53 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+func (m *PageMeta) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *PageMeta) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if int64(m.Page) == 0 {
+		m.Page = 1
+	}
+	if int64(m.Page) != 0 {
+	}
+	if int64(m.Size) == 0 {
+		m.Size = 10
+	}
+	if int64(m.Size) != 0 {
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *GetPageReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *GetPageReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if int64(m.Page) == 0 {
+		m.Page = 1
+	}
+	if int64(m.Page) != 0 {
+	}
+	if int64(m.Size) == 0 {
+		m.Size = 10
+	}
+	if int64(m.Size) != 0 {
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *GetPageRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *GetPageRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
 func (m *Empty) Validate() error {
 	return m.ValidateE("")
 }
