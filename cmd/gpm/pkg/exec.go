@@ -63,6 +63,7 @@ func execBash(c *cli.Context) error {
 		return err
 	}
 
+	var result string
 	for {
 		b, err := s.Next()
 		if err != nil {
@@ -71,11 +72,12 @@ func execBash(c *cli.Context) error {
 		if b.Error != "" {
 			return errors.New(b.Error)
 		}
-		fmt.Fprintln(outE, b.Result)
+		result = b.Result
 		if b.Finished {
 			break
 		}
 	}
+	fmt.Fprintln(outE, result)
 
 	return nil
 }

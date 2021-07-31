@@ -236,22 +236,24 @@ func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (<-chan *gpmv1.ExecRes
 		return nil, verrs.InternalServerError(g.Name(), err.Error())
 	}
 
-	buf := make([]byte, 1024*32)
+	size := 1024 * 32
 	go func() {
 		for {
 			select {
 			case <-ech:
+				buf := make([]byte, size)
 				stderr.Read(buf)
 				out <- &gpmv1.ExecResult{Error: string(buf), Finished: true}
 				return
 			case <-done:
+				buf := make([]byte, size)
 				stdout.Read(buf)
 				out <- &gpmv1.ExecResult{Result: string(buf), Finished: true}
 				return
 			default:
-
 			}
 
+			buf := make([]byte, size)
 			stdout.Read(buf)
 			out <- &gpmv1.ExecResult{Result: string(buf)}
 		}

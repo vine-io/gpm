@@ -117,19 +117,23 @@ func (g *gpm) InstallService(
 					return
 				}
 			}
-			fname := filepath.Join(dir, hdr.Name)
-			file, e1 := createFile(fname)
-			if e1 != nil {
-				outs <- &gpmv1.InstallServiceResult{Error: e.Error()}
-				return
-			}
-			_, e1 = io.Copy(file, tr)
-			if e1 != nil && e1 != io.EOF {
-				outs <- &gpmv1.InstallServiceResult{Error: e.Error()}
+			if hdr.FileInfo().IsDir() {
+				_ = os.MkdirAll(filepath.Join(dir, hdr.Name), os.ModePerm)
+			} else {
+				fname := filepath.Join(dir, hdr.Name)
+				file, e1 := createFile(fname)
+				if e1 != nil {
+					outs <- &gpmv1.InstallServiceResult{Error: e.Error()}
+					return
+				}
+				_, e1 = io.Copy(file, tr)
+				if e1 != nil && e1 != io.EOF {
+					outs <- &gpmv1.InstallServiceResult{Error: e.Error()}
+					file.Close()
+					return
+				}
 				file.Close()
-				return
 			}
-			file.Close()
 		}
 
 		_, err = g.CreateService(ctx, spec)

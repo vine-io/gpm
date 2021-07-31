@@ -38,7 +38,7 @@ import (
 func lsBash(c *cli.Context) error {
 
 	path := c.String("path")
-	if path != "" {
+	if path == "" {
 		return fmt.Errorf("missing path")
 	}
 
