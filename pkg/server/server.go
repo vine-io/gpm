@@ -32,16 +32,6 @@ import (
 	verrs "github.com/lack-io/vine/proto/apis/errors"
 )
 
-func (s *server) GetPage(ctx context.Context, req *pb.GetPageReq, rsp *pb.GetPageRsp) error {
-	var err error
-	if err = req.Validate(); err != nil {
-		return verrs.BadRequest(s.Name(), err.Error())
-	}
-
-	rsp.Result = fmt.Sprintf("id=%s name=%s page=%v", req.Id, req.Name, req.PageMeta)
-	return nil
-}
-
 func (s *server) Healthz(ctx context.Context, _ *pb.Empty, rsp *pb.Empty) error {
 	return nil
 }

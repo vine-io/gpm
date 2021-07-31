@@ -70,27 +70,6 @@ service GpmService {
   // +gen:summary=远程命令行交互
   // +gen:post=/api/v1/Action/terminal
   rpc Terminal(stream TerminalReq) returns (stream TerminalRsp);
-
-  // +gen:get=/api/page/{id}/{name}
-  rpc GetPage(GetPageReq) returns (GetPageRsp);
-}
-
-message PageMeta {
-  // +gen:default=1
-  int32 page = 1;
-  // +gen:default=10
-  int32 size = 2;
-}
-
-message GetPageReq {
-  string id = 1;
-  string name = 2;
-  // +gen:inline
-  PageMeta meta = 3;
-}
-
-message GetPageRsp {
-  string result = 1;
 }
 
 message Empty {}
