@@ -32,9 +32,16 @@ build-linux:
 	GOOS=linux GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
 	GOOS=linux GOARCH=amd64 go build -o _output/linux/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
 
-build: build-darwin
+build: build-darwin build-linux build-windows
+
+tar: build
+	cd _output && \
+	tar -zcvf gpm-darwin-$(GIT_TAG).tar.gz darwin/* && \
+	tar -zcvf gpm-linux-$(GIT_TAG).tar.gz linux/*  && \
+	zip gpm-windows-$(GIT_TAG).zip windows/* && \
+	rm -fr darwin/ linux/ windows/
 
 clean:
 	rm -fr vendor
 
-.PHONY: build-tag install build-darwin build-windows build-linux build clean
+.PHONY: build-tag install build-darwin build-windows build-linux build tar clean
