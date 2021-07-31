@@ -22,3 +22,5 @@ _output
 .idea
 .vscode
 extract/data
+
+.DS_Store
