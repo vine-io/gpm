@@ -64,7 +64,7 @@ func adminCmd(cmd *exec.Cmd) {
 }
 
 func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
-	cmd := exec.Command("/bin/bash")
+	cmd := exec.Command("powershell.exe")
 
 	sysAttr := &syscall.SysProcAttr{
 		HideWindow: true,

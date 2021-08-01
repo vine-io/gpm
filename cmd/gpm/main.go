@@ -65,6 +65,7 @@ func main() {
 			pkg.ExecBashCmd(),
 			pkg.PushBashCmd(),
 			pkg.PullBashCmd(),
+			pkg.TerminalBashCmd(),
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{

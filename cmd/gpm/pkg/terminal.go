@@ -24,59 +24,106 @@ package pkg
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"log"
+	"io"
+	"os"
+	"strings"
 
-	"github.com/gpm2/gpm/pkg/runtime"
+	"github.com/gpm2/gpm/pkg/runtime/client"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine"
-	"github.com/lack-io/vine/core/client"
+	"github.com/lack-io/cli"
+	"google.golang.org/grpc/status"
 )
 
-func terminal() {
-	app := vine.NewService()
+type Sender struct {
+	in *gpmv1.TerminalIn
+	s  *client.TerminalStream
+}
 
-	cc := pb.NewGpmService(
-		runtime.GpmName, app.Client(),
-	)
+func (s *Sender) Write(data []byte) (int, error) {
+	n := len(data)
+	s.in.Command = string(data)
+	if err := s.s.Send(s.in); err != nil {
+		return 0, err
+	}
+	return n, nil
+}
 
+func terminalBash(c *cli.Context) error {
+
+	opts := getCallOptions(c)
+	cc := client.New()
 	ctx := context.Background()
 
-	in := &pb.TerminalReq{
-		In: &gpmv1.TerminalIn{
-			Command: "",
-			Env:     map[string]string{"a": "bbb"},
-		},
-	}
+	stdin := os.Stdin
+	out := os.Stdout
+	outE := os.Stderr
 
-	rsp, err := cc.Terminal(ctx, client.WithRetries(0))
-	if err != nil {
-		log.Fatal(err)
+	in := &gpmv1.TerminalIn{}
+	env := c.StringSlice("env")
+	in.User = c.String("user")
+	in.Group = c.String("group")
+	if err := in.Validate(); err != nil {
+		return err
 	}
-
-	go func() {
-		in.In.Command = `echo $a`
-		e := rsp.Send(in)
-		if e != nil {
-			log.Fatal(err)
+	for _, item := range env {
+		parts := strings.Split(item, "=")
+		if len(parts) > 1 {
+			in.Env[parts[0]] = parts[1]
 		}
+	}
 
-		in.In.Command = `ifconfig`
-		rsp.Send(in)
+	t, err := cc.Terminal(ctx, opts...)
+	if err != nil {
+		return err
+	}
 
-		in.In.Command = `exit`
-		rsp.Send(in)
-	}()
+	sender := &Sender{in: in, s: t}
+	go io.Copy(sender, stdin)
 
 	for {
-		out, err := rsp.Recv()
+		b, err := t.Recv()
 		if err != nil {
-			log.Fatal(err)
+			return errors.New(status.Convert(err).Message())
 		}
-		fmt.Println(out.Result)
-		if out.Result.IsOk {
-			return
+		if b.Error != "" {
+			fmt.Fprintf(outE, b.Error)
 		}
+		if b.Stderr != nil {
+			fmt.Fprintf(outE, string(b.Stderr))
+		}
+		if b.Stdout != nil {
+			fmt.Fprintf(out, string(b.Stdout))
+		}
+		if b.IsOk {
+			break
+		}
+	}
+
+	return nil
+}
+
+func TerminalBashCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "terminal",
+		Usage:    "start a terminal",
+		Category: "bash",
+		Action:   terminalBash,
+		Flags: []cli.Flag{
+			&cli.StringSliceFlag{
+				Name:    "env",
+				Aliases: []string{"E"},
+				Usage:   "specify the env for exec",
+			},
+			&cli.StringFlag{
+				Name:  "user",
+				Usage: "specify the user for exec",
+			},
+			&cli.StringFlag{
+				Name:  "group",
+				Usage: "specify the group for exec",
+			},
+		},
 	}
 }
