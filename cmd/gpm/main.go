@@ -42,6 +42,7 @@ func main() {
 		Commands: []*cli.Command{
 			pkg.HealthCmd(),
 			pkg.DeployCmd(),
+			pkg.TarCmd(),
 			pkg.UpdateCmd(),
 			pkg.RunCmd(),
 			pkg.ShutdownCmd(),

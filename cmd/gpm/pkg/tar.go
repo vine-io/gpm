@@ -23,32 +23,106 @@
 package pkg
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 
 	"github.com/lack-io/cli"
 )
 
-func tar(c *cli.Context) error {
+func tarFn(c *cli.Context) error {
 
+	outE := os.Stdout
 	name := c.String("name")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
+	targets := c.StringSlice("target")
+	if len(targets) == 0 {
+		return fmt.Errorf("missing target")
+	}
+
+	fmt.Fprintf(outE, "starting tar %s\n", name)
+	dest, err := os.Create(name)
+	if err != nil {
+		return err
+	}
+	defer dest.Close()
+
+	gw := gzip.NewWriter(dest)
+	defer gw.Close()
+
+	tw := tar.NewWriter(gw)
+	defer tw.Close()
+
+	for _, t := range targets {
+		err = compress(t, "", tw, outE)
+		if err != nil {
+			return fmt.Errorf("compress %s: %v", t, err)
+		}
+	}
+
+	fmt.Fprintf(outE, "tar %s successfully!\n", name)
 
 	return nil
+}
+
+func compress(path string, prefix string, tw *tar.Writer, out io.Writer) error {
+	fmt.Fprintf(out, "compress %s\n", path)
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		return err
+	}
+	if info.IsDir() {
+		prefix = filepath.Join(prefix, info.Name())
+		fileInfos, err := file.Readdir(-1)
+		if err != nil {
+			return err
+		}
+		for _, fi := range fileInfos {
+			err = compress(filepath.Join(file.Name(), fi.Name()), prefix, tw, out)
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+	header, err := tar.FileInfoHeader(info, "")
+	header.Name = filepath.Join(prefix, header.Name)
+	if err != nil {
+		return err
+	}
+	err = tw.WriteHeader(header)
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(tw, file)
+	return err
 }
 
 func TarCmd() *cli.Command {
 	return &cli.Command{
 		Name:     "tar",
 		Usage:    "create a package for Install subcommand",
-		Category: "bash",
-		Action:   tar,
+		Action:   tarFn,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "name",
 				Aliases: []string{"N"},
 				Usage:   "the specify the name for package",
+			},
+			&cli.StringSliceFlag{
+				Name:    "target",
+				Aliases: []string{"T"},
+				Usage:   "the specify the target list for package",
 			},
 		},
 	}
