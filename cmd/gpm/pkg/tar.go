@@ -20,12 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package config
+package pkg
 
-type Config struct {
-	Root          string
-	Address       string
-	APIAddress    string
-	EnableOpenAPI bool
-	EnableLog     bool
+import (
+	"fmt"
+
+	"github.com/lack-io/cli"
+)
+
+func tar(c *cli.Context) error {
+
+	name := c.String("name")
+	if len(name) == 0 {
+		return fmt.Errorf("missing name")
+	}
+
+	return nil
+}
+
+func TarCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "tar",
+		Usage:    "create a package for Install subcommand",
+		Category: "bash",
+		Action:   tar,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "the specify the name for package",
+			},
+		},
+	}
 }

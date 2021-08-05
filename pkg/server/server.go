@@ -29,6 +29,7 @@ import (
 
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+	log "github.com/lack-io/vine/lib/logger"
 	verrs "github.com/lack-io/vine/proto/apis/errors"
 )
 
@@ -338,6 +339,7 @@ func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err
 		for {
 			req, err = stream.Recv()
 			if err != nil {
+				log.Errorf("receive data: %v", err)
 				return
 			}
 

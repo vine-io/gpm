@@ -24,11 +24,11 @@ package server
 
 import (
 	"fmt"
-	"mime"
 	"os"
 	"path/filepath"
 	gruntime "runtime"
 
+	"github.com/gpm2/gpm/pkg/api"
 	"github.com/gpm2/gpm/pkg/dao"
 	"github.com/gpm2/gpm/pkg/runtime"
 	"github.com/gpm2/gpm/pkg/runtime/config"
@@ -38,35 +38,19 @@ import (
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
 	"github.com/lack-io/plugins/logger/zap"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/lack-io/cli"
 	"github.com/lack-io/vine"
 	grpcClient "github.com/lack-io/vine/core/client/grpc"
 	grpcServer "github.com/lack-io/vine/core/server/grpc"
-	ahandler "github.com/lack-io/vine/lib/api/handler"
-	"github.com/lack-io/vine/lib/api/handler/openapi"
-	arpc "github.com/lack-io/vine/lib/api/handler/rpc"
-	"github.com/lack-io/vine/lib/api/resolver"
-	"github.com/lack-io/vine/lib/api/resolver/grpc"
-	"github.com/lack-io/vine/lib/api/router"
-	regRouter "github.com/lack-io/vine/lib/api/router/registry"
+	_ "github.com/lack-io/vine/lib/api/handler/openapi/statik"
 	apihttp "github.com/lack-io/vine/lib/api/server"
-	httpapi "github.com/lack-io/vine/lib/api/server/http"
 	log "github.com/lack-io/vine/lib/logger"
 	"github.com/lack-io/vine/util/helper"
-	"github.com/lack-io/vine/util/namespace"
-	"github.com/rakyll/statik/fs"
-
-	_ "github.com/lack-io/vine/lib/api/handler/openapi/statik"
 )
 
 var (
 	APIAddress    = ":7800"
-	Handler       = "rpc"
-	Type          = "api"
-	APIPath       = "/"
-	enableOpenAPI = false
+	EnableOpenAPI = true
 	Address       = ":7700"
 
 	flags = []cli.Flag{
@@ -83,10 +67,11 @@ var (
 			Destination: &APIAddress,
 		},
 		&cli.BoolFlag{
-			Name:    "enable-openapi",
-			Usage:   "Enable OpenAPI3",
-			EnvVars: []string{"VINE_ENABLE_OPENAPI"},
-			Value:   true,
+			Name:        "enable-openapi",
+			Usage:       "Enable OpenAPI3",
+			EnvVars:     []string{"VINE_ENABLE_OPENAPI"},
+			Destination: &EnableOpenAPI,
+			Value: EnableOpenAPI,
 		},
 		&cli.BoolFlag{
 			Name:    "enable-cors",
@@ -100,7 +85,7 @@ var (
 type server struct {
 	vine.Service
 
-	api apihttp.Server
+	API *api.RestAPI `inject:""`
 
 	H service.Gpm `inject:""`
 }
@@ -149,8 +134,6 @@ func (s *server) Init() error {
 		vine.Flags(flags...),
 		vine.Action(func(c *cli.Context) error {
 
-			enableOpenAPI = c.Bool("enable-openapi")
-
 			if c.Bool("enable-tls") {
 				cfg, err := helper.TLSConfig(c)
 				if err != nil {
@@ -164,6 +147,8 @@ func (s *server) Init() error {
 
 			Address = c.String("server-address")
 			cfg.Address = Address
+			cfg.APIAddress = APIAddress
+			cfg.EnableOpenAPI = EnableOpenAPI
 
 			if c.Bool("enable-log") {
 				cfg.EnableLog = true
@@ -190,53 +175,6 @@ func (s *server) Init() error {
 
 	aopts = append(aopts, apihttp.EnableCORS(true))
 
-	// create the router
-	app := fiber.New(fiber.Config{DisableStartupMessage: true})
-
-	if enableOpenAPI {
-		openAPI := openapi.New(s.Service)
-		_ = mime.AddExtensionType(".svg", "image/svg+xml")
-		sfs, err := fs.New()
-		if err != nil {
-			log.Fatalf("Starting OpenAPI: %v", err)
-		}
-		prefix := "/openapi-ui/"
-		app.All(prefix, openAPI.OpenAPIHandler)
-		app.Use(prefix, filesystem.New(filesystem.Config{Root: sfs}))
-		app.Get("/openapi.json", openAPI.OpenAPIJOSNHandler)
-		app.Get("/services", openAPI.OpenAPIServiceHandler)
-		log.Infof("Starting OpenAPI at %v", prefix)
-	}
-
-	// create the namespace resolver
-	nsResolver := namespace.NewResolver(Type, runtime.Namespace)
-	// resolver options
-	ropts := []resolver.Option{
-		resolver.WithNamespace(nsResolver.ResolveWithType),
-		resolver.WithHandler(Handler),
-	}
-
-	log.Infof("Registering API RPC Handler at %s", APIPath)
-	rr := grpc.NewResolver(ropts...)
-	rt := regRouter.NewRouter(
-		router.WithHandler(arpc.Handler),
-		router.WithResolver(rr),
-		router.WithRegistry(s.Options().Registry),
-	)
-	rp := arpc.NewHandler(
-		ahandler.WithNamespace(runtime.Namespace),
-		ahandler.WithRouter(rt),
-		ahandler.WithClient(s.Client()),
-	)
-	app.Group(APIPath, rp.Handle)
-
-	api := httpapi.NewServer(APIAddress)
-	if err = api.Init(aopts...); err != nil {
-		return err
-	}
-	api.Handle("/", app)
-	s.api = api
-
 	if err = inject.Provide(cfg); err != nil {
 		return err
 	}
@@ -254,6 +192,10 @@ func (s *server) Init() error {
 		return err
 	}
 
+	if err = s.API.Init(aopts...); err != nil {
+		return err
+	}
+
 	if err = pb.RegisterGpmServiceHandler(s.Service.Server(), s); err != nil {
 		return err
 	}
@@ -262,7 +204,7 @@ func (s *server) Init() error {
 }
 
 func (s *server) Run() error {
-	if err := s.api.Start(); err != nil {
+	if err := s.API.Start(); err != nil {
 		return err
 	}
 
@@ -270,7 +212,7 @@ func (s *server) Run() error {
 		return err
 	}
 
-	if err := s.api.Stop(); err != nil {
+	if err := s.API.Stop(); err != nil {
 		return err
 	}
 

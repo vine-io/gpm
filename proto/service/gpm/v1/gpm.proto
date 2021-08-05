@@ -38,18 +38,15 @@ service GpmService {
   // +gen:delete=/api/v1/Service/{name}
   rpc DeleteService(DeleteServiceReq) returns (DeleteServiceRsp);
 
-  // +gen:summary=动态监听服务日志
-  // +gen:post=/api/v1/Service/{name}/watchLogs
+  // 动态监听服务日志
   rpc WatchServiceLog(WatchServiceLogReq) returns (stream WatchServiceLogRsp);
 
-  // +gen:summary=远程安装服务
-  // +gen:post=/api/v1/Service/install
+  // 远程安装服务
   rpc InstallService(stream InstallServiceReq) returns (stream InstallServiceRsp);
   // +gen:summary=查看服务历史版本
   // +gen:get=/api/v1/Service/{name}/versions
   rpc ListServiceVersions(ListServiceVersionsReq) returns (ListServiceVersionsRsp);
-  // +gen:summary=升级服务
-  // +gen:post=/api/v1/Service/{name}/upgrade
+  // 升级服务
   rpc UpgradeService(stream UpgradeServiceReq) returns (stream UpgradeServiceRsp);
   // +gen:summary=回滚服务
   // +gen:post=/api/v1/Service/{name}/rollback
@@ -58,16 +55,13 @@ service GpmService {
   // +gen:summary=获取目录信息下文件列表
   // +gen:get=/api/v1/Action/ls
   rpc Ls(LsReq) returns (LsRsp);
-  // +gen:summary=拉取文件
-  // +gen:post=/api/v1/Action/pull
+  // 拉取文件
   rpc Pull(PullReq) returns (stream PullRsp);
-  // +gen:summary=推送文件
-  // +gen:post=/api/v1/Action/push
+  // 推送文件
   rpc Push(stream PushReq) returns (stream PushRsp);
-  // +gen:summary=远程执行命令
-  // +gen:post=/api/v1/Action/exec
+  // 远程执行命令
   rpc Exec(ExecReq) returns (stream ExecRsp);
-  // +gen:summary=远程命令行交互
+  // 远程命令行交互
   // +gen:post=/api/v1/Action/terminal
   rpc Terminal(stream TerminalReq) returns (stream TerminalRsp);
 }

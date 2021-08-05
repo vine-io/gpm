@@ -6984,17 +6984,14 @@ type GpmServiceClient interface {
 	// +gen:summary=删除服务
 	// +gen:delete=/api/v1/Service/{name}
 	DeleteService(ctx context.Context, in *DeleteServiceReq, opts ...grpc.CallOption) (*DeleteServiceRsp, error)
-	// +gen:summary=动态监听服务日志
-	// +gen:post=/api/v1/Service/{name}/watchLogs
+	// 动态监听服务日志
 	WatchServiceLog(ctx context.Context, in *WatchServiceLogReq, opts ...grpc.CallOption) (GpmService_WatchServiceLogClient, error)
-	// +gen:summary=远程安装服务
-	// +gen:post=/api/v1/Service/install
+	// 远程安装服务
 	InstallService(ctx context.Context, opts ...grpc.CallOption) (GpmService_InstallServiceClient, error)
 	// +gen:summary=查看服务历史版本
 	// +gen:get=/api/v1/Service/{name}/versions
 	ListServiceVersions(ctx context.Context, in *ListServiceVersionsReq, opts ...grpc.CallOption) (*ListServiceVersionsRsp, error)
-	// +gen:summary=升级服务
-	// +gen:post=/api/v1/Service/{name}/upgrade
+	// 升级服务
 	UpgradeService(ctx context.Context, opts ...grpc.CallOption) (GpmService_UpgradeServiceClient, error)
 	// +gen:summary=回滚服务
 	// +gen:post=/api/v1/Service/{name}/rollback
@@ -7002,16 +6999,13 @@ type GpmServiceClient interface {
 	// +gen:summary=获取目录信息下文件列表
 	// +gen:get=/api/v1/Action/ls
 	Ls(ctx context.Context, in *LsReq, opts ...grpc.CallOption) (*LsRsp, error)
-	// +gen:summary=拉取文件
-	// +gen:post=/api/v1/Action/pull
+	// 拉取文件
 	Pull(ctx context.Context, in *PullReq, opts ...grpc.CallOption) (GpmService_PullClient, error)
-	// +gen:summary=推送文件
-	// +gen:post=/api/v1/Action/push
+	// 推送文件
 	Push(ctx context.Context, opts ...grpc.CallOption) (GpmService_PushClient, error)
-	// +gen:summary=远程执行命令
-	// +gen:post=/api/v1/Action/exec
+	// 远程执行命令
 	Exec(ctx context.Context, in *ExecReq, opts ...grpc.CallOption) (GpmService_ExecClient, error)
-	// +gen:summary=远程命令行交互
+	// 远程命令行交互
 	// +gen:post=/api/v1/Action/terminal
 	Terminal(ctx context.Context, opts ...grpc.CallOption) (GpmService_TerminalClient, error)
 }
@@ -7414,17 +7408,14 @@ type GpmServiceServer interface {
 	// +gen:summary=删除服务
 	// +gen:delete=/api/v1/Service/{name}
 	DeleteService(context.Context, *DeleteServiceReq) (*DeleteServiceRsp, error)
-	// +gen:summary=动态监听服务日志
-	// +gen:post=/api/v1/Service/{name}/watchLogs
+	// 动态监听服务日志
 	WatchServiceLog(*WatchServiceLogReq, GpmService_WatchServiceLogServer) error
-	// +gen:summary=远程安装服务
-	// +gen:post=/api/v1/Service/install
+	// 远程安装服务
 	InstallService(GpmService_InstallServiceServer) error
 	// +gen:summary=查看服务历史版本
 	// +gen:get=/api/v1/Service/{name}/versions
 	ListServiceVersions(context.Context, *ListServiceVersionsReq) (*ListServiceVersionsRsp, error)
-	// +gen:summary=升级服务
-	// +gen:post=/api/v1/Service/{name}/upgrade
+	// 升级服务
 	UpgradeService(GpmService_UpgradeServiceServer) error
 	// +gen:summary=回滚服务
 	// +gen:post=/api/v1/Service/{name}/rollback
@@ -7432,16 +7423,13 @@ type GpmServiceServer interface {
 	// +gen:summary=获取目录信息下文件列表
 	// +gen:get=/api/v1/Action/ls
 	Ls(context.Context, *LsReq) (*LsRsp, error)
-	// +gen:summary=拉取文件
-	// +gen:post=/api/v1/Action/pull
+	// 拉取文件
 	Pull(*PullReq, GpmService_PullServer) error
-	// +gen:summary=推送文件
-	// +gen:post=/api/v1/Action/push
+	// 推送文件
 	Push(GpmService_PushServer) error
-	// +gen:summary=远程执行命令
-	// +gen:post=/api/v1/Action/exec
+	// 远程执行命令
 	Exec(*ExecReq, GpmService_ExecServer) error
-	// +gen:summary=远程命令行交互
+	// 远程命令行交互
 	// +gen:post=/api/v1/Action/terminal
 	Terminal(GpmService_TerminalServer) error
 }
