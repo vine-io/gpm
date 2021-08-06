@@ -63,7 +63,7 @@ func listService(c *cli.Context) error {
 		}
 		row = append(row, fmt.Sprintf("%d", item.Pid))
 		row = append(row, fmt.Sprintf("%.1f%%", item.Stat.CpuPercent))
-		row = append(row, fmt.Sprintf("%s/%.1f%%", unit.ConvAuto(int64(item.Stat.Memory), 1), item.Stat.MemPercent*100))
+		row = append(row, fmt.Sprintf("%s/%.1f%%", unit.ConvAuto(int64(item.Stat.Memory), 1), item.Stat.MemPercent))
 		row = append(row, item.Status)
 		row = append(row, time.Now().Sub(time.Unix(item.StartTimestamp, 0)).String())
 		tw.Append(row)
