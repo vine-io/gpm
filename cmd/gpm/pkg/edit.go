@@ -40,10 +40,7 @@ func editService(c *cli.Context) error {
 	ctx := context.Background()
 	outE := os.Stdout
 	spec := &gpmv1.EditServiceSpec{
-		Env:         map[string]string{},
-		SysProcAttr: &gpmv1.SysProcAttr{},
-		Log:         &gpmv1.ProcLog{},
-		AutoRestart: 1,
+		Env: map[string]string{},
 	}
 
 	name := c.String("name")
@@ -51,11 +48,31 @@ func editService(c *cli.Context) error {
 	spec.Args = c.StringSlice("args")
 	spec.Dir = c.String("dir")
 	env := c.StringSlice("env")
-	spec.SysProcAttr.User = c.String("user")
-	spec.SysProcAttr.Group = c.String("group")
-	spec.Log.Expire = int32(c.Int("log-expire"))
-	spec.Log.MaxSize = c.Int64("log-max-size")
-	autoRestart := c.Bool("auto-restart")
+	user := c.String("user")
+	group := c.String("group")
+	if user != "" || group != "" {
+		spec.SysProcAttr = &gpmv1.SysProcAttr{}
+	}
+	if user != "" {
+		spec.SysProcAttr.User = user
+	}
+	if group != "" {
+		spec.SysProcAttr.Group = group
+	}
+
+	expire := int32(c.Int("log-expire"))
+	maxSize := c.Int64("log-max-size")
+	if expire > 0 || maxSize > 0 {
+		spec.Log = &gpmv1.ProcLog{}
+	}
+	if expire > 0 {
+		spec.Log.Expire = expire
+	}
+	if maxSize > 0 {
+		spec.Log.MaxSize = maxSize
+	}
+
+	spec.AutoRestart = int32(c.Int("auto-restart"))
 	if err := spec.Validate(); err != nil {
 		return err
 	}
@@ -64,11 +81,6 @@ func editService(c *cli.Context) error {
 		if len(parts) > 1 {
 			spec.Env[parts[0]] = parts[1]
 		}
-	}
-	if autoRestart {
-		spec.AutoRestart = 1
-	} else {
-		spec.AutoRestart = 0
 	}
 
 	s, err := cc.EditService(ctx, name, spec, opts...)
@@ -123,17 +135,15 @@ func EditServiceCmd() *cli.Command {
 			&cli.IntFlag{
 				Name:  "log-expire",
 				Usage: "specify the expire for service log",
-				Value: 30,
 			},
 			&cli.Int64Flag{
 				Name:  "log-max-size",
 				Usage: "specify the max size for service log",
-				Value: 1024 * 1024 * 50,
 			},
-			&cli.BoolFlag{
+			&cli.IntFlag{
 				Name:  "auto-restart",
 				Usage: "Whether auto restart service when it crashing",
-				Value: true,
+				Value: 1,
 			},
 		},
 	}

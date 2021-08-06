@@ -236,7 +236,13 @@ func (g *gpm) EditService(ctx context.Context, name string, spec *gpmv1.EditServ
 		service.Dir = spec.Dir
 	}
 	if spec.Log != nil {
-		service.Log = spec.Log
+		service.Log = &gpmv1.ProcLog{}
+		if spec.Log.Expire > 0 {
+			service.Log.Expire = spec.Log.Expire
+		}
+		if spec.Log.MaxSize > 0 {
+			service.Log.MaxSize = spec.Log.MaxSize
+		}
 	}
 	if spec.SysProcAttr != nil {
 		service.SysProcAttr = spec.SysProcAttr
