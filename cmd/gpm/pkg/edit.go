@@ -88,7 +88,7 @@ func editService(c *cli.Context) error {
 		return err
 	}
 
-	fmt.Fprintf(outE, "edit service '%s' successfully!", s.Name)
+	fmt.Fprintf(outE, "edit service '%s' successfully!\n", s.Name)
 	return nil
 }
 
