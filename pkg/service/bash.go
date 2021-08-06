@@ -195,12 +195,10 @@ func (g *gpm) Push(ctx context.Context, dst, name string, in <-chan *gpmv1.PushI
 					return
 				}
 
-				if b.Length > 0 {
-					_, err = f.Write(b.Chunk)
-					if err != nil {
-						outs <- &gpmv1.PushResult{Error: err.Error()}
-						return
-					}
+				_, err = f.Write(b.Chunk[0:b.Length])
+				if err != nil {
+					outs <- &gpmv1.PushResult{Error: err.Error()}
+					return
 				}
 				if b.IsOk {
 					outs <- &gpmv1.PushResult{IsOk: true}

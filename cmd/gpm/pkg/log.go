@@ -26,6 +26,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/gpm2/gpm/pkg/runtime/client"
@@ -53,7 +54,7 @@ func tailService(c *cli.Context) error {
 
 	for {
 		b, err := s.Next()
-		if err != nil {
+		if err != nil || err != io.EOF {
 			return errors.New(status.Convert(err).Message())
 		}
 		if b.Error != "" {
