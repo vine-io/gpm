@@ -220,7 +220,7 @@ func InstallServiceCmd() *cli.Command {
 			&cli.Int64Flag{
 				Name:  "log-max-size",
 				Usage: "specify the max size for service log",
-				Value: 1024 * 1024 * 1,
+				Value: 1024 * 1024 * 50,
 			},
 			&cli.StringFlag{
 				Name:    "version",
