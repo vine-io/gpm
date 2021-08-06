@@ -51,6 +51,7 @@ func main() {
 			pkg.InfoServiceCmd(),
 			pkg.GetServiceCmd(),
 			pkg.CreateServiceCmd(),
+			pkg.EditServiceCmd(),
 			pkg.StartServiceCmd(),
 			pkg.StopServiceCmd(),
 			pkg.DeleteServiceCmd(),

@@ -50,6 +50,7 @@ type Gpm interface {
 	ListService(context.Context) ([]*gpmv1.Service, int64, error)
 	GetService(context.Context, string) (*gpmv1.Service, error)
 	CreateService(context.Context, *gpmv1.ServiceSpec) (*gpmv1.Service, error)
+	EditService(context.Context, string, *gpmv1.EditServiceSpec) (*gpmv1.Service, error)
 	StartService(context.Context, string) (*gpmv1.Service, error)
 	StopService(context.Context, string) (*gpmv1.Service, error)
 	RebootService(context.Context, string) (*gpmv1.Service, error)
@@ -150,7 +151,7 @@ func (g *gpm) ListService(ctx context.Context) ([]*gpmv1.Service, int64, error) 
 }
 
 func (g *gpm) GetService(ctx context.Context, name string) (*gpmv1.Service, error) {
-	s, err := g.DB.FindService(ctx, name)
+	s, err := g.getService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -160,8 +161,17 @@ func (g *gpm) GetService(ctx context.Context, name string) (*gpmv1.Service, erro
 	return s, nil
 }
 
+func (g *gpm) getService(ctx context.Context, name string) (*gpmv1.Service, error) {
+	s, err := g.DB.FindService(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return s, nil
+}
+
 func (g *gpm) CreateService(ctx context.Context, spec *gpmv1.ServiceSpec) (*gpmv1.Service, error) {
-	if v, _ := g.GetService(ctx, spec.Name); v != nil {
+	if v, _ := g.getService(ctx, spec.Name); v != nil {
 		return nil, verrs.Conflict(g.Name(), "service %s already exists", spec.Name)
 	}
 
@@ -200,8 +210,68 @@ func (g *gpm) CreateService(ctx context.Context, spec *gpmv1.ServiceSpec) (*gpmv
 	return service, nil
 }
 
+func (g *gpm) EditService(ctx context.Context, name string, spec *gpmv1.EditServiceSpec) (*gpmv1.Service, error) {
+	service, err := g.getService(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+
+	g.RLock()
+	p, ok := g.ps[name]
+	g.RUnlock()
+
+	var isRunning bool
+	if ok && p.Status == gpmv1.StatusRunning {
+		isRunning = true
+		g.stopService(ctx, p)
+	}
+
+	if spec.Bin != "" {
+		service.Bin = spec.Bin
+	}
+	if len(spec.Env) > 0 {
+		service.Env = spec.Env
+	}
+	if spec.Dir != "" {
+		service.Dir = spec.Dir
+	}
+	if spec.Log != nil {
+		service.Log = spec.Log
+	}
+	if spec.SysProcAttr != nil {
+		service.SysProcAttr = spec.SysProcAttr
+	}
+	if len(spec.Args) > 0 {
+		service.Args = spec.Args
+	}
+	if spec.AutoRestart != spec.AutoRestart {
+		service.AutoRestart = spec.AutoRestart
+	}
+
+	err = fillService(service)
+	if err != nil {
+		return nil, err
+	}
+
+	service, err = g.DB.UpdateService(ctx, service)
+	if err != nil {
+		return nil, err
+	}
+
+	p = NewProcess(service)
+	if isRunning {
+		g.startService(ctx, p)
+	}
+
+	g.Lock()
+	g.ps[service.Name] = p
+	g.Unlock()
+
+	return service, nil
+}
+
 func (g *gpm) StartService(ctx context.Context, name string) (*gpmv1.Service, error) {
-	s, err := g.GetService(ctx, name)
+	s, err := g.getService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -250,7 +320,7 @@ func (g *gpm) startService(ctx context.Context, p *Process) (*gpmv1.Service, err
 }
 
 func (g *gpm) StopService(ctx context.Context, name string) (*gpmv1.Service, error) {
-	s, err := g.GetService(ctx, name)
+	s, err := g.getService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -286,7 +356,7 @@ func (g *gpm) stopService(ctx context.Context, p *Process) (*gpmv1.Service, erro
 }
 
 func (g *gpm) RebootService(ctx context.Context, name string) (*gpmv1.Service, error) {
-	s, err := g.GetService(ctx, name)
+	s, err := g.getService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +371,7 @@ func (g *gpm) RebootService(ctx context.Context, name string) (*gpmv1.Service, e
 }
 
 func (g *gpm) DeleteService(ctx context.Context, name string) (*gpmv1.Service, error) {
-	s, err := g.GetService(ctx, name)
+	s, err := g.getService(ctx, name)
 	if err != nil {
 		return nil, err
 	}

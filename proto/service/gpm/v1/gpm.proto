@@ -10,8 +10,7 @@ import "github.com/gpm2/gpm/proto/apis/gpm/v1/gpm.proto";
 service GpmService {
   // gpm 检测 gpm 服务状态
   rpc Healthz(Empty) returns (Empty);
-  // +gen:summary=gpm 升级
-  // +gen:post=/api/update
+  // gpm 升级
   rpc UpdateSelf(stream UpdateSelfReq) returns (stream UpdateSelfRsp);
   // +gen:summary=gpm 信息
   // +gen:get=/api/v1/info
@@ -25,6 +24,9 @@ service GpmService {
   // +gen:summary=新建服务
   // +gen:post=/api/v1/Service
   rpc CreateService(CreateServiceReq) returns (CreateServiceRsp);
+  // +gen:summary=修改服务信息
+  // +gen:patch=/api/v1/Service/{name}
+  rpc EditService(EditServiceReq) returns (EditServiceRsp);
   // +gen:summary=启动服务
   // +gen:patch=/api/v1/Service/{name}/action/start
   rpc StartService(StartServiceReq) returns (StartServiceRsp);
@@ -62,7 +64,6 @@ service GpmService {
   // 远程执行命令
   rpc Exec(ExecReq) returns (stream ExecRsp);
   // 远程命令行交互
-  // +gen:post=/api/v1/Action/terminal
   rpc Terminal(stream TerminalReq) returns (stream TerminalRsp);
 }
 
@@ -105,6 +106,16 @@ message CreateServiceReq {
 }
 
 message CreateServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message EditServiceReq {
+  string name = 1;
+  // +gen:required
+  gpmv1.EditServiceSpec spec = 2;
+}
+
+message EditServiceRsp {
   gpmv1.Service service = 1;
 }
 

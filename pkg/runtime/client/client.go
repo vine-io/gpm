@@ -95,6 +95,14 @@ func (s *SimpleClient) CreateService(ctx context.Context, spec *gpmv1.ServiceSpe
 	return rsp.Service, nil
 }
 
+func (s *SimpleClient) EditService(ctx context.Context, name string, spec *gpmv1.EditServiceSpec, opts ...client.CallOption) (*gpmv1.Service, error) {
+	rsp, err := s.cc.EditService(ctx, &pb.EditServiceReq{Name: name, Spec: spec}, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return rsp.Service, nil
+}
+
 func (s *SimpleClient) StartService(ctx context.Context, name string, opts ...client.CallOption) (*gpmv1.Service, error) {
 	rsp, err := s.cc.StartService(ctx, &pb.StartServiceReq{Name: name}, opts...)
 	if err != nil {

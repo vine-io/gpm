@@ -68,6 +68,15 @@ func (m *ServiceSpec) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
+func (m *EditServiceSpec) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *EditServiceSpec) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
 func (m *ProcLog) Validate() error {
 	return m.ValidateE("")
 }

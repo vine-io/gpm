@@ -129,6 +129,29 @@ func (m *CreateServiceRsp) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
+func (m *EditServiceReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *EditServiceReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if m.Spec == nil {
+		errs = append(errs, fmt.Errorf("field '%sspec' is required", prefix))
+	} else {
+		errs = append(errs, m.Spec.ValidateE(prefix+"spec."))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *EditServiceRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *EditServiceRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
 func (m *StartServiceReq) Validate() error {
 	return m.ValidateE("")
 }

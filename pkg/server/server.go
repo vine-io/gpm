@@ -108,6 +108,14 @@ func (s *server) CreateService(ctx context.Context, req *pb.CreateServiceReq, rs
 	return
 }
 
+func (s *server) EditService(ctx context.Context, req *pb.EditServiceReq, rsp *pb.EditServiceRsp) (err error) {
+	if err = req.Validate(); err != nil {
+		return verrs.BadRequest(s.Name(), err.Error())
+	}
+	rsp.Service, err = s.H.EditService(ctx, req.Name, req.Spec)
+	return
+}
+
 func (s *server) StartService(ctx context.Context, req *pb.StartServiceReq, rsp *pb.StartServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
