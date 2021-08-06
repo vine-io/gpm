@@ -142,7 +142,7 @@ func EditServiceCmd() *cli.Command {
 			},
 			&cli.IntFlag{
 				Name:  "auto-restart",
-				Usage: "Whether auto restart service when it crashing",
+				Usage: "Whether auto restart service when it crashing (1,-1)",
 				Value: 1,
 			},
 		},

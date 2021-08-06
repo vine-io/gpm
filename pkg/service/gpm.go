@@ -250,7 +250,7 @@ func (g *gpm) EditService(ctx context.Context, name string, spec *gpmv1.EditServ
 	if len(spec.Args) > 0 {
 		service.Args = spec.Args
 	}
-	if spec.AutoRestart != spec.AutoRestart {
+	if spec.AutoRestart != 0 {
 		service.AutoRestart = spec.AutoRestart
 	}
 
