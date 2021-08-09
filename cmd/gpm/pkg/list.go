@@ -51,11 +51,12 @@ func listService(c *cli.Context) error {
 	}
 
 	tw := twr.NewWriter(outE)
-	tw.SetHeader([]string{"Name", "User", "Pid", "CPU", "Memory", "Status", "Uptime"})
+	tw.SetHeader([]string{"Name", "Version", "User", "Pid", "CPU", "Memory", "Status", "Uptime"})
 
 	for _, item := range list {
 		row := make([]string, 0)
 		row = append(row, item.Name)
+		row = append(row, item.Version)
 		if item.SysProcAttr != nil {
 			row = append(row, fmt.Sprintf("%s:%s", item.SysProcAttr.User, item.SysProcAttr.Group))
 		} else {
@@ -69,7 +70,7 @@ func listService(c *cli.Context) error {
 		tw.Append(row)
 	}
 
-	tw.SetColumnColor(twr.Colors{}, twr.Colors{}, twr.Colors{}, twr.Colors{},
+	tw.SetColumnColor(twr.Colors{}, twr.Colors{}, twr.Colors{}, twr.Colors{}, twr.Colors{},
 		twr.Colors{}, twr.Colors{twr.FgRedColor}, twr.Colors{})
 	tw.Render()
 	fmt.Fprintf(os.Stdout, "\nTotal: %d\n", total)

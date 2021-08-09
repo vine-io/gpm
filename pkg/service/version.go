@@ -45,7 +45,7 @@ func (g *gpm) InstallService(
 	in <-chan *gpmv1.Package,
 ) (<-chan *gpmv1.InstallServiceResult, error) {
 
-	v, _ := g.GetService(ctx, spec.Name)
+	v, _ := g.getService(ctx, spec.Name)
 	if v != nil {
 		return nil, verrs.Conflict(g.Name(), "service '%s' already exists", spec.Name)
 	}
@@ -168,7 +168,7 @@ func (g *gpm) UpgradeService(
 	in <-chan *gpmv1.Package,
 ) (<-chan *gpmv1.UpgradeServiceResult, error) {
 
-	service, err := g.GetService(ctx, name)
+	service, err := g.getService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -182,6 +182,7 @@ func (g *gpm) UpgradeService(
 	go func() {
 		_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages", name), 0755)
 		pack := filepath.Join(g.Cfg.Root, "packages", name, name+"-"+version+".tar.gz")
+		log.Infof("save package: %v", pack)
 		f, err := os.Create(pack)
 		if err != nil {
 			outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
@@ -212,9 +213,14 @@ func (g *gpm) UpgradeService(
 
 	CHUNKED:
 
+		g.RLock()
+		p := g.ps[service.Name]
+		g.RUnlock()
+
 		isRunning := service.Status == gpmv1.StatusRunning
 		if isRunning {
-			g.StopService(ctx, service.Name)
+			log.Infof("stop service: %s", service.Name)
+			g.stopService(ctx, p)
 		}
 
 		_ = f.Close()
@@ -228,12 +234,14 @@ func (g *gpm) UpgradeService(
 		root := dir + "_" + version
 		_ = os.MkdirAll(root, 0755)
 		_ = os.Remove(dir)
+		log.Infof("relink %s -> %s", dir, root)
 		err = os.Symlink(root, dir)
 		if err != nil {
 			outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
 			return
 		}
 
+		log.Infof("unpack service %s package", service.Name)
 		gr, err := gzip.NewReader(f)
 		if err != nil {
 			outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
@@ -265,13 +273,17 @@ func (g *gpm) UpgradeService(
 			file.Close()
 		}
 
-		vf := service.Version + "@" + time.Now().Format("20060102150405")
+		vf := version + "@" + time.Now().Format("20060102150405")
+		log.Infof("service %s append version %s", service.Name, version)
 		_ = ioutil.WriteFile(filepath.Join(g.Cfg.Root, "services", name, "versions", vf), []byte(""), 0777)
 
 		service.Version = version
 		g.DB.UpdateService(ctx, service)
+
+		p = NewProcess(service)
 		if isRunning {
-			g.StartService(ctx, service.Name)
+			log.Infof("start service %s", service.Name)
+			g.startService(ctx, p)
 		}
 
 		outs <- &gpmv1.UpgradeServiceResult{IsOk: true}
@@ -283,7 +295,7 @@ func (g *gpm) UpgradeService(
 }
 
 func (g *gpm) RollbackService(ctx context.Context, name string, version string) error {
-	s, err := g.GetService(ctx, name)
+	s, err := g.getService(ctx, name)
 	if err != nil {
 		return err
 	}
@@ -303,12 +315,18 @@ func (g *gpm) RollbackService(ctx context.Context, name string, version string) 
 		return verrs.NotFound(g.Name(), "invalid version '%s' of service:%s", version, name)
 	}
 
+	g.RLock()
+	p := g.ps[s.Name]
+	g.RUnlock()
 	isRunning := s.Status == gpmv1.StatusRunning
 	if isRunning {
-		g.StopService(ctx, name)
+		g.stopService(ctx, p)
 	}
-	_ = os.Remove(s.Dir)
-	err = os.Symlink(s.Dir+"_"+version, s.Dir)
+	dir := s.Dir
+	root := s.Dir + "_" + version
+	log.Infof("relink %s -> %s", dir, root)
+	_ = os.Remove(dir)
+	err = os.Symlink(root, dir)
 	if err != nil {
 		return verrs.InternalServerError(g.Name(), err.Error())
 	}
@@ -318,8 +336,10 @@ func (g *gpm) RollbackService(ctx context.Context, name string, version string) 
 	if err != nil {
 		return err
 	}
+
+	p = NewProcess(s)
 	if isRunning {
-		g.StartService(ctx, name)
+		g.startService(ctx, p)
 	}
 
 	return nil
