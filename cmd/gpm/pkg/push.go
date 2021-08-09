@@ -97,10 +97,11 @@ func push(ctx context.Context, pb *pbr.ProgressBar, src, dst string, opts ...vcl
 	done := make(chan struct{}, 1)
 	buf := make([]byte, 1024*32)
 
-	stream, err := cc.Push(ctx, opts...)
+	stream, err := cc.Push(context.TODO(), opts...)
 	if err != nil {
 		return err
 	}
+	defer stream.Close()
 
 	go func() {
 		err = send(src, dst, pb, stream, buf)
@@ -108,8 +109,6 @@ func push(ctx context.Context, pb *pbr.ProgressBar, src, dst string, opts ...vcl
 			ech <- err
 			return
 		}
-
-		done <- struct{}{}
 	}()
 
 	go func() {

@@ -332,6 +332,7 @@ func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err
 	}
 
 	in := make(chan *gpmv1.PushIn, 10)
+	defer close(in)
 
 	in <- req.In
 	outs, e := s.H.Push(ctx, req.In.Dst, req.In.Name, in)
@@ -341,15 +342,18 @@ func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err
 	}
 
 	go func() {
-		defer close(in)
 		for {
 			req, err = stream.Recv()
-			if err != nil {
+			if err != nil && err != io.EOF {
 				log.Errorf("receive data: %v", err)
 				return
 			}
 
 			in <- req.In
+
+			if io.EOF != nil {
+				return
+			}
 		}
 	}()
 
@@ -357,8 +361,11 @@ func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err
 		select {
 		case <-ctx.Done():
 			return
-		case out := <-outs:
-			stream.Send(&pb.PushRsp{Result: out})
+		case out, ok := <-outs:
+			if !ok {
+				return
+			}
+			_ = stream.Send(&pb.PushRsp{Result: out})
 		}
 	}
 }

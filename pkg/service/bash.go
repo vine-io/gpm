@@ -177,7 +177,7 @@ func (g *gpm) Push(ctx context.Context, dst, name string, in <-chan *gpmv1.PushI
 		}
 	}
 
-	log.Infof("receive file: %s", dst)
+	log.Infof("save file: %s -> %s", name, dst)
 	outs := make(chan *gpmv1.PushResult, 10)
 	go func() {
 		f, err := os.Create(dst)
