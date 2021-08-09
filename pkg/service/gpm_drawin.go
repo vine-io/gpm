@@ -119,6 +119,10 @@ func execSysProcAttr(cmd *exec.Cmd, in *gpmv1.ExecIn) {
 		}
 	}
 
+	cmd.Env = os.Environ()
+	for k, v := range in.Env {
+		cmd.Env = append(cmd.Env, k+"="+v)
+	}
 	cmd.SysProcAttr = sysAttr
 	cmd.Dir = in.Dir
 }
@@ -131,6 +135,7 @@ func adminCmd(cmd *exec.Cmd) {
 			Gid: 0,
 		},
 	}
+	cmd.Env = os.Environ()
 	cmd.SysProcAttr = sysAttr
 }
 
