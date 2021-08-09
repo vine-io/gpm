@@ -23,10 +23,13 @@
 package server
 
 import (
+	"bytes"
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	gruntime "runtime"
+	"time"
 
 	"github.com/gpm2/gpm/pkg/api"
 	"github.com/gpm2/gpm/pkg/dao"
@@ -36,16 +39,16 @@ import (
 	"github.com/gpm2/gpm/pkg/runtime/ssl"
 	"github.com/gpm2/gpm/pkg/service"
 	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/plugins/logger/zap"
-
 	"github.com/lack-io/cli"
+	"github.com/lack-io/plugins/logger/zap"
 	"github.com/lack-io/vine"
 	grpcClient "github.com/lack-io/vine/core/client/grpc"
+	vserver "github.com/lack-io/vine/core/server"
 	grpcServer "github.com/lack-io/vine/core/server/grpc"
-	_ "github.com/lack-io/vine/lib/api/handler/openapi/statik"
 	apihttp "github.com/lack-io/vine/lib/api/server"
 	log "github.com/lack-io/vine/lib/logger"
 	"github.com/lack-io/vine/util/helper"
+	"google.golang.org/grpc/peer"
 )
 
 var (
@@ -71,7 +74,7 @@ var (
 			Usage:       "Enable OpenAPI3",
 			EnvVars:     []string{"VINE_ENABLE_OPENAPI"},
 			Destination: &EnableOpenAPI,
-			Value: EnableOpenAPI,
+			Value:       EnableOpenAPI,
 		},
 		&cli.BoolFlag{
 			Name:    "enable-cors",
@@ -132,6 +135,7 @@ func (s *server) Init() error {
 		ghTLSOption(),
 		cliTLSOption(),
 		vine.Flags(flags...),
+		vine.WrapHandler(newLoggerWrapper()),
 		vine.Action(func(c *cli.Context) error {
 
 			if c.Bool("enable-tls") {
@@ -223,5 +227,29 @@ func New(opts ...vine.Option) *server {
 	srv := vine.NewService(opts...)
 	return &server{
 		Service: srv,
+	}
+}
+
+func newLoggerWrapper() vserver.HandlerWrapper {
+	return func(fn vserver.HandlerFunc) vserver.HandlerFunc {
+		return func(ctx context.Context, req vserver.Request, rsp interface{}) error {
+			buf := bytes.NewBuffer([]byte(""))
+			now := time.Now()
+			err := fn(ctx, req, rsp)
+			buf.WriteString(fmt.Sprintf("[%s] ", time.Now().Sub(now).String()))
+			buf.WriteString("[" + req.ContentType() + "] ")
+			pr, ok := peer.FromContext(ctx)
+			if ok {
+				buf.WriteString(pr.Addr.String() + " -> ")
+			}
+			buf.WriteString(req.Service() + "-" + req.Endpoint())
+			if err != nil {
+				buf.WriteString(": " + err.Error())
+				log.Error(buf.String())
+			} else {
+				log.Info(buf.String())
+			}
+			return err
+		}
 	}
 }

@@ -51,6 +51,8 @@ import (
 	"github.com/lack-io/vine/util/namespace"
 	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc/status"
+
+	_ "github.com/lack-io/vine/lib/api/handler/openapi/statik"
 )
 
 func init() {

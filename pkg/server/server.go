@@ -24,7 +24,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"io"
 
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
@@ -84,7 +83,6 @@ func (s *server) Info(ctx context.Context, _ *pb.InfoReq, rsp *pb.InfoRsp) (err 
 }
 
 func (s *server) ListService(ctx context.Context, req *pb.ListServiceReq, rsp *pb.ListServiceRsp) (err error) {
-	fmt.Println(req)
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
