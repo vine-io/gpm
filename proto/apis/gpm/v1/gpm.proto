@@ -162,15 +162,6 @@ message FileInfo {
   bool IsDir = 5;
 }
 
-message ExecIn {
-  // +gen:required
-  string name = 1;
-  repeated string args = 2;
-  map<string, string> env = 3;
-  string user = 4;
-  string group = 5;
-}
-
 message UpdateIn {
   // +gen:required
   string name = 1;
@@ -188,10 +179,18 @@ message UpdateResult {
   bool isOk = 2;
 }
 
+message ExecIn {
+  // +gen:required
+  string name = 1;
+  repeated string args = 2;
+  string dir = 3;
+  map<string, string> env = 4;
+  string user = 5;
+  string group = 6;
+}
+
 message ExecResult {
   string result = 1;
-  string error = 2;
-  bool finished = 3;
 }
 
 message PullResult {

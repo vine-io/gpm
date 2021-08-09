@@ -126,6 +126,14 @@ func NewGpmServiceEndpoints() []*apipb.Endpoint {
 			Body:        "*",
 			Handler:     "rpc",
 		},
+		&apipb.Endpoint{
+			Name:        "GpmService.Exec",
+			Description: "GpmService.Exec",
+			Path:        []string{"/api/v1/Action/exec"},
+			Method:      []string{"POST"},
+			Body:        "*",
+			Handler:     "rpc",
+		},
 	}
 }
 
@@ -146,6 +154,35 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 			},
 		},
 		Paths: map[string]*openapi.OpenAPIPath{
+			"/api/v1/Action/exec": &openapi.OpenAPIPath{
+				Post: &openapi.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "远程执行命令",
+					Description: "GpmService Exec",
+					OperationId: "GpmServiceExec",
+					RequestBody: &openapi.PathRequestBody{
+						Description: "Exec ExecReq",
+						Content: &openapi.PathRequestBodyContent{
+							ApplicationJson: &openapi.ApplicationContent{
+								Schema: &openapi.Schema{
+									Ref: "#/components/schemas/v1.ExecReq",
+								},
+							},
+						},
+					},
+					Responses: map[string]*openapi.PathResponse{
+						"200": &openapi.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapi.PathRequestBodyContent{
+								ApplicationJson: &openapi.ApplicationContent{
+									Schema: &openapi.Schema{Ref: "#/components/schemas/v1.ExecRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapi.PathSecurity{},
+				},
+			},
 			"/api/v1/Action/ls": &openapi.OpenAPIPath{
 				Get: &openapi.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
@@ -543,6 +580,25 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 		Components: &openapi.OpenAPIComponents{
 			SecuritySchemes: &openapi.SecuritySchemes{},
 			Schemas: map[string]*openapi.Model{
+				"v1.ExecReq": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"in": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.ExecIn",
+						},
+					},
+					Required: []string{"in"},
+				},
+				"v1.ExecRsp": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"result": &openapi.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/v1.ExecResult",
+						},
+					},
+				},
 				"v1.LsReq": &openapi.Model{
 					Type: "object",
 					Properties: map[string]*openapi.Schema{
@@ -753,6 +809,39 @@ func NewGpmServiceOpenAPI() *openapi.OpenAPI {
 						"gpm": &openapi.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/v1.GpmInfo",
+						},
+					},
+				},
+				"v1.ExecIn": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"name": &openapi.Schema{
+							Type: "string",
+						},
+						"args": &openapi.Schema{
+							Type:  "array",
+							Items: &openapi.Schema{Type: "string"},
+						},
+						"dir": &openapi.Schema{
+							Type: "string",
+						},
+						"env": &openapi.Schema{
+							AdditionalProperties: &openapi.Schema{},
+						},
+						"user": &openapi.Schema{
+							Type: "string",
+						},
+						"group": &openapi.Schema{
+							Type: "string",
+						},
+					},
+					Required: []string{"name"},
+				},
+				"v1.ExecResult": &openapi.Model{
+					Type: "object",
+					Properties: map[string]*openapi.Schema{
+						"result": &openapi.Schema{
+							Type: "string",
 						},
 					},
 				},
@@ -1061,8 +1150,9 @@ type GpmService interface {
 	Pull(ctx context.Context, in *PullReq, opts ...client.CallOption) (GpmService_PullService, error)
 	// 推送文件
 	Push(ctx context.Context, opts ...client.CallOption) (GpmService_PushService, error)
-	// 远程执行命令
-	Exec(ctx context.Context, in *ExecReq, opts ...client.CallOption) (GpmService_ExecService, error)
+	// +gen:summary=远程执行命令
+	// +gen:post=/api/v1/Action/exec
+	Exec(ctx context.Context, in *ExecReq, opts ...client.CallOption) (*ExecRsp, error)
 	// 远程命令行交互
 	Terminal(ctx context.Context, opts ...client.CallOption) (GpmService_TerminalService, error)
 }
@@ -1511,53 +1601,14 @@ func (x *gpmServicePush) Recv() (*PushRsp, error) {
 	return m, nil
 }
 
-func (c *gpmService) Exec(ctx context.Context, in *ExecReq, opts ...client.CallOption) (GpmService_ExecService, error) {
-	req := c.c.NewRequest(c.name, "GpmService.Exec", &ExecReq{})
-	stream, err := c.c.Stream(ctx, req, opts...)
+func (c *gpmService) Exec(ctx context.Context, in *ExecReq, opts ...client.CallOption) (*ExecRsp, error) {
+	req := c.c.NewRequest(c.name, "GpmService.Exec", in)
+	out := new(ExecRsp)
+	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
 	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
-	}
-	return &gpmServiceExec{stream}, nil
-}
-
-type GpmService_ExecService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*ExecRsp, error)
-}
-
-type gpmServiceExec struct {
-	stream client.Stream
-}
-
-func (x *gpmServiceExec) Close() error {
-	return x.stream.Close()
-}
-
-func (x *gpmServiceExec) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *gpmServiceExec) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *gpmServiceExec) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *gpmServiceExec) Recv() (*ExecRsp, error) {
-	m := new(ExecRsp)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
+	return out, nil
 }
 
 func (c *gpmService) Terminal(ctx context.Context, opts ...client.CallOption) (GpmService_TerminalService, error) {
@@ -1664,8 +1715,9 @@ type GpmServiceHandler interface {
 	Pull(context.Context, *PullReq, GpmService_PullStream) error
 	// 推送文件
 	Push(context.Context, GpmService_PushStream) error
-	// 远程执行命令
-	Exec(context.Context, *ExecReq, GpmService_ExecStream) error
+	// +gen:summary=远程执行命令
+	// +gen:post=/api/v1/Action/exec
+	Exec(context.Context, *ExecReq, *ExecRsp) error
 	// 远程命令行交互
 	Terminal(context.Context, GpmService_TerminalStream) error
 }
@@ -1691,7 +1743,7 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		Ls(ctx context.Context, in *LsReq, out *LsRsp) error
 		Pull(ctx context.Context, stream server.Stream) error
 		Push(ctx context.Context, stream server.Stream) error
-		Exec(ctx context.Context, stream server.Stream) error
+		Exec(ctx context.Context, in *ExecReq, out *ExecRsp) error
 		Terminal(ctx context.Context, stream server.Stream) error
 	}
 	type GpmService struct {
@@ -1791,6 +1843,14 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		Description: "GpmService.Ls",
 		Path:        []string{"/api/v1/Action/ls"},
 		Method:      []string{"GET"},
+		Body:        "*",
+		Handler:     "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&apipb.Endpoint{
+		Name:        "GpmService.Exec",
+		Description: "GpmService.Exec",
+		Path:        []string{"/api/v1/Action/exec"},
+		Method:      []string{"POST"},
 		Body:        "*",
 		Handler:     "rpc",
 	}))
@@ -2114,44 +2174,8 @@ func (x *gpmServicePushStream) Recv() (*PushReq, error) {
 	return m, nil
 }
 
-func (h *gpmServiceHandler) Exec(ctx context.Context, stream server.Stream) error {
-	m := new(ExecReq)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.GpmServiceHandler.Exec(ctx, m, &gpmServiceExecStream{stream})
-}
-
-type GpmService_ExecStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*ExecRsp) error
-}
-
-type gpmServiceExecStream struct {
-	stream server.Stream
-}
-
-func (x *gpmServiceExecStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *gpmServiceExecStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *gpmServiceExecStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *gpmServiceExecStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *gpmServiceExecStream) Send(m *ExecRsp) error {
-	return x.stream.Send(m)
+func (h *gpmServiceHandler) Exec(ctx context.Context, in *ExecReq, out *ExecRsp) error {
+	return h.GpmServiceHandler.Exec(ctx, in, out)
 }
 
 func (h *gpmServiceHandler) Terminal(ctx context.Context, stream server.Stream) error {

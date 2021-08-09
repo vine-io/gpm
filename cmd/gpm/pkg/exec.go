@@ -24,7 +24,6 @@ package pkg
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -32,7 +31,6 @@ import (
 	"github.com/gpm2/gpm/pkg/runtime/client"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	"github.com/lack-io/cli"
-	"google.golang.org/grpc/status"
 )
 
 func execBash(c *cli.Context) error {
@@ -45,11 +43,16 @@ func execBash(c *cli.Context) error {
 	in := &gpmv1.ExecIn{}
 	in.Name = c.String("cmd")
 	in.Args = c.StringSlice("args")
+	in.Dir = c.String("dir")
 	env := c.StringSlice("env")
 	in.User = c.String("user")
 	in.Group = c.String("group")
 	if err := in.Validate(); err != nil {
 		return err
+	}
+
+	if len(env) > 0 {
+		in.Env = map[string]string{}
 	}
 	for _, item := range env {
 		parts := strings.Split(item, "=")
@@ -58,26 +61,12 @@ func execBash(c *cli.Context) error {
 		}
 	}
 
-	s, err := cc.Exec(ctx, in, opts...)
+	result, err := cc.Exec(ctx, in, opts...)
 	if err != nil {
 		return err
 	}
 
-	var result string
-	for {
-		b, err := s.Next()
-		if err != nil {
-			return errors.New(status.Convert(err).Message())
-		}
-		if b.Error != "" {
-			return errors.New(b.Error)
-		}
-		result = b.Result
-		if b.Finished {
-			break
-		}
-	}
-	fmt.Fprintln(outE, result)
+	fmt.Fprintln(outE, result.Result)
 
 	return nil
 }
@@ -98,6 +87,10 @@ func ExecBashCmd() *cli.Command {
 				Name:    "args",
 				Aliases: []string{"A"},
 				Usage:   "specify the args for exec",
+			},
+			&cli.StringFlag{
+				Name:  "dir",
+				Usage: "specify the directory path for exec",
 			},
 			&cli.StringSliceFlag{
 				Name:    "env",

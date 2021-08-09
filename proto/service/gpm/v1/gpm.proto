@@ -61,8 +61,9 @@ service GpmService {
   rpc Pull(PullReq) returns (stream PullRsp);
   // 推送文件
   rpc Push(stream PushReq) returns (stream PushRsp);
-  // 远程执行命令
-  rpc Exec(ExecReq) returns (stream ExecRsp);
+  // +gen:summary=远程执行命令
+  // +gen:post=/api/v1/Action/exec
+  rpc Exec(ExecReq) returns (ExecRsp);
   // 远程命令行交互
   rpc Terminal(stream TerminalReq) returns (stream TerminalRsp);
 }

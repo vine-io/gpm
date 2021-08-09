@@ -54,13 +54,16 @@ func tailService(c *cli.Context) error {
 
 	for {
 		b, err := s.Next()
-		if err != nil || err != io.EOF {
+		if err != nil && err != io.EOF {
 			return errors.New(status.Convert(err).Message())
 		}
 		if b.Error != "" {
 			return errors.New(b.Error)
 		}
 		fmt.Fprintln(outE, b.Text)
+		if err == io.EOF {
+			break
+		}
 	}
 
 	return nil

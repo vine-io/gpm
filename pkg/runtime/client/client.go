@@ -203,12 +203,12 @@ func (s *SimpleClient) Push(ctx context.Context, opts ...client.CallOption) (*Pu
 	return NewPushStream(stream), nil
 }
 
-func (s *SimpleClient) Exec(ctx context.Context, in *gpmv1.ExecIn, opts ...client.CallOption) (*ExecWatcher, error) {
+func (s *SimpleClient) Exec(ctx context.Context, in *gpmv1.ExecIn, opts ...client.CallOption) (*gpmv1.ExecResult, error) {
 	rsp, err := s.cc.Exec(ctx, &pb.ExecReq{In: in}, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return &ExecWatcher{s: rsp}, nil
+	return rsp.Result, nil
 }
 
 func (s *SimpleClient) Terminal(ctx context.Context, opts ...client.CallOption) (*TerminalStream, error) {

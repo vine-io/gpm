@@ -170,26 +170,6 @@ func (w *PullWatcher) Close() error {
 	return w.s.Close()
 }
 
-type ExecWatcher struct {
-	s pb.GpmService_ExecService
-}
-
-func (w *ExecWatcher) Context() context.Context {
-	return w.s.Context()
-}
-
-func (w *ExecWatcher) Next() (*gpmv1.ExecResult, error) {
-	rsp, err := w.s.Recv()
-	if err != nil {
-		return nil, err
-	}
-	return rsp.Result, nil
-}
-
-func (w *ExecWatcher) Close() error {
-	return w.s.Close()
-}
-
 type PushStream struct {
 	s pb.GpmService_PushService
 

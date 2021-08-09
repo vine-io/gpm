@@ -169,18 +169,6 @@ func (m *FileInfo) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
-func (m *ExecIn) Validate() error {
-	return m.ValidateE("")
-}
-
-func (m *ExecIn) ValidateE(prefix string) error {
-	errs := make([]error, 0)
-	if len(m.Name) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
-	}
-	return is.MargeErr(errs...)
-}
-
 func (m *UpdateIn) Validate() error {
 	return m.ValidateE("")
 }
@@ -202,6 +190,18 @@ func (m *UpdateResult) Validate() error {
 
 func (m *UpdateResult) ValidateE(prefix string) error {
 	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *ExecIn) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ExecIn) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
 	return is.MargeErr(errs...)
 }
 

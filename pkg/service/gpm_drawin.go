@@ -29,6 +29,7 @@ import (
 	"os/exec"
 	"os/user"
 	"strconv"
+	"strings"
 	"syscall"
 
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
@@ -119,6 +120,7 @@ func execSysProcAttr(cmd *exec.Cmd, in *gpmv1.ExecIn) {
 	}
 
 	cmd.SysProcAttr = sysAttr
+	cmd.Dir = in.Dir
 }
 
 func adminCmd(cmd *exec.Cmd) {
@@ -161,4 +163,8 @@ func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
 	}
 
 	return cmd
+}
+
+func beauty(b []byte) string {
+	return strings.TrimSuffix(string(b), "\n")
 }

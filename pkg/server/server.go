@@ -161,11 +161,14 @@ func (s *server) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq
 		select {
 		case <-ctx.Done():
 			return
-		case out := <-outs:
-			rsp := &pb.WatchServiceLogRsp{Log: out}
-			e = stream.Send(rsp)
+		case out, ok := <-outs:
+			if !ok {
+				return
+			}
+			e = stream.Send(&pb.WatchServiceLogRsp{Log: out})
 			if e != nil && e != io.EOF {
-				return e
+				err = e
+				return
 			}
 		}
 	}
@@ -370,32 +373,12 @@ func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err
 	}
 }
 
-func (s *server) Exec(ctx context.Context, req *pb.ExecReq, stream pb.GpmService_ExecStream) (err error) {
+func (s *server) Exec(ctx context.Context, req *pb.ExecReq, rsp *pb.ExecRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	outs, e := s.H.Exec(ctx, req.In)
-	if e != nil {
-		err = e
-		return
-	}
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case out := <-outs:
-			rsp := &pb.ExecRsp{Result: out}
-			e = stream.Send(rsp)
-			if e != nil && e != io.EOF {
-				err = e
-				return
-			}
-			if out.Finished {
-				return
-			}
-		}
-	}
+	rsp.Result, err = s.H.Exec(ctx, req.In)
+	return
 }
 
 func (s *server) Terminal(ctx context.Context, stream pb.GpmService_TerminalStream) (err error) {

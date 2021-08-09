@@ -211,59 +211,19 @@ func (g *gpm) Push(ctx context.Context, dst, name string, in <-chan *gpmv1.PushI
 	return outs, nil
 }
 
-func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (<-chan *gpmv1.ExecResult, error) {
+func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (*gpmv1.ExecResult, error) {
 
 	cmd := exec.CommandContext(ctx, in.Name, in.Args...)
 	execSysProcAttr(cmd, in)
 
-	out := make(chan *gpmv1.ExecResult, 10)
-	ech := make(chan error, 1)
-	done := make(chan struct{}, 1)
-
-	stdout, err := cmd.StdoutPipe()
+	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, verrs.InternalServerError(g.Name(), err.Error())
+		return nil, verrs.InternalServerError(g.Name(), "exec %w: %v", err, beauty(b))
 	}
 
-	stderr, err := cmd.StderrPipe()
-	if err != nil {
-		return nil, verrs.InternalServerError(g.Name(), err.Error())
+	out := &gpmv1.ExecResult{
+		Result: beauty(b),
 	}
-
-	if err = cmd.Start(); err != nil {
-		return nil, verrs.InternalServerError(g.Name(), err.Error())
-	}
-
-	size := 1024 * 32
-	go func() {
-		for {
-			select {
-			case <-ech:
-				buf := make([]byte, size)
-				stderr.Read(buf)
-				out <- &gpmv1.ExecResult{Error: string(buf), Finished: true}
-				return
-			case <-done:
-				buf := make([]byte, size)
-				stdout.Read(buf)
-				out <- &gpmv1.ExecResult{Result: string(buf), Finished: true}
-				return
-			default:
-			}
-
-			buf := make([]byte, size)
-			stdout.Read(buf)
-			out <- &gpmv1.ExecResult{Result: string(buf)}
-		}
-	}()
-
-	go func() {
-		if err = cmd.Wait(); err != nil {
-			ech <- verrs.InternalServerError(g.Name(), err.Error())
-		} else {
-			done <- struct{}{}
-		}
-	}()
 
 	return out, nil
 }
