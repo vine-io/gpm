@@ -57,6 +57,13 @@ func tailService(c *cli.Context) error {
 		if err != nil && err != io.EOF {
 			return errors.New(status.Convert(err).Message())
 		}
+		if err == io.EOF {
+			s, err = cc.WatchServiceLog(ctx, name, number, follow, opts...)
+			if err != nil {
+				return err
+			}
+			continue
+		}
 		if b.Error != "" {
 			return errors.New(b.Error)
 		}
