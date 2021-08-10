@@ -245,7 +245,6 @@ func (db *DB) UpdateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 func (db *DB) DeleteService(ctx context.Context, name string) error {
 	var (
 		done = make(chan struct{}, 1)
-		ech  = make(chan error, 1)
 	)
 
 	go func() {
@@ -259,8 +258,6 @@ func (db *DB) DeleteService(ctx context.Context, name string) error {
 	select {
 	case <-ctx.Done():
 		return ErrTimeout
-	case e := <-ech:
-		return e
 	case <-done:
 		return nil
 	}
