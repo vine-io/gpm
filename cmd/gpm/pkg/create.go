@@ -124,12 +124,12 @@ func CreateServiceCmd() *cli.Command {
 			&cli.IntFlag{
 				Name:  "log-expire",
 				Usage: "specify the expire for service log",
-				Value: 30,
+				Value: 15,
 			},
 			&cli.Int64Flag{
 				Name:  "log-max-size",
 				Usage: "specify the max size for service log",
-				Value: 1024 * 1024 * 50,
+				Value: 1024 * 1024 * 10,
 			},
 			&cli.StringFlag{
 				Name:    "version",
