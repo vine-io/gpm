@@ -43,32 +43,6 @@ import (
 	proc "github.com/shirou/gopsutil/process"
 )
 
-type Gpm interface {
-	Init() error
-	Info(context.Context) (*gpmv1.GpmInfo, error)
-	UpdateSelf(context.Context, string, <-chan *gpmv1.UpdateIn) (<-chan *gpmv1.UpdateResult, error)
-	ListService(context.Context) ([]*gpmv1.Service, int64, error)
-	GetService(context.Context, string) (*gpmv1.Service, error)
-	CreateService(context.Context, *gpmv1.ServiceSpec) (*gpmv1.Service, error)
-	EditService(context.Context, string, *gpmv1.EditServiceSpec) (*gpmv1.Service, error)
-	StartService(context.Context, string) (*gpmv1.Service, error)
-	StopService(context.Context, string) (*gpmv1.Service, error)
-	RebootService(context.Context, string) (*gpmv1.Service, error)
-	DeleteService(context.Context, string) (*gpmv1.Service, error)
-	WatchServiceLog(context.Context, string, int64, bool) (<-chan *gpmv1.ServiceLog, error)
-
-	InstallService(context.Context, *gpmv1.ServiceSpec, <-chan *gpmv1.Package) (<-chan *gpmv1.InstallServiceResult, error)
-	ListServiceVersions(context.Context, string) ([]*gpmv1.ServiceVersion, error)
-	UpgradeService(context.Context, string, string, <-chan *gpmv1.Package) (<-chan *gpmv1.UpgradeServiceResult, error)
-	RollbackService(context.Context, string, string) error
-
-	Ls(context.Context, string) ([]*gpmv1.FileInfo, error)
-	Pull(context.Context, string, bool) (<-chan *gpmv1.PullResult, error)
-	Push(context.Context, string, string, <-chan *gpmv1.PushIn) (<-chan *gpmv1.PushResult, error)
-	Exec(context.Context, *gpmv1.ExecIn) (*gpmv1.ExecResult, error)
-	Terminal(context.Context, <-chan *gpmv1.TerminalIn) (<-chan *gpmv1.TerminalResult, error)
-}
-
 func init() {
 	inject.ProvidePanic(new(gpm))
 }
@@ -401,60 +375,52 @@ func (g *gpm) DeleteService(ctx context.Context, name string) (*gpmv1.Service, e
 	return s, err
 }
 
-func (g *gpm) WatchServiceLog(ctx context.Context, name string, number int64, follow bool) (<-chan *gpmv1.ServiceLog, error) {
+func (g *gpm) WatchServiceLog(ctx context.Context, name string, number int64, follow bool, sender Sender) error {
 	f := filepath.Join(g.Cfg.Root, "logs", name, name+".log")
 	stat, _ := os.Stat(f)
 	if stat == nil {
-		return nil, verrs.NotFound(g.Name(), "service '%s' log not exists", name)
+		return verrs.NotFound(g.Name(), "service '%s' log not exists", name)
 	}
 
-	out := make(chan *gpmv1.ServiceLog, 10)
-	ech := make(chan error, 1)
+	cfg := tail.Config{
+		Poll: true,
+	}
 
-	go func() {
-		cfg := tail.Config{
-			Poll: true,
+	if number > 0 {
+		total := stat.Size()
+		if number > total {
+			cfg.Location = &tail.SeekInfo{Offset: 0, Whence: io.SeekStart}
+		} else {
+			cfg.Location = &tail.SeekInfo{Offset: -1 * number, Whence: io.SeekEnd}
 		}
+	}
 
-		if number > 0 {
-			total := stat.Size()
-			if number > total {
-				cfg.Location = &tail.SeekInfo{Offset: 0, Whence: io.SeekStart}
-			} else {
-				cfg.Location = &tail.SeekInfo{Offset: -1 * number, Whence: io.SeekEnd}
+	if follow {
+		cfg.ReOpen = true
+		cfg.Follow = true
+	}
+
+	t, err := tail.TailFile(f, cfg)
+	if err != nil {
+		return err
+	}
+
+	for {
+		select {
+		case <-ctx.Done():
+			return nil
+		case line, ok := <-t.Lines:
+			if !ok {
+				continue
 			}
-		}
-
-		if follow {
-			cfg.ReOpen = true
-			cfg.Follow = true
-		}
-
-		t, err := tail.TailFile(f, cfg)
-		if err != nil {
-			ech <- err
-			return
-		}
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case line, ok := <-t.Lines:
-				if !ok {
-					continue
-				}
-				l := &gpmv1.ServiceLog{
-					Text:      line.Text,
-					Timestamp: line.Time.Unix(),
-				}
-				if line.Err != nil {
-					l.Error = line.Err.Error()
-				}
-				out <- l
+			l := &gpmv1.ServiceLog{
+				Text:      line.Text,
+				Timestamp: line.Time.Unix(),
 			}
+			if line.Err != nil {
+				l.Error = line.Err.Error()
+			}
+			_ = sender.Send(l)
 		}
-	}()
-
-	return out, nil
+	}
 }

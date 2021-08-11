@@ -39,115 +39,118 @@ import (
 	verrs "github.com/lack-io/vine/proto/apis/errors"
 )
 
-func (g *gpm) InstallService(
-	ctx context.Context,
-	spec *gpmv1.ServiceSpec,
-	in <-chan *gpmv1.Package,
-) (<-chan *gpmv1.InstallServiceResult, error) {
+func (g *gpm) InstallService(ctx context.Context, stream Stream) error {
 
-	v, _ := g.getService(ctx, spec.Name)
-	if v != nil {
-		return nil, verrs.Conflict(g.Name(), "service '%s' already exists", spec.Name)
-	}
+	var (
+		file *os.File
+		err  error
+		dst  string
+		spec *gpmv1.ServiceSpec
+	)
 
-	outs := make(chan *gpmv1.InstallServiceResult, 10)
-
-	go func() {
-		_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages", spec.Name), 0755)
-		pack := filepath.Join(g.Cfg.Root, "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
-		f, err := os.Create(pack)
-		if err != nil {
-			outs <- &gpmv1.InstallServiceResult{Error: err.Error()}
-			return
+	defer func() {
+		if file != nil {
+			_ = file.Close()
 		}
-		defer f.Close()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case p, ok := <-in:
-				if !ok {
-					return
-				}
-				if p.Length > 0 {
-					_, err = f.Write(p.Chunk[0:p.Length])
-					if err != nil {
-						outs <- &gpmv1.InstallServiceResult{Error: err.Error()}
-						return
-					}
-				}
-				if p.IsOk {
-					goto CHUNKED
-				}
-			}
-		}
-
-	CHUNKED:
-		_ = f.Close()
-		f, err = os.Open(pack)
-		if err != nil {
-			outs <- &gpmv1.InstallServiceResult{Error: err.Error()}
-			return
-		}
-
-		dir := spec.Dir
-		root := dir + "_" + spec.Version
-		_ = os.MkdirAll(root, 0755)
-		_ = os.Remove(dir)
-		err = os.Symlink(root, dir)
-		if err != nil {
-			outs <- &gpmv1.InstallServiceResult{Error: err.Error()}
-			return
-		}
-
-		gr, err := gzip.NewReader(f)
-		if err != nil {
-			outs <- &gpmv1.InstallServiceResult{Error: err.Error()}
-			return
-		}
-		tr := tar.NewReader(gr)
-		for {
-			hdr, e := tr.Next()
-			if e != nil {
-				if e == io.EOF {
-					break
-				} else {
-					outs <- &gpmv1.InstallServiceResult{Error: e.Error()}
-					return
-				}
-			}
-			if hdr.FileInfo().IsDir() {
-				_ = os.MkdirAll(filepath.Join(dir, hdr.Name), os.ModePerm)
-			} else {
-				fname := filepath.Join(dir, hdr.Name)
-				file, e1 := createFile(fname)
-				if e1 != nil {
-					outs <- &gpmv1.InstallServiceResult{Error: e.Error()}
-					return
-				}
-				_, e1 = io.Copy(file, tr)
-				if e1 != nil && e1 != io.EOF {
-					outs <- &gpmv1.InstallServiceResult{Error: e.Error()}
-					file.Close()
-					return
-				}
-				file.Close()
-			}
-		}
-
-		_, err = g.CreateService(ctx, spec)
-		if err != nil {
-			outs <- &gpmv1.InstallServiceResult{Error: err.Error()}
-			return
-		}
-
-		outs <- &gpmv1.InstallServiceResult{IsOk: true}
-		log.Infof("install service %s@%s", spec.Name, spec.Version)
-		return
 	}()
 
-	return outs, nil
+	for {
+		data, err := stream.Recv()
+		if err != nil && err != io.EOF {
+			return err
+		}
+		b := data.(*gpmv1.InstallServiceIn)
+		spec = b.Spec
+		pack := b.Pack
+
+		if file == nil {
+			if err = b.Validate(); err != nil {
+				return verrs.BadRequest(g.Name(), err.Error())
+			}
+
+			v, _ := g.getService(ctx, spec.Name)
+			if v != nil {
+				return verrs.Conflict(g.Name(), "service '%s' already exists", spec.Name)
+			}
+
+			_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages", spec.Name), 0o755)
+			dst = filepath.Join(g.Cfg.Root, "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
+			file, err = os.Create(dst)
+			if err != nil {
+				return err
+			}
+		}
+
+		if pack.Length > 0 {
+			_, err = file.Write(pack.Chunk[0:pack.Length])
+			if err != nil {
+				return err
+			}
+		}
+		if pack.IsOk {
+			goto CHUNKED
+		}
+
+		if err == io.EOF {
+			return nil
+		}
+	}
+
+CHUNKED:
+	_ = file.Close()
+	file, err = os.Open(dst)
+	if err != nil {
+		return err
+	}
+
+	dir := spec.Dir
+	root := dir + "_" + spec.Version
+	_ = os.MkdirAll(root, 0o755)
+	_ = os.Remove(dir)
+	err = os.Symlink(root, dir)
+	if err != nil {
+		return err
+	}
+
+	gr, err := gzip.NewReader(file)
+	if err != nil {
+		return err
+	}
+	tr := tar.NewReader(gr)
+	for {
+		hdr, e := tr.Next()
+		if e != nil {
+			if e == io.EOF {
+				break
+			} else {
+				return err
+			}
+		}
+		if hdr.FileInfo().IsDir() {
+			_ = os.MkdirAll(filepath.Join(dir, hdr.Name), os.ModePerm)
+		} else {
+			fname := filepath.Join(dir, hdr.Name)
+			f, e1 := createFile(fname)
+			if e1 != nil {
+				return err
+			}
+			_, e1 = io.Copy(f, tr)
+			if e1 != nil && e1 != io.EOF {
+				f.Close()
+				return err
+			}
+			f.Close()
+		}
+	}
+
+	_, err = g.CreateService(ctx, spec)
+	if err != nil {
+		return err
+	}
+
+	log.Infof("install service %s@%s", spec.Name, spec.Version)
+
+	return stream.Send(&gpmv1.InstallServiceResult{IsOk: true})
 }
 
 func (g *gpm) ListServiceVersions(ctx context.Context, name string) ([]*gpmv1.ServiceVersion, error) {
@@ -163,134 +166,151 @@ func (g *gpm) ListServiceVersions(ctx context.Context, name string) ([]*gpmv1.Se
 	return vs, nil
 }
 
-func (g *gpm) UpgradeService(
-	ctx context.Context, name, version string,
-	in <-chan *gpmv1.Package,
-) (<-chan *gpmv1.UpgradeServiceResult, error) {
+func (g *gpm) UpgradeService(ctx context.Context, stream Stream) error {
 
-	service, err := g.getService(ctx, name)
-	if err != nil {
-		return nil, err
-	}
+	var (
+		file    *os.File
+		err     error
+		dst     string
+		name    string
+		version string
+		service *gpmv1.Service
+	)
 
-	if service.Version == version {
-		return nil, verrs.Conflict(g.Name(), "version %s already exists", version)
-	}
-
-	outs := make(chan *gpmv1.UpgradeServiceResult, 10)
-
-	go func() {
-		_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages", name), 0755)
-		pack := filepath.Join(g.Cfg.Root, "packages", name, name+"-"+version+".tar.gz")
-		log.Infof("save package: %v", pack)
-		f, err := os.Create(pack)
-		if err != nil {
-			outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
-			return
+	defer func() {
+		if file != nil {
+			_ = file.Close()
 		}
-		defer f.Close()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case p, ok := <-in:
-				if !ok {
-					return
-				}
-				if p.Length > 0 {
-					_, err = f.Write(p.Chunk[0:p.Length])
-					if err != nil {
-						outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
-						return
-					}
-				}
-				if p.IsOk {
-					goto CHUNKED
-				}
-			}
-		}
-
-	CHUNKED:
-
-		g.RLock()
-		p := g.ps[service.Name]
-		g.RUnlock()
-
-		isRunning := service.Status == gpmv1.StatusRunning
-		if isRunning {
-			log.Infof("stop service: %s", service.Name)
-			g.stopService(ctx, p)
-		}
-
-		_ = f.Close()
-		f, err = os.Open(pack)
-		if err != nil {
-			outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
-			return
-		}
-
-		dir := service.Dir
-		root := dir + "_" + version
-		_ = os.MkdirAll(root, 0755)
-		_ = os.Remove(dir)
-		log.Infof("relink %s -> %s", dir, root)
-		err = os.Symlink(root, dir)
-		if err != nil {
-			outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
-			return
-		}
-
-		log.Infof("unpack service %s package", service.Name)
-		gr, err := gzip.NewReader(f)
-		if err != nil {
-			outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
-			return
-		}
-		tr := tar.NewReader(gr)
-		for {
-			hdr, e := tr.Next()
-			if e != nil {
-				if e == io.EOF {
-					break
-				} else {
-					outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
-					return
-				}
-			}
-			fname := filepath.Join(dir, hdr.Name)
-			file, e1 := createFile(fname)
-			if e1 != nil {
-				outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
-				return
-			}
-			_, e1 = io.Copy(file, tr)
-			if e1 != nil && e1 != io.EOF {
-				outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
-				file.Close()
-				return
-			}
-			file.Close()
-		}
-
-		vf := version + "@" + time.Now().Format("20060102150405")
-		log.Infof("service %s append version %s", service.Name, version)
-		_ = ioutil.WriteFile(filepath.Join(g.Cfg.Root, "services", name, "versions", vf), []byte(""), 0o777)
-
-		service.Version = version
-		g.DB.UpdateService(ctx, service)
-
-		p = NewProcess(service)
-		if isRunning {
-			log.Infof("start service %s", service.Name)
-			g.startService(ctx, p)
-		}
-
-		outs <- &gpmv1.UpgradeServiceResult{IsOk: true}
-		return
 	}()
 
-	return outs, nil
+	var data interface{}
+	for {
+		data, err = stream.Recv()
+		if err != nil && err != io.EOF {
+			return err
+		}
+		b := data.(*gpmv1.UpgradeServiceIn)
+		name, version = b.Name, b.Version
+		pack := b.Pack
+
+		if file == nil {
+			if err = b.Validate(); err != nil {
+				return verrs.BadRequest(g.Name(), err.Error())
+			}
+
+			service, err = g.getService(ctx, name)
+			if err != nil {
+				return err
+			}
+
+			if service.Version == version {
+				return verrs.Conflict(g.Name(), "version %s already exists", version)
+			}
+
+			_ = os.MkdirAll(filepath.Join(g.Cfg.Root, "packages", name), 0o755)
+			dst = filepath.Join(g.Cfg.Root, "packages", name, name+"-"+version+".tar.gz")
+			log.Infof("save package: %v", dst)
+			file, err = os.Create(dst)
+			if err != nil {
+				//outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
+				return err
+			}
+			//defer f.Close()
+		}
+
+		if pack.Length > 0 {
+			_, err = file.Write(pack.Chunk[0:pack.Length])
+			if err != nil {
+				//outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
+				return err
+			}
+		}
+
+		if err == io.EOF {
+			return nil
+		}
+
+		if pack.IsOk {
+			goto CHUNKED
+		}
+	}
+
+CHUNKED:
+
+	g.RLock()
+	p := g.ps[service.Name]
+	g.RUnlock()
+
+	isRunning := service.Status == gpmv1.StatusRunning
+	if isRunning {
+		log.Infof("stop service: %s", service.Name)
+		g.stopService(ctx, p)
+	}
+
+	_ = file.Close()
+	file, err = os.Open(dst)
+	if err != nil {
+		//outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
+		return err
+	}
+
+	dir := service.Dir
+	root := dir + "_" + version
+	_ = os.MkdirAll(root, 0o755)
+	_ = os.Remove(dir)
+	log.Infof("relink %s -> %s", dir, root)
+	err = os.Symlink(root, dir)
+	if err != nil {
+		//outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
+		return err
+	}
+
+	log.Infof("unpack service %s package", service.Name)
+	gr, err := gzip.NewReader(file)
+	if err != nil {
+		//outs <- &gpmv1.UpgradeServiceResult{Error: err.Error()}
+		return err
+	}
+	tr := tar.NewReader(gr)
+	for {
+		hdr, e := tr.Next()
+		if e != nil {
+			if e == io.EOF {
+				break
+			} else {
+				//outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
+				return err
+			}
+		}
+		fname := filepath.Join(dir, hdr.Name)
+		f, e1 := createFile(fname)
+		if e1 != nil {
+			//outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
+			return err
+		}
+		_, e1 = io.Copy(f, tr)
+		if e1 != nil && e1 != io.EOF {
+			//outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
+			f.Close()
+			return err
+		}
+		f.Close()
+	}
+
+	vf := version + "@" + time.Now().Format("20060102150405")
+	log.Infof("service %s append version %s", service.Name, version)
+	_ = ioutil.WriteFile(filepath.Join(g.Cfg.Root, "services", name, "versions", vf), []byte(""), 0o777)
+
+	service.Version = version
+	g.DB.UpdateService(ctx, service)
+
+	p = NewProcess(service)
+	if isRunning {
+		log.Infof("start service %s", service.Name)
+		g.startService(ctx, p)
+	}
+
+	return stream.Send(&gpmv1.UpgradeServiceResult{IsOk: true})
 
 }
 
@@ -346,9 +366,9 @@ func (g *gpm) RollbackService(ctx context.Context, name string, version string) 
 }
 
 func createFile(name string) (*os.File, error) {
-	err := os.MkdirAll(string([]rune(name)[0:strings.LastIndex(name, "/")]), 0755)
+	err := os.MkdirAll(string([]rune(name)[0:strings.LastIndex(name, "/")]), 0o755)
 	if err != nil {
 		return nil, err
 	}
-	return os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	return os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
 }

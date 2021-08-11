@@ -124,12 +124,51 @@ func (m *Package) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
+func (m *InstallServiceIn) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *InstallServiceIn) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if m.Spec == nil {
+		errs = append(errs, fmt.Errorf("field '%sspec' is required", prefix))
+	} else {
+		errs = append(errs, m.Spec.ValidateE(prefix+"spec."))
+	}
+	if m.Pack == nil {
+		errs = append(errs, fmt.Errorf("field '%spack' is required", prefix))
+	} else {
+		errs = append(errs, m.Pack.ValidateE(prefix+"pack."))
+	}
+	return is.MargeErr(errs...)
+}
+
 func (m *InstallServiceResult) Validate() error {
 	return m.ValidateE("")
 }
 
 func (m *InstallServiceResult) ValidateE(prefix string) error {
 	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *UpgradeServiceIn) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *UpgradeServiceIn) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	if len(m.Version) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sversion' is required", prefix))
+	}
+	if m.Pack == nil {
+		errs = append(errs, fmt.Errorf("field '%spack' is required", prefix))
+	} else {
+		errs = append(errs, m.Pack.ValidateE(prefix+"pack."))
+	}
 	return is.MargeErr(errs...)
 }
 
@@ -175,9 +214,6 @@ func (m *UpdateIn) Validate() error {
 
 func (m *UpdateIn) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if len(m.Name) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
-	}
 	if len(m.Version) == 0 {
 		errs = append(errs, fmt.Errorf("field '%sversion' is required", prefix))
 	}

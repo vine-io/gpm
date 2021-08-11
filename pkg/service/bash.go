@@ -23,13 +23,13 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 
 	"github.com/google/uuid"
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
@@ -85,33 +85,36 @@ func (g *gpm) Ls(ctx context.Context, root string) ([]*gpmv1.FileInfo, error) {
 	return files, nil
 }
 
-func (g *gpm) Pull(ctx context.Context, name string, isDir bool) (<-chan *gpmv1.PullResult, error) {
-	ts := func(name string, total int64, buf []byte, out chan<- *gpmv1.PullResult) {
+func (g *gpm) Pull(ctx context.Context, name string, isDir bool, sender Sender) error {
+	ts := func(name string, total int64, buf []byte, stream Sender) error {
 		var err error
 		var f *os.File
+		out := &gpmv1.PullResult{}
 
 		defer func() {
 			if err != nil {
-				out <- &gpmv1.PullResult{Name: name, Error: err.Error()}
+				out.Name, out.Error = name, err.Error()
+				_ = stream.Send(out)
 			}
 		}()
 
 		f, err = os.Open(name)
 		if err != nil {
-			return
+			return err
 		}
 		defer f.Close()
 
 		for {
 			nr, er := f.Read(buf)
 			if nr > 0 {
-				out <- &gpmv1.PullResult{
+				out = &gpmv1.PullResult{
 					Name:     name,
 					Total:    total,
 					Chunk:    buf[0:nr],
 					Length:   int64(nr),
 					Finished: false,
 				}
+				stream.Send(out)
 			}
 			if er != nil {
 				if er != io.EOF {
@@ -121,94 +124,115 @@ func (g *gpm) Pull(ctx context.Context, name string, isDir bool) (<-chan *gpmv1.
 			}
 		}
 
-		return
+		return err
 	}
 
 	stat, _ := os.Stat(name)
 	if stat == nil {
-		return nil, verrs.NotFound(g.Name(), "%s not exist", name)
+		return verrs.NotFound(g.Name(), "%s not exist", name)
 	}
 	if stat.IsDir() && !isDir {
-		return nil, verrs.BadRequest(g.Name(), "%s is a directory", name)
+		return verrs.BadRequest(g.Name(), "%s is a directory", name)
 	}
 	if !stat.IsDir() && isDir {
-		return nil, verrs.BadRequest(g.Name(), "%s is not a directory", name)
+		return verrs.BadRequest(g.Name(), "%s is not a directory", name)
 	}
 
 	buf := make([]byte, 1024*32)
-	outs := make(chan *gpmv1.PullResult, 10)
 
-	go func() {
-		if !stat.IsDir() {
-			ts(name, stat.Size(), buf, outs)
-		} else {
-			_ = filepath.Walk(name, func(path string, info fs.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-				if info.IsDir() {
-					return nil
-				}
-				if !info.Mode().IsRegular() {
-					return nil
-				}
-				ts(path, info.Size(), buf, outs)
+	var err error
+	if !stat.IsDir() {
+		err = ts(name, stat.Size(), buf, sender)
+	} else {
+		err = filepath.Walk(name, func(path string, info fs.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if info.IsDir() {
 				return nil
-			})
-		}
+			}
+			if !info.Mode().IsRegular() {
+				return nil
+			}
+			return ts(path, info.Size(), buf, sender)
+		})
+	}
+	if err != nil {
+		return err
+	}
 
-		outs <- &gpmv1.PullResult{Finished: true}
-	}()
-
-	return outs, nil
+	return sender.Send(&gpmv1.PullResult{Finished: true})
 }
 
-func (g *gpm) Push(ctx context.Context, dst, name string, in <-chan *gpmv1.PushIn) (<-chan *gpmv1.PushResult, error) {
-	stat, _ := os.Stat(dst)
-	if stat != nil && stat.IsDir() {
-		dst = filepath.Join(dst, name)
-	}
-	dir := filepath.Dir(dst)
-	stat, _ = os.Stat(dir)
-	if stat == nil {
-		err := os.MkdirAll(dir, 0o777)
-		if err != nil {
-			return nil, verrs.InternalServerError(g.Name(), err.Error())
-		}
-	}
+func (g *gpm) Push(ctx context.Context, stream Stream) error {
+	var file *os.File
+	out := &gpmv1.PushResult{}
 
-	log.Infof("save file: %s -> %s", name, dst)
-	outs := make(chan *gpmv1.PushResult, 10)
-	go func() {
-		f, err := os.Create(dst)
-		if err != nil {
-			outs <- &gpmv1.PushResult{Error: err.Error()}
-			return
-		}
-		defer f.Close()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case b, ok := <-in:
-				if !ok {
-					return
-				}
-
-				_, err = f.Write(b.Chunk[0:b.Length])
-				if err != nil {
-					outs <- &gpmv1.PushResult{Error: err.Error()}
-					return
-				}
-				if b.IsOk {
-					outs <- &gpmv1.PushResult{IsOk: true}
-					return
-				}
-			}
+	defer func() {
+		if file != nil {
+			_ = file.Close()
 		}
 	}()
 
-	return outs, nil
+	for {
+		select {
+		case <-ctx.Done():
+			log.Infof("push stream done!")
+			return nil
+		default:
+		}
+
+		data, err := stream.Recv()
+		if err != nil && err != io.EOF {
+			out.Error = err.Error()
+			_ = stream.Send(out)
+			return err
+		}
+		b := data.(*gpmv1.PushIn)
+
+		if file == nil {
+			if err = b.Validate(); err != nil {
+				out.Error = verrs.BadRequest(g.Name(), err.Error()).Error()
+				_ = stream.Send(out)
+				return err
+			}
+
+			dst := b.Dst
+			stat, _ := os.Stat(b.Dst)
+			if stat != nil && stat.IsDir() {
+				dst = filepath.Join(dst, b.Name)
+			}
+			dir := filepath.Dir(dst)
+			if stat == nil {
+				err = os.MkdirAll(dir, 0o777)
+				if err != nil {
+					out.Error = verrs.InternalServerError(g.Name(), err.Error()).Error()
+					_ = stream.Send(out)
+					return err
+				}
+			}
+
+			log.Infof("save file: %s -> %s", b.Name, dst)
+			file, err = os.Create(dst)
+			if err != nil {
+				out.Error = verrs.InternalServerError(g.Name(), err.Error()).Error()
+				_ = stream.Send(out)
+				return err
+			}
+		}
+
+		_, err = file.Write(b.Chunk[0:b.Length])
+		if err != nil {
+			out.Error = err.Error()
+			_ = stream.Send(out)
+			return err
+		}
+		if b.IsOk {
+			out.IsOk = true
+			_ = stream.Send(out)
+			return nil
+		}
+	}
 }
 
 func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (*gpmv1.ExecResult, error) {
@@ -228,106 +252,62 @@ func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (*gpmv1.ExecResult, er
 	return out, nil
 }
 
-func (g *gpm) Terminal(ctx context.Context, in <-chan *gpmv1.TerminalIn) (<-chan *gpmv1.TerminalResult, error) {
-	b := <-in
+type wr struct {
+	stream Stream
+}
 
-	var err error
+func (wr *wr) Write(data []byte) (int, error) {
+	err := wr.stream.Send(&gpmv1.TerminalResult{Stdout: data})
+	return len(data), err
+}
+
+func (wr *wr) Read(data []byte) (int, error) {
+	buf, err := wr.stream.Recv()
+	if err != nil {
+		return 0, err
+	}
+	b := buf.(*gpmv1.TerminalIn)
+	return bytes.NewBuffer(data).WriteString(b.Command)
+}
+
+func (g *gpm) Terminal(ctx context.Context, stream Stream) error {
+	data, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+	b := data.(*gpmv1.TerminalIn)
+
 	if err = b.Validate(); err != nil {
-		return nil, verrs.BadGateway(g.Name(), err.Error())
+		return verrs.BadGateway(g.Name(), err.Error())
 	}
 	tid := uuid.New().String()
 
-	outs := make(chan *gpmv1.TerminalResult, 10)
-
+	into := &wr{stream: stream}
 	cmd := startTerminal(b)
+
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		return nil, verrs.InternalServerError(g.Name(), err.Error())
+		return verrs.InternalServerError(g.Name(), err.Error())
 	}
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return nil, verrs.InternalServerError(g.Name(), err.Error())
+		return verrs.InternalServerError(g.Name(), err.Error())
 	}
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return nil, verrs.InternalServerError(g.Name(), err.Error())
+		return verrs.InternalServerError(g.Name(), err.Error())
 	}
 
-	go func() {
-		var ok bool
-		defer stdin.Close()
-
-		for {
-			shell := strings.TrimSpace(b.Command)
-			if shell == "" {
-				continue
-			}
-			log.Infof("terminal %s write stdin: %s", tid, shell)
-			_, e := stdin.Write([]byte(shell + "\n"))
-			if e != nil {
-				outs <- &gpmv1.TerminalResult{Error: e.Error()}
-				log.Warnf("terminal %s stdin failed: %v", tid, e)
-			}
-
-			select {
-			case <-ctx.Done():
-				return
-			case b, ok = <-in:
-				if !ok {
-					return
-				}
-			}
-		}
-	}()
-
-	go func() {
-		defer stdout.Close()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-			}
-
-			buf := make([]byte, 1024*16)
-			n, _ := stdout.Read(buf)
-			if n > 0 {
-				outs <- &gpmv1.TerminalResult{Stdout: buf[0:n]}
-			}
-		}
-	}()
-
-	go func() {
-		defer stderr.Close()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			default:
-			}
-
-			buf := make([]byte, 1024*16)
-			n, _ := stderr.Read(buf)
-			if n > 0 {
-				outs <- &gpmv1.TerminalResult{Stderr: buf[0:n]}
-			}
-		}
-	}()
+	go io.Copy(stdin, into)
+	go io.Copy(into, stdout)
+	go io.Copy(into, stderr)
 
 	if err = cmd.Start(); err != nil {
-		return nil, verrs.InternalServerError(g.Name(), err.Error())
+		return verrs.InternalServerError(g.Name(), err.Error())
 	}
 
-	go func() {
-		select {
-		case <-ctx.Done():
-			cmd.Process.Kill()
-			cmd.Process.Wait()
-			cmd.Process.Release()
-			log.Infof("terminal %s done!", tid)
-			return
-		}
-	}()
+	_, err = cmd.Process.Wait()
+	log.Infof("terminal %s done!", tid)
 
-	return outs, nil
+	return err
 }

@@ -137,8 +137,33 @@ func (in *Package) DeepCopyInto(out *Package) {
 }
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *InstallServiceIn) DeepCopyInto(out *InstallServiceIn) {
+	*out = *in
+	if in.Spec != nil {
+		in, out := &in.Spec, &out.Spec
+		*out = new(ServiceSpec)
+		(*in).DeepCopyInto(*out)
+	}
+	if in.Pack != nil {
+		in, out := &in.Pack, &out.Pack
+		*out = new(Package)
+		(*in).DeepCopyInto(*out)
+	}
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
 func (in *InstallServiceResult) DeepCopyInto(out *InstallServiceResult) {
 	*out = *in
+}
+
+// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
+func (in *UpgradeServiceIn) DeepCopyInto(out *UpgradeServiceIn) {
+	*out = *in
+	if in.Pack != nil {
+		in, out := &in.Pack, &out.Pack
+		*out = new(Package)
+		(*in).DeepCopyInto(*out)
+	}
 }
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.

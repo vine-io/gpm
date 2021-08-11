@@ -168,11 +168,7 @@ message WatchServiceLogRsp {
 }
 
 message InstallServiceReq {
-  // +gen:required
-  gpmv1.ServiceSpec spec = 1;
-
-  // +gen:required
-  gpmv1.Package pack = 2;
+  gpmv1.InstallServiceIn in = 1;
 }
 
 message InstallServiceRsp {
@@ -189,15 +185,7 @@ message ListServiceVersionsRsp {
 }
 
 message UpgradeServiceReq {
-  // 服务名称
-  // +gen:required
-  string name = 1;
-
-  // +gen:required
-  string version = 2;
-
-  // +gen:required
-  gpmv1.Package pack = 21;
+  gpmv1.UpgradeServiceIn in = 1;
 }
 
 message UpgradeServiceRsp {

@@ -97,8 +97,10 @@ func (w *InstallStream) Context() context.Context {
 
 func (w *InstallStream) Send(pack *gpmv1.Package) error {
 	err := w.s.Send(&pb.InstallServiceReq{
-		Spec: w.spec,
-		Pack: pack,
+		In: &gpmv1.InstallServiceIn{
+			Spec: w.spec,
+			Pack: pack,
+		},
 	})
 	return err
 }
@@ -131,9 +133,11 @@ func (s *UpgradeStream) Context() context.Context {
 
 func (s *UpgradeStream) Send(pack *gpmv1.Package) error {
 	err := s.s.Send(&pb.UpgradeServiceReq{
-		Name:    s.name,
-		Version: s.version,
-		Pack:    pack,
+		In: &gpmv1.UpgradeServiceIn{
+			Name:    s.name,
+			Version: s.version,
+			Pack:    pack,
+		},
 	})
 	return err
 }

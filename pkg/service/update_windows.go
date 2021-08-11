@@ -27,63 +27,76 @@ package service
 import (
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
-	gruntime "runtime"
 	"strings"
 	"time"
 
 	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
 	log "github.com/lack-io/vine/lib/logger"
+	verrs "github.com/lack-io/vine/proto/apis/errors"
 )
 
-func (g *gpm) UpdateSelf(ctx context.Context, version string, in <-chan *gpmv1.UpdateIn) (<-chan *gpmv1.UpdateResult, error) {
+func (g *gpm) UpdateSelf(ctx context.Context, stream Stream) error {
+	var (
+		file *os.File
+		err  error
+		dst  string
+	)
 
-	log.Infof("update gpm and gpmd to %s", version)
-	outs := make(chan *gpmv1.UpdateResult, 10)
-	go func() {
-		// 接收 gpm 文件
-		dst := filepath.Join(os.TempDir(), fmt.Sprintf("gpm-tmp"))
-		if gruntime.GOOS == "windows" {
-			dst += ".exe"
+	defer func() {
+		if file != nil {
+			_ = file.Close()
 		}
-		f, err := os.Create(dst)
-		if err != nil {
-			outs <- &gpmv1.UpdateResult{Error: err.Error()}
-			return
+	}()
+
+	var data interface{}
+	for {
+		data, err = stream.Recv()
+		if err != nil && err != io.EOF {
+			return err
 		}
-		defer f.Close()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case b, ok := <-in:
-				if !ok {
-					return
-				}
+		b := data.(*gpmv1.UpdateIn)
 
-				if b.Length > 0 {
-					_, err = f.Write(b.Chunk)
-					if err != nil {
-						outs <- &gpmv1.UpdateResult{Error: err.Error()}
-						return
-					}
-				}
-				if b.IsOk {
-					outs <- &gpmv1.UpdateResult{IsOk: true}
-				}
+		if file == nil {
+			log.Infof("update gpm and gpmd to %s", b.Version)
+			if err = b.Validate(); err != nil {
+				return verrs.BadRequest(g.Name(), err.Error())
+			}
 
-				if b.DeploySignal {
-					goto EXIT
-				}
+			// 接收 gpm 文件
+			dst = filepath.Join(os.TempDir(), fmt.Sprintf("gpm-tmp.exe"))
+			file, err = os.Create(dst)
+			if err != nil {
+				//outs <- &gpmv1.UpdateResult{Error: err.Error()}
+				return err
 			}
 		}
-	EXIT:
-		f.Chmod(0o777)
-		_ = f.Close()
 
+		if b.Length > 0 {
+			_, err = file.Write(b.Chunk)
+			if err != nil {
+				//outs <- &gpmv1.UpdateResult{Error: err.Error()}
+				return err
+			}
+		}
+		if b.IsOk {
+			stream.Send(&gpmv1.UpdateResult{IsOk: true})
+		}
+
+		if b.DeploySignal {
+			goto EXIT
+		}
+	}
+
+EXIT:
+	file.Chmod(0o777)
+	_ = file.Close()
+
+	go func() {
 		args := []string{"deploy", "--run", "--args", fmt.Sprintf(`"--server-address=%s"`, g.Cfg.Address)}
 		if g.Cfg.EnableLog {
 			args = append(args, fmt.Sprintf(`--args "--enable-log"`))
@@ -114,5 +127,5 @@ func (g *gpm) UpdateSelf(ctx context.Context, version string, in <-chan *gpmv1.U
 		os.Exit(0)
 	}()
 
-	return outs, nil
+	return nil
 }
