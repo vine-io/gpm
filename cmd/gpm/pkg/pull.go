@@ -108,7 +108,7 @@ func pullBash(c *cli.Context) error {
 				if strings.Contains(t, "/") || strings.Contains(t, "\\") {
 					t = strings.ReplaceAll(t, "\\", "/")
 					newDir := filepath.Join(dst, filepath.Dir(t))
-					_ = os.MkdirAll(newDir, 0777)
+					_ = os.MkdirAll(newDir, 0o777)
 				}
 				file, err = os.Create(filepath.Join(dst, t))
 			} else {

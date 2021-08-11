@@ -171,7 +171,7 @@ func (g *gpm) Push(ctx context.Context, dst, name string, in <-chan *gpmv1.PushI
 	dir := filepath.Dir(dst)
 	stat, _ = os.Stat(dir)
 	if stat == nil {
-		err := os.MkdirAll(dir, 0777)
+		err := os.MkdirAll(dir, 0o777)
 		if err != nil {
 			return nil, verrs.InternalServerError(g.Name(), err.Error())
 		}

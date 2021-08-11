@@ -39,7 +39,7 @@ var f embed.FS
 
 func GetSSL(root string) (*grpc.Grpc2Http, error) {
 	dir := filepath.Join(root, "ssl")
-	_ = os.MkdirAll(dir, 0777)
+	_ = os.MkdirAll(dir, 0o777)
 
 	fca := filepath.Join(dir, "ca.pem")
 	fpem := filepath.Join(dir, "server.pem")
@@ -50,7 +50,7 @@ func GetSSL(root string) (*grpc.Grpc2Http, error) {
 		if err != nil {
 			return nil, err
 		}
-		if err = ioutil.WriteFile(fca, ca, 0777); err != nil {
+		if err = ioutil.WriteFile(fca, ca, 0o777); err != nil {
 			return nil, err
 		}
 	}
@@ -59,7 +59,7 @@ func GetSSL(root string) (*grpc.Grpc2Http, error) {
 		if err != nil {
 			return nil, err
 		}
-		if err = ioutil.WriteFile(fpem, pem, 0777); err != nil {
+		if err = ioutil.WriteFile(fpem, pem, 0o777); err != nil {
 			return nil, err
 		}
 	}
@@ -68,7 +68,7 @@ func GetSSL(root string) (*grpc.Grpc2Http, error) {
 		if err != nil {
 			return nil, err
 		}
-		if err = ioutil.WriteFile(fkey, key, 0777); err != nil {
+		if err = ioutil.WriteFile(fkey, key, 0o777); err != nil {
 			return nil, err
 		}
 	}

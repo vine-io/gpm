@@ -89,7 +89,7 @@ type gpm struct {
 func (g *gpm) Init() error {
 	var err error
 
-	if err = os.MkdirAll(filepath.Join(g.Cfg.Root, "services"), 0777); err != nil {
+	if err = os.MkdirAll(filepath.Join(g.Cfg.Root, "services"), 0o777); err != nil {
 		return err
 	}
 	ctx := context.Background()

@@ -81,7 +81,7 @@ func (g *gpm) UpdateSelf(ctx context.Context, version string, in <-chan *gpmv1.U
 			}
 		}
 	EXIT:
-		f.Chmod(0777)
+		f.Chmod(0o777)
 		_ = f.Close()
 
 		args := []string{"deploy", "--run", "--args", fmt.Sprintf(`"--server-address=%s"`, g.Cfg.Address)}
@@ -93,7 +93,7 @@ func (g *gpm) UpdateSelf(ctx context.Context, version string, in <-chan *gpmv1.U
 		script := filepath.Join(os.TempDir(), "start.bat")
 
 		_ = ioutil.WriteFile(script, []byte(fmt.Sprintf(`@echo off
-%s`, shell)), 0777)
+%s`, shell)), 0o777)
 		cmd := exec.Command("cmd", "/C", shell)
 		adminCmd(cmd)
 		err = cmd.Start()

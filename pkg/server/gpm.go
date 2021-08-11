@@ -106,9 +106,9 @@ func (s *server) Init() error {
 		} else {
 			cfg.Root = "/opt/gpm"
 		}
-		_ = os.MkdirAll(filepath.Join(cfg.Root, "logs"), 0777)
-		_ = os.MkdirAll(filepath.Join(cfg.Root, "services"), 0777)
-		_ = os.MkdirAll(filepath.Join(cfg.Root, "packages"), 0777)
+		_ = os.MkdirAll(filepath.Join(cfg.Root, "logs"), 0o777)
+		_ = os.MkdirAll(filepath.Join(cfg.Root, "services"), 0o777)
+		_ = os.MkdirAll(filepath.Join(cfg.Root, "packages"), 0o777)
 	}
 
 	gh, err := ssl.GetSSL(cfg.Root)

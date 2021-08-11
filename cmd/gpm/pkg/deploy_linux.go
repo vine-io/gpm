@@ -79,7 +79,7 @@ func deploy(c *cli.Context) error {
 	}
 
 	for _, dir := range dirs {
-		_ = os.MkdirAll(dir, 0777)
+		_ = os.MkdirAll(dir, 0o777)
 	}
 
 	// 安装 gpm
@@ -98,7 +98,7 @@ func deploy(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("install gpm: %v", err)
 	}
-	_ = dst.Chmod(0777)
+	_ = dst.Chmod(0o777)
 
 	link, _ := os.Readlink(gpm)
 	_ = os.Remove(gpm)
@@ -117,11 +117,11 @@ func deploy(c *cli.Context) error {
 		return fmt.Errorf("get gpmd binary: %v", err)
 	}
 	fname = filepath.Join(root, "bin", "gpmd-"+runtime.GitTag)
-	err = ioutil.WriteFile(fname, buf, 0777)
+	err = ioutil.WriteFile(fname, buf, 0o777)
 	if err != nil {
 		return fmt.Errorf("install gpmd: %v", err)
 	}
-	_ = os.Chmod(fname, 0777)
+	_ = os.Chmod(fname, 0o777)
 
 	link, _ = os.Readlink(gpmd)
 	_ = os.Remove(gpmd)
@@ -145,7 +145,7 @@ func deploy(c *cli.Context) error {
 		fmt.Fprintf(outE, "start gpmd successfully!\n")
 	}
 
-	_ = ioutil.WriteFile(autoStartFile, []byte(gpmdTmp), 0777)
+	_ = ioutil.WriteFile(autoStartFile, []byte(gpmdTmp), 0o777)
 
 	fmt.Fprintf(outE, "install gpm successfully!\n")
 	return nil
