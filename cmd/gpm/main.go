@@ -43,6 +43,7 @@ func main() {
 			pkg.HealthCmd(),
 			pkg.DeployCmd(),
 			pkg.TarCmd(),
+			pkg.UnTarCmd(),
 			pkg.UpdateCmd(),
 			pkg.RunCmd(),
 			pkg.ShutdownCmd(),

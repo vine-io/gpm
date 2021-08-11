@@ -54,8 +54,9 @@ func (g *gpm) InstallService(ctx context.Context, stream Stream) error {
 		}
 	}()
 
+	var data interface{}
 	for {
-		data, err := stream.Recv()
+		data, err = stream.Recv()
 		if err != nil && err != io.EOF {
 			return err
 		}
@@ -123,7 +124,7 @@ CHUNKED:
 			if e == io.EOF {
 				break
 			} else {
-				return err
+				return e
 			}
 		}
 		if hdr.FileInfo().IsDir() {
@@ -132,12 +133,12 @@ CHUNKED:
 			fname := filepath.Join(dir, hdr.Name)
 			f, e1 := createFile(fname)
 			if e1 != nil {
-				return err
+				return e1
 			}
 			_, e1 = io.Copy(f, tr)
 			if e1 != nil && e1 != io.EOF {
 				f.Close()
-				return err
+				return e1
 			}
 			f.Close()
 		}
@@ -279,20 +280,20 @@ CHUNKED:
 				break
 			} else {
 				//outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
-				return err
+				return e
 			}
 		}
 		fname := filepath.Join(dir, hdr.Name)
 		f, e1 := createFile(fname)
 		if e1 != nil {
 			//outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
-			return err
+			return e1
 		}
 		_, e1 = io.Copy(f, tr)
 		if e1 != nil && e1 != io.EOF {
 			//outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
 			f.Close()
-			return err
+			return e1
 		}
 		f.Close()
 	}

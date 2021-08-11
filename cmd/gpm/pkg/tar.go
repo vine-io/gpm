@@ -111,7 +111,7 @@ func compress(path string, prefix string, tw *tar.Writer, out io.Writer) error {
 func TarCmd() *cli.Command {
 	return &cli.Command{
 		Name:     "tar",
-		Usage:    "create a package for Install subcommand",
+		Usage:    "create a compress package for Install subcommand",
 		Action:   tarFn,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
