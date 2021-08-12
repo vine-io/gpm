@@ -28,15 +28,14 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	"github.com/vine-io/gpm/pkg/runtime"
-	"github.com/vine-io/gpm/pkg/runtime/client"
-	"github.com/vine-io/gpm/pkg/runtime/config"
-	"github.com/vine-io/gpm/pkg/runtime/inject"
-	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
+	"github.com/rakyll/statik/fs"
+	pbr "github.com/schollz/progressbar/v3"
 	"github.com/vine-io/vine"
+	vclient "github.com/vine-io/vine/core/client"
 	ahandler "github.com/vine-io/vine/lib/api/handler"
 	"github.com/vine-io/vine/lib/api/handler/openapi"
 	arpc "github.com/vine-io/vine/lib/api/handler/rpc"
@@ -49,8 +48,13 @@ import (
 	log "github.com/vine-io/vine/lib/logger"
 	verrs "github.com/vine-io/vine/proto/apis/errors"
 	"github.com/vine-io/vine/util/namespace"
-	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc/status"
+
+	"github.com/vine-io/gpm/pkg/runtime"
+	"github.com/vine-io/gpm/pkg/runtime/client"
+	"github.com/vine-io/gpm/pkg/runtime/config"
+	"github.com/vine-io/gpm/pkg/runtime/inject"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 
 	_ "github.com/vine-io/vine/lib/api/handler/openapi/statik"
 )
@@ -169,7 +173,6 @@ func (r *RestAPI) getEndpointsHandler() fiber.Handler {
 		})
 	}
 }
-
 func (r *RestAPI) pushHandler() fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
@@ -203,7 +206,12 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 
 		ctx := c.Context()
 		cc := client.New()
-		stream, err := cc.Push(ctx)
+		opts := []vclient.CallOption{
+			vclient.WithDialTimeout(time.Hour * 2),
+			vclient.WithStreamTimeout(time.Hour * 2),
+		}
+
+		stream, err := cc.Push(ctx, opts...)
 		if err != nil {
 			return fiber.NewError(http.StatusBadGateway, "connect to gpm server: "+err.Error())
 		}
@@ -212,8 +220,18 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 		done := make(chan struct{}, 1)
 		ech := make(chan error, 1)
 
+		outE := log.DefaultLogger.Options().Out
+		pb := pbr.NewOptions(int(file.Size),
+			pbr.OptionSetWriter(outE),
+			pbr.OptionShowBytes(true),
+			pbr.OptionEnableColorCodes(true),
+			pbr.OptionOnCompletion(func() {
+				fmt.Fprintf(outE, "\n")
+			}),
+		)
+
 		go func() {
-			buf := make([]byte, 1024)
+			buf := make([]byte, 1024*32)
 			for {
 				n, e := fd.Read(buf)
 				if e != nil && e != io.EOF {
@@ -223,14 +241,14 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 				if e == io.EOF {
 					in.IsOk = true
 				}
-				in.Length = int64(n)
-				in.Chunk = buf[0:n]
-				e = stream.Send(in)
-				if e != nil {
-					ech <- fmt.Errorf("save file: %v", err)
-					return
+				if n > 0 || in.IsOk {
+					_ = pb.Add(n)
+					in.Length = int64(n)
+					in.Chunk = buf[0:n]
+					_ = stream.Send(in)
 				}
 				if e == io.EOF {
+					log.Infof("push process finished")
 					break
 				}
 			}
@@ -238,16 +256,12 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 
 		go func() {
 			for {
-				select {
-				case <-stream.Context().Done():
-					goto EXIT
-				default:
-				}
 				b, e := stream.Recv()
-				if e != nil {
+				if e != nil && e != io.EOF {
 					ech <- errors.New(status.Convert(e).Message())
 					return
 				}
+
 				if b.Error != "" {
 					ech <- errors.New(verrs.Parse(b.Error).Detail)
 					return
@@ -256,7 +270,6 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 					break
 				}
 			}
-		EXIT:
 			done <- struct{}{}
 		}()
 

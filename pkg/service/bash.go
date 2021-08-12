@@ -25,6 +25,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -32,6 +33,7 @@ import (
 	"path/filepath"
 
 	"github.com/google/uuid"
+	"github.com/lack-io/pkg/unit"
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 	log "github.com/vine-io/vine/lib/logger"
 	verrs "github.com/vine-io/vine/proto/apis/errors"
@@ -163,10 +165,14 @@ func (g *gpm) Pull(ctx context.Context, name string, isDir bool, sender Sender) 
 
 	return sender.Send(&gpmv1.PullResult{Finished: true})
 }
-
 func (g *gpm) Push(ctx context.Context, stream Stream) error {
-	var file *os.File
-	out := &gpmv1.PushResult{}
+	var (
+		file    *os.File
+		dst     string
+		out     = &gpmv1.PushResult{}
+		total   int64
+		current int64 = 0
+	)
 
 	defer func() {
 		if file != nil {
@@ -177,8 +183,7 @@ func (g *gpm) Push(ctx context.Context, stream Stream) error {
 	for {
 		select {
 		case <-ctx.Done():
-			log.Infof("push stream done!")
-			return nil
+			return verrs.InternalServerError(g.Name(), "client finish early")
 		default:
 		}
 
@@ -197,7 +202,8 @@ func (g *gpm) Push(ctx context.Context, stream Stream) error {
 				return err
 			}
 
-			dst := b.Dst
+			dst = b.Dst
+			total = b.Total
 			stat, _ := os.Stat(b.Dst)
 			if stat != nil && stat.IsDir() {
 				dst = filepath.Join(dst, b.Name)
@@ -207,12 +213,14 @@ func (g *gpm) Push(ctx context.Context, stream Stream) error {
 				err = os.MkdirAll(dir, 0o777)
 				if err != nil {
 					out.Error = verrs.InternalServerError(g.Name(), err.Error()).Error()
-					_ = stream.Send(out)
+					if e := stream.Send(out); e != nil {
+						log.Errorf("send failed: %v", e)
+					}
 					return err
 				}
 			}
 
-			log.Infof("save file: %s -> %s", b.Name, dst)
+			log.Infof("save file: %s (%s) -> %s", b.Name, unit.ConvAuto(b.Total, 2), dst)
 			file, err = os.Create(dst)
 			if err != nil {
 				out.Error = verrs.InternalServerError(g.Name(), err.Error()).Error()
@@ -221,20 +229,30 @@ func (g *gpm) Push(ctx context.Context, stream Stream) error {
 			}
 		}
 
-		_, err = file.Write(b.Chunk[0:b.Length])
-		if err != nil {
-			out.Error = err.Error()
-			_ = stream.Send(out)
+		var n int
+		n, err = file.Write(b.Chunk[0:b.Length])
+		if err != nil || int64(n) != b.Length {
+			out.Error = fmt.Sprintf("write data error %v", err)
+			if e := stream.Send(out); e != nil {
+				log.Errorf("send failed: %v", e)
+			}
 			return err
 		}
+		current += int64(n)
 		if b.IsOk {
-			out.IsOk = true
-			_ = stream.Send(out)
+			if total != current {
+				out.Error = "lacking data"
+			} else {
+				out.IsOk = true
+			}
+			if e := stream.Send(out); e != nil {
+				log.Errorf("send failed: %v", e)
+			}
+			log.Infof("receive file %s finished", dst)
 			return nil
 		}
 	}
 }
-
 func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (*gpmv1.ExecResult, error) {
 
 	cmd := exec.CommandContext(ctx, in.Name, in.Args...)
