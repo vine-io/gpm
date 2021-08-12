@@ -25,6 +25,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"io/fs"
 	"os"
@@ -85,8 +86,8 @@ func (g *gpm) Ls(ctx context.Context, root string) ([]*gpmv1.FileInfo, error) {
 	return files, nil
 }
 
-func (g *gpm) Pull(ctx context.Context, name string, isDir bool, sender Sender) error {
-	ts := func(name string, total int64, buf []byte, stream Sender) error {
+func (g *gpm) Pull(ctx context.Context, name string, isDir bool, sender IOWriter) error {
+	ts := func(name string, total int64, buf []byte, stream IOWriter) error {
 		var err error
 		var f *os.File
 		out := &gpmv1.PullResult{}
@@ -164,9 +165,8 @@ func (g *gpm) Pull(ctx context.Context, name string, isDir bool, sender Sender) 
 	return sender.Send(&gpmv1.PullResult{Finished: true})
 }
 
-func (g *gpm) Push(ctx context.Context, stream Stream) error {
+func (g *gpm) Push(ctx context.Context, stream IOReader) error {
 	var file *os.File
-	out := &gpmv1.PushResult{}
 
 	defer func() {
 		if file != nil {
@@ -174,6 +174,7 @@ func (g *gpm) Push(ctx context.Context, stream Stream) error {
 		}
 	}()
 
+	var err error
 	for {
 		select {
 		case <-ctx.Done():
@@ -182,18 +183,14 @@ func (g *gpm) Push(ctx context.Context, stream Stream) error {
 		default:
 		}
 
-		data, err := stream.Recv()
-		if err != nil && err != io.EOF {
-			out.Error = err.Error()
-			_ = stream.Send(out)
-			return err
+		data, e := stream.Recv()
+		if e != nil && e != io.EOF {
+			return fmt.Errorf("receive data: %v", e)
 		}
 		b := data.(*gpmv1.PushIn)
 
 		if file == nil {
 			if err = b.Validate(); err != nil {
-				out.Error = verrs.BadRequest(g.Name(), err.Error()).Error()
-				_ = stream.Send(out)
 				return err
 			}
 
@@ -206,8 +203,6 @@ func (g *gpm) Push(ctx context.Context, stream Stream) error {
 			if stat == nil {
 				err = os.MkdirAll(dir, 0o777)
 				if err != nil {
-					out.Error = verrs.InternalServerError(g.Name(), err.Error()).Error()
-					_ = stream.Send(out)
 					return err
 				}
 			}
@@ -215,24 +210,23 @@ func (g *gpm) Push(ctx context.Context, stream Stream) error {
 			log.Infof("save file: %s -> %s", b.Name, dst)
 			file, err = os.Create(dst)
 			if err != nil {
-				out.Error = verrs.InternalServerError(g.Name(), err.Error()).Error()
-				_ = stream.Send(out)
 				return err
 			}
 		}
 
-		_, err = file.Write(b.Chunk[0:b.Length])
-		if err != nil {
-			out.Error = err.Error()
-			_ = stream.Send(out)
-			return err
+		if b.Length > 0 {
+			_, err = file.Write(b.Chunk[0:b.Length])
+			if err != nil {
+				return err
+			}
 		}
+
 		if b.IsOk {
-			out.IsOk = true
-			_ = stream.Send(out)
-			return nil
+			break
 		}
 	}
+
+	return stream.Close()
 }
 
 func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (*gpmv1.ExecResult, error) {
@@ -253,7 +247,7 @@ func (g *gpm) Exec(ctx context.Context, in *gpmv1.ExecIn) (*gpmv1.ExecResult, er
 }
 
 type wr struct {
-	stream Stream
+	stream IOStream
 }
 
 func (wr *wr) Write(data []byte) (int, error) {
@@ -270,7 +264,7 @@ func (wr *wr) Read(data []byte) (int, error) {
 	return bytes.NewBuffer(data).WriteString(b.Command)
 }
 
-func (g *gpm) Terminal(ctx context.Context, stream Stream) error {
+func (g *gpm) Terminal(ctx context.Context, stream IOStream) error {
 	data, err := stream.Recv()
 	if err != nil {
 		return err

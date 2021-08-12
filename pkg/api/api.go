@@ -23,22 +23,24 @@
 package api
 
 import (
-	"errors"
-	"fmt"
 	"io"
 	"mime"
 	"net/http"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/rakyll/statik/fs"
 	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/gpm/pkg/runtime/client"
 	"github.com/vine-io/gpm/pkg/runtime/config"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 	"github.com/vine-io/vine"
+	vclient "github.com/vine-io/vine/core/client"
 	ahandler "github.com/vine-io/vine/lib/api/handler"
 	"github.com/vine-io/vine/lib/api/handler/openapi"
+	_ "github.com/vine-io/vine/lib/api/handler/openapi/statik"
 	arpc "github.com/vine-io/vine/lib/api/handler/rpc"
 	"github.com/vine-io/vine/lib/api/resolver"
 	"github.com/vine-io/vine/lib/api/resolver/grpc"
@@ -47,12 +49,7 @@ import (
 	apihttp "github.com/vine-io/vine/lib/api/server"
 	httpapi "github.com/vine-io/vine/lib/api/server/http"
 	log "github.com/vine-io/vine/lib/logger"
-	verrs "github.com/vine-io/vine/proto/apis/errors"
 	"github.com/vine-io/vine/util/namespace"
-	"github.com/rakyll/statik/fs"
-	"google.golang.org/grpc/status"
-
-	_ "github.com/vine-io/vine/lib/api/handler/openapi/statik"
 )
 
 func init() {
@@ -203,67 +200,39 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 
 		ctx := c.Context()
 		cc := client.New()
-		stream, err := cc.Push(ctx)
+		opts := []vclient.CallOption{
+			vclient.WithDialTimeout(time.Hour * 2),
+			vclient.WithStreamTimeout(time.Hour * 2),
+		}
+
+		stream, err := cc.Push(ctx, opts...)
 		if err != nil {
 			return fiber.NewError(http.StatusBadGateway, "connect to gpm server: "+err.Error())
 		}
-		defer stream.Close()
 
-		done := make(chan struct{}, 1)
-		ech := make(chan error, 1)
+		buf := make([]byte, 1024*32)
+		for {
+			n, e := fd.Read(buf)
+			if e != nil && e != io.EOF {
+				return fiber.NewError(http.StatusInternalServerError, e.Error())
+			}
 
-		go func() {
-			buf := make([]byte, 1024)
-			for {
-				n, e := fd.Read(buf)
-				if e != nil && e != io.EOF {
-					ech <- fmt.Errorf("read file: %v", err)
-					return
-				}
-				if e == io.EOF {
-					in.IsOk = true
-				}
+			if n > 0 {
 				in.Length = int64(n)
 				in.Chunk = buf[0:n]
-				e = stream.Send(in)
-				if e != nil {
-					ech <- fmt.Errorf("save file: %v", err)
-					return
-				}
-				if e == io.EOF {
-					break
+				err = stream.Send(in)
+				if err != nil {
+					return fiber.NewError(http.StatusInternalServerError, err.Error())
 				}
 			}
-		}()
 
-		go func() {
-			for {
-				select {
-				case <-stream.Context().Done():
-					goto EXIT
-				default:
-				}
-				b, e := stream.Recv()
-				if e != nil {
-					ech <- errors.New(status.Convert(e).Message())
-					return
-				}
-				if b.Error != "" {
-					ech <- errors.New(verrs.Parse(b.Error).Detail)
-					return
-				}
-				if b.IsOk {
-					break
-				}
+			if e == io.EOF {
+				break
 			}
-		EXIT:
-			done <- struct{}{}
-		}()
+		}
 
-		select {
-		case e := <-ech:
-			return fiber.NewError(http.StatusInternalServerError, e.Error())
-		case <-done:
+		if err = stream.Wait(); err != nil {
+			return fiber.NewError(http.StatusInternalServerError, err.Error())
 		}
 
 		return c.JSON(fiber.Map{

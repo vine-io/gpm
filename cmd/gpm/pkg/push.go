@@ -24,7 +24,6 @@ package pkg
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -32,12 +31,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	pbr "github.com/schollz/progressbar/v3"
+	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/pkg/runtime/client"
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
-	"github.com/vine-io/cli"
 	vclient "github.com/vine-io/vine/core/client"
-	pbr "github.com/schollz/progressbar/v3"
-	"google.golang.org/grpc/status"
 )
 
 func pushBash(c *cli.Context) error {
@@ -93,50 +91,19 @@ func pushBash(c *cli.Context) error {
 
 func push(ctx context.Context, pb *pbr.ProgressBar, src, dst string, opts ...vclient.CallOption) error {
 	cc := client.New()
-	ech := make(chan error, 1)
-	done := make(chan struct{}, 1)
 	buf := make([]byte, 1024*32)
 
 	stream, err := cc.Push(ctx, opts...)
 	if err != nil {
 		return err
 	}
-	defer stream.Close()
 
-	go func() {
-		err = send(src, dst, pb, stream, buf)
-		if err != nil {
-			ech <- err
-			return
-		}
-	}()
-
-	go func() {
-		for {
-			b, err := stream.Recv()
-			if err != nil {
-				ech <- errors.New(status.Convert(err).Message())
-				return
-			}
-			if len(b.Error) != 0 {
-				ech <- errors.New(b.Error)
-				return
-			}
-			if b.IsOk {
-				done <- struct{}{}
-				return
-			}
-		}
-	}()
-
-	select {
-	case e := <-ech:
-		_ = pb.Clear()
-		return e
-	case <-done:
+	err = send(src, dst, pb, stream, buf)
+	if err != nil {
+		return fmt.Errorf("send data: %v", err)
 	}
 
-	return nil
+	return stream.Wait()
 }
 
 func send(path, dst string, bar *pbr.ProgressBar, stream *client.PushStream, buf []byte) error {
@@ -156,10 +123,6 @@ func send(path, dst string, bar *pbr.ProgressBar, stream *client.PushStream, buf
 		n, e := file.Read(buf)
 		if e != nil && e != io.EOF {
 			return e
-		}
-
-		if e == io.EOF {
-			p.IsOk = true
 		}
 
 		_ = bar.Add(n)

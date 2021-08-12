@@ -35,8 +35,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/cli"
+	"github.com/vine-io/gpm/pkg/runtime"
 )
 
 //go:embed testdata/gpmd
@@ -70,7 +70,10 @@ func deploy(c *cli.Context) error {
 	}
 
 	for _, dir := range dirs {
-		_ = os.MkdirAll(dir, 0o777)
+		e := os.MkdirAll(dir, 0o777)
+		if e != nil {
+			return e
+		}
 	}
 
 	// 安装 gpm

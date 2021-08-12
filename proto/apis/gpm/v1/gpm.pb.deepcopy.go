@@ -229,11 +229,6 @@ func (in *PushIn) DeepCopyInto(out *PushIn) {
 }
 
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
-func (in *PushResult) DeepCopyInto(out *PushResult) {
-	*out = *in
-}
-
-// DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
 func (in *TerminalIn) DeepCopyInto(out *TerminalIn) {
 	*out = *in
 	if in.Env != nil {

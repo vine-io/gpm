@@ -31,16 +31,16 @@ import (
 	"sync"
 	"time"
 
+	"github.com/hpcloud/tail"
+	"github.com/shirou/gopsutil/mem"
+	proc "github.com/shirou/gopsutil/process"
 	"github.com/vine-io/gpm/pkg/dao"
 	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/gpm/pkg/runtime/config"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
-	"github.com/hpcloud/tail"
 	"github.com/vine-io/vine"
 	verrs "github.com/vine-io/vine/proto/apis/errors"
-	"github.com/shirou/gopsutil/mem"
-	proc "github.com/shirou/gopsutil/process"
 )
 
 func init() {
@@ -375,7 +375,7 @@ func (g *gpm) DeleteService(ctx context.Context, name string) (*gpmv1.Service, e
 	return s, err
 }
 
-func (g *gpm) WatchServiceLog(ctx context.Context, name string, number int64, follow bool, sender Sender) error {
+func (g *gpm) WatchServiceLog(ctx context.Context, name string, number int64, follow bool, sender IOWriter) error {
 	f := filepath.Join(g.Cfg.Root, "logs", name, name+".log")
 	stat, _ := os.Stat(f)
 	if stat == nil {

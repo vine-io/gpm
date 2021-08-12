@@ -39,7 +39,7 @@ import (
 	verrs "github.com/vine-io/vine/proto/apis/errors"
 )
 
-func (g *gpm) InstallService(ctx context.Context, stream Stream) error {
+func (g *gpm) InstallService(ctx context.Context, stream IOStream) error {
 
 	var (
 		file *os.File
@@ -167,7 +167,7 @@ func (g *gpm) ListServiceVersions(ctx context.Context, name string) ([]*gpmv1.Se
 	return vs, nil
 }
 
-func (g *gpm) UpgradeService(ctx context.Context, stream Stream) error {
+func (g *gpm) UpgradeService(ctx context.Context, stream IOStream) error {
 
 	var (
 		file    *os.File

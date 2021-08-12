@@ -222,9 +222,7 @@ message PushReq {
   gpmv1.PushIn in = 1;
 }
 
-message PushRsp {
-  gpmv1.PushResult result = 1;
-}
+message PushRsp {}
 
 message ExecReq {
   // +gen:required
