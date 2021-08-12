@@ -32,9 +32,9 @@ import (
 	"path/filepath"
 
 	"github.com/google/uuid"
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
-	log "github.com/lack-io/vine/lib/logger"
-	verrs "github.com/lack-io/vine/proto/apis/errors"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
+	log "github.com/vine-io/vine/lib/logger"
+	verrs "github.com/vine-io/vine/proto/apis/errors"
 )
 
 func (g *gpm) Ls(ctx context.Context, root string) ([]*gpmv1.FileInfo, error) {

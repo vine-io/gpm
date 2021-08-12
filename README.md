@@ -63,7 +63,7 @@ GLOBAL OPTIONS:
    --version, -v             print the version (default: false)
 ```
 ### 安装 gpm
-现在相应操作系统版本的 [gpm](https://github.com/gpm2/gpm/releases) 。
+现在相应操作系统版本的 [gpm](https://github.com/vine-io/gpm/releases) 。
 解压后执行命令:
 ```shell
 $ ./gpm deploy

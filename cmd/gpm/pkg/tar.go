@@ -30,7 +30,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/lack-io/cli"
+	"github.com/vine-io/cli"
 )
 
 func tarFn(c *cli.Context) error {

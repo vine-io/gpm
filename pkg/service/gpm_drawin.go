@@ -32,7 +32,7 @@ import (
 	"strings"
 	"syscall"
 
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 )
 
 func fillService(s *gpmv1.Service) error {

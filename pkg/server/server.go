@@ -25,8 +25,8 @@ package server
 import (
 	"context"
 
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	verrs "github.com/lack-io/vine/proto/apis/errors"
+	pb "github.com/vine-io/gpm/proto/service/gpm/v1"
+	verrs "github.com/vine-io/vine/proto/apis/errors"
 )
 
 func (s *server) Healthz(ctx context.Context, _ *pb.Empty, rsp *pb.Empty) error {

@@ -35,8 +35,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	"github.com/lack-io/cli"
+	"github.com/vine-io/gpm/pkg/runtime"
+	"github.com/vine-io/cli"
 )
 
 //go:embed testdata/gpmd

@@ -36,12 +36,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gpm2/gpm/pkg/dao"
-	"github.com/gpm2/gpm/pkg/runtime/config"
-	"github.com/gpm2/gpm/pkg/runtime/inject"
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	"github.com/vine-io/gpm/pkg/dao"
+	"github.com/vine-io/gpm/pkg/runtime/config"
+	"github.com/vine-io/gpm/pkg/runtime/inject"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 	"github.com/lack-io/pkg/unit"
-	log "github.com/lack-io/vine/lib/logger"
+	log "github.com/vine-io/vine/lib/logger"
 	"github.com/shirou/gopsutil/mem"
 	proc "github.com/shirou/gopsutil/process"
 )

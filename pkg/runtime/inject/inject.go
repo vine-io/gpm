@@ -24,7 +24,7 @@ package inject
 
 import (
 	"github.com/lack-io/pkg/inject"
-	log "github.com/lack-io/vine/lib/logger"
+	log "github.com/vine-io/vine/lib/logger"
 )
 
 type logger struct{}

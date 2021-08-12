@@ -23,8 +23,8 @@
 package pkg
 
 import (
-	"github.com/lack-io/cli"
-	vclient "github.com/lack-io/vine/core/client"
+	"github.com/vine-io/cli"
+	vclient "github.com/vine-io/vine/core/client"
 )
 
 func getCallOptions(c *cli.Context) []vclient.CallOption {

@@ -31,7 +31,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/lack-io/cli"
+	"github.com/vine-io/cli"
 )
 
 func unTarFn(c *cli.Context) error {

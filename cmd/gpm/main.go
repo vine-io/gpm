@@ -28,10 +28,10 @@ import (
 	"sort"
 	"time"
 
-	"github.com/gpm2/gpm/cmd/gpm/pkg"
-	"github.com/gpm2/gpm/pkg/runtime"
-	"github.com/lack-io/cli"
-	verrs "github.com/lack-io/vine/proto/apis/errors"
+	"github.com/vine-io/gpm/cmd/gpm/pkg"
+	"github.com/vine-io/gpm/pkg/runtime"
+	"github.com/vine-io/cli"
+	verrs "github.com/vine-io/vine/proto/apis/errors"
 )
 
 func main() {

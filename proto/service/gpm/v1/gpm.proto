@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package gpmv1;
 
-option go_package = "github.com/gpm2/gpm/proto/service/gpm/v1;gpmv1";
+option go_package = "github.com/vine-io/gpm/proto/service/gpm/v1;gpmv1";
 
-import "github.com/gpm2/gpm/proto/apis/gpm/v1/gpm.proto";
+import "github.com/vine-io/gpm/proto/apis/gpm/v1/gpm.proto";
 
 // +gen:openapi
 service GpmService {

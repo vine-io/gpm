@@ -23,7 +23,7 @@
 package main
 
 import (
-	"github.com/gpm2/gpm/pkg"
+	"github.com/vine-io/gpm/pkg"
 )
 
 func main() {

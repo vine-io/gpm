@@ -1,7 +1,7 @@
 syntax = "proto3";
 package gpmv1;
 
-option go_package = "github.com/gpm2/gpm/proto/apis/gpm/v1;gpmv1";
+option go_package = "github.com/vine-io/gpm/proto/apis/gpm/v1;gpmv1";
 
 message Service {
   // 服务名称

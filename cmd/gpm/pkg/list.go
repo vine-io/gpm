@@ -28,11 +28,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/gpm2/gpm/pkg/runtime/client"
+	"github.com/vine-io/gpm/pkg/runtime/client"
 	"github.com/lack-io/pkg/unit"
 	twr "github.com/olekukonko/tablewriter"
 
-	"github.com/lack-io/cli"
+	"github.com/vine-io/cli"
 )
 
 func listService(c *cli.Context) error {

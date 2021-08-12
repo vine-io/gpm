@@ -28,9 +28,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/gpm2/gpm/pkg/runtime/client"
+	"github.com/vine-io/gpm/pkg/runtime/client"
 	json "github.com/json-iterator/go"
-	"github.com/lack-io/cli"
+	"github.com/vine-io/cli"
 	"github.com/lack-io/pkg/unit"
 	tw "github.com/olekukonko/tablewriter"
 	"gopkg.in/yaml.v3"

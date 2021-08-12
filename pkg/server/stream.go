@@ -23,8 +23,8 @@
 package server
 
 import (
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
+	pb "github.com/vine-io/gpm/proto/service/gpm/v1"
 )
 
 type simpleUpdateSelfStream struct {

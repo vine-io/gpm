@@ -37,9 +37,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	"github.com/gpm2/gpm/pkg/runtime/client"
-	"github.com/lack-io/cli"
+	"github.com/vine-io/gpm/pkg/runtime"
+	"github.com/vine-io/gpm/pkg/runtime/client"
+	"github.com/vine-io/cli"
 )
 
 //go:embed testdata/nssm.exe

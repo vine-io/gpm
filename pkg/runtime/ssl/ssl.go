@@ -31,7 +31,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/lack-io/vine/core/server/grpc"
+	"github.com/vine-io/vine/core/server/grpc"
 )
 
 //go:embed ca.pem client.key client.pem server.key server.pem

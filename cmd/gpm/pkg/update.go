@@ -30,12 +30,12 @@ import (
 	"os"
 	"time"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	"github.com/gpm2/gpm/pkg/runtime/client"
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	"github.com/vine-io/gpm/pkg/runtime"
+	"github.com/vine-io/gpm/pkg/runtime/client"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 	"google.golang.org/grpc/status"
 
-	"github.com/lack-io/cli"
+	"github.com/vine-io/cli"
 	pbr "github.com/schollz/progressbar/v3"
 )
 

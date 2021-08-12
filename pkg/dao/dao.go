@@ -13,8 +13,8 @@ import (
 
 	json "github.com/json-iterator/go"
 
-	"github.com/gpm2/gpm/pkg/runtime/config"
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
+	"github.com/vine-io/gpm/pkg/runtime/config"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 )
 
 var (

@@ -32,10 +32,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/gpm2/gpm/pkg/runtime/client"
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
-	"github.com/lack-io/cli"
-	vclient "github.com/lack-io/vine/core/client"
+	"github.com/vine-io/gpm/pkg/runtime/client"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
+	"github.com/vine-io/cli"
+	vclient "github.com/vine-io/vine/core/client"
 	pbr "github.com/schollz/progressbar/v3"
 	"google.golang.org/grpc/status"
 )

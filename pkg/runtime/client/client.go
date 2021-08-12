@@ -25,12 +25,12 @@ package client
 import (
 	"context"
 
-	"github.com/gpm2/gpm/pkg/runtime"
-	"github.com/gpm2/gpm/pkg/runtime/ssl"
-	gpmv1 "github.com/gpm2/gpm/proto/apis/gpm/v1"
-	pb "github.com/gpm2/gpm/proto/service/gpm/v1"
-	"github.com/lack-io/vine/core/client"
-	"github.com/lack-io/vine/core/client/grpc"
+	"github.com/vine-io/gpm/pkg/runtime"
+	"github.com/vine-io/gpm/pkg/runtime/ssl"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
+	pb "github.com/vine-io/gpm/proto/service/gpm/v1"
+	"github.com/vine-io/vine/core/client"
+	"github.com/vine-io/vine/core/client/grpc"
 )
 
 type SimpleClient struct {
