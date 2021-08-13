@@ -23,6 +23,7 @@
 package api
 
 import (
+	"fmt"
 	"io"
 	"mime"
 	"net/http"
@@ -32,16 +33,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/rakyll/statik/fs"
 	pbr "github.com/schollz/progressbar/v3"
-	"github.com/vine-io/gpm/pkg/runtime"
-	"github.com/vine-io/gpm/pkg/runtime/client"
-	"github.com/vine-io/gpm/pkg/runtime/config"
-	"github.com/vine-io/gpm/pkg/runtime/inject"
-	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 	"github.com/vine-io/vine"
 	vclient "github.com/vine-io/vine/core/client"
 	ahandler "github.com/vine-io/vine/lib/api/handler"
 	"github.com/vine-io/vine/lib/api/handler/openapi"
-	_ "github.com/vine-io/vine/lib/api/handler/openapi/statik"
 	arpc "github.com/vine-io/vine/lib/api/handler/rpc"
 	"github.com/vine-io/vine/lib/api/resolver"
 	"github.com/vine-io/vine/lib/api/resolver/grpc"
@@ -51,6 +46,14 @@ import (
 	httpapi "github.com/vine-io/vine/lib/api/server/http"
 	log "github.com/vine-io/vine/lib/logger"
 	"github.com/vine-io/vine/util/namespace"
+
+	"github.com/vine-io/gpm/pkg/runtime"
+	"github.com/vine-io/gpm/pkg/runtime/client"
+	"github.com/vine-io/gpm/pkg/runtime/config"
+	"github.com/vine-io/gpm/pkg/runtime/inject"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
+
+	_ "github.com/vine-io/vine/lib/api/handler/openapi/statik"
 )
 
 func init() {
