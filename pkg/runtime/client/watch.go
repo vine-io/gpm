@@ -195,16 +195,12 @@ func (s *PushStream) Send(in *gpmv1.PushIn) error {
 	return err
 }
 
-func (s *PushStream) Recv() (*gpmv1.PushResult, error) {
-	rsp, err := s.s.Recv()
-	if err != nil {
-		return nil, err
+func (s *PushStream) Wait() error {
+	if err := s.s.Send(&pb.PushReq{In: &gpmv1.PushIn{IsOk: true}}); err != nil {
+		return err
 	}
-	return rsp.Result, nil
-}
-
-func (s *PushStream) Close() error {
-	return s.s.Close()
+	_, err := s.s.Recv()
+	return err
 }
 
 type TerminalStream struct {

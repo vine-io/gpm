@@ -154,7 +154,7 @@ func (s *server) Pull(ctx context.Context, req *pb.PullReq, stream pb.GpmService
 }
 
 func (s *server) Push(ctx context.Context, stream pb.GpmService_PushStream) (err error) {
-	return s.H.Push(ctx, &simplePushStream{stream: stream})
+	return s.H.Push(ctx, &simplePushReader{stream: stream})
 }
 
 func (s *server) Exec(ctx context.Context, req *pb.ExecReq, rsp *pb.ExecRsp) (err error) {

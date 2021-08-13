@@ -268,15 +268,6 @@ func (m *PushIn) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
-func (m *PushResult) Validate() error {
-	return m.ValidateE("")
-}
-
-func (m *PushResult) ValidateE(prefix string) error {
-	errs := make([]error, 0)
-	return is.MargeErr(errs...)
-}
-
 func (m *TerminalIn) Validate() error {
 	return m.ValidateE("")
 }

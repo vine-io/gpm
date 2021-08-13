@@ -40,7 +40,7 @@ import (
 	verrs "github.com/vine-io/vine/proto/apis/errors"
 )
 
-func (g *gpm) UpdateSelf(ctx context.Context, stream Stream) error {
+func (g *gpm) UpdateSelf(ctx context.Context, stream IOStream) error {
 	var (
 		file *os.File
 		err  error

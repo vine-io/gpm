@@ -23,8 +23,6 @@
 package api
 
 import (
-	"errors"
-	"fmt"
 	"io"
 	"mime"
 	"net/http"
@@ -34,10 +32,16 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/rakyll/statik/fs"
 	pbr "github.com/schollz/progressbar/v3"
+	"github.com/vine-io/gpm/pkg/runtime"
+	"github.com/vine-io/gpm/pkg/runtime/client"
+	"github.com/vine-io/gpm/pkg/runtime/config"
+	"github.com/vine-io/gpm/pkg/runtime/inject"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 	"github.com/vine-io/vine"
 	vclient "github.com/vine-io/vine/core/client"
 	ahandler "github.com/vine-io/vine/lib/api/handler"
 	"github.com/vine-io/vine/lib/api/handler/openapi"
+	_ "github.com/vine-io/vine/lib/api/handler/openapi/statik"
 	arpc "github.com/vine-io/vine/lib/api/handler/rpc"
 	"github.com/vine-io/vine/lib/api/resolver"
 	"github.com/vine-io/vine/lib/api/resolver/grpc"
@@ -46,17 +50,7 @@ import (
 	apihttp "github.com/vine-io/vine/lib/api/server"
 	httpapi "github.com/vine-io/vine/lib/api/server/http"
 	log "github.com/vine-io/vine/lib/logger"
-	verrs "github.com/vine-io/vine/proto/apis/errors"
 	"github.com/vine-io/vine/util/namespace"
-	"google.golang.org/grpc/status"
-
-	"github.com/vine-io/gpm/pkg/runtime"
-	"github.com/vine-io/gpm/pkg/runtime/client"
-	"github.com/vine-io/gpm/pkg/runtime/config"
-	"github.com/vine-io/gpm/pkg/runtime/inject"
-	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
-
-	_ "github.com/vine-io/vine/lib/api/handler/openapi/statik"
 )
 
 func init() {
@@ -173,6 +167,7 @@ func (r *RestAPI) getEndpointsHandler() fiber.Handler {
 		})
 	}
 }
+
 func (r *RestAPI) pushHandler() fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
@@ -215,10 +210,6 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 		if err != nil {
 			return fiber.NewError(http.StatusBadGateway, "connect to gpm server: "+err.Error())
 		}
-		defer stream.Close()
-
-		done := make(chan struct{}, 1)
-		ech := make(chan error, 1)
 
 		outE := log.DefaultLogger.Options().Out
 		pb := pbr.NewOptions(int(file.Size),
@@ -230,53 +221,30 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 			}),
 		)
 
-		go func() {
-			buf := make([]byte, 1024*32)
-			for {
-				n, e := fd.Read(buf)
-				if e != nil && e != io.EOF {
-					ech <- fmt.Errorf("read file: %v", err)
-					return
-				}
-				if e == io.EOF {
-					in.IsOk = true
-				}
-				if n > 0 || in.IsOk {
-					_ = pb.Add(n)
-					in.Length = int64(n)
-					in.Chunk = buf[0:n]
-					_ = stream.Send(in)
-				}
-				if e == io.EOF {
-					log.Infof("push process finished")
-					break
+		buf := make([]byte, 1024*32)
+		for {
+			n, e := fd.Read(buf)
+			if e != nil && e != io.EOF {
+				return fiber.NewError(http.StatusInternalServerError, e.Error())
+			}
+
+			if n > 0 {
+				_ = pb.Add(n)
+				in.Length = int64(n)
+				in.Chunk = buf[0:n]
+				err = stream.Send(in)
+				if err != nil {
+					return fiber.NewError(http.StatusInternalServerError, err.Error())
 				}
 			}
-		}()
 
-		go func() {
-			for {
-				b, e := stream.Recv()
-				if e != nil && e != io.EOF {
-					ech <- errors.New(status.Convert(e).Message())
-					return
-				}
-
-				if b.Error != "" {
-					ech <- errors.New(verrs.Parse(b.Error).Detail)
-					return
-				}
-				if b.IsOk {
-					break
-				}
+			if e == io.EOF {
+				break
 			}
-			done <- struct{}{}
-		}()
+		}
 
-		select {
-		case e := <-ech:
-			return fiber.NewError(http.StatusInternalServerError, e.Error())
-		case <-done:
+		if err = stream.Wait(); err != nil {
+			return fiber.NewError(http.StatusInternalServerError, err.Error())
 		}
 
 		return c.JSON(fiber.Map{

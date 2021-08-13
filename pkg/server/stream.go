@@ -111,11 +111,11 @@ func (s *simplePullSender) Close() error {
 	return s.stream.Close()
 }
 
-type simplePushStream struct {
+type simplePushReader struct {
 	stream pb.GpmService_PushStream
 }
 
-func (s *simplePushStream) Recv() (interface{}, error) {
+func (s *simplePushReader) Recv() (interface{}, error) {
 	b, err := s.stream.Recv()
 	if err != nil {
 		return nil, err
@@ -123,11 +123,10 @@ func (s *simplePushStream) Recv() (interface{}, error) {
 	return b.In, nil
 }
 
-func (s *simplePushStream) Send(msg interface{}) error {
-	return s.stream.Send(&pb.PushRsp{Result: msg.(*gpmv1.PushResult)})
-}
-
-func (s *simplePushStream) Close() error {
+func (s *simplePushReader) Close() error {
+	if e := s.stream.Send(&pb.PushRsp{}); e != nil {
+		return e
+	}
 	return s.stream.Close()
 }
 

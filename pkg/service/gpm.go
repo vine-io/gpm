@@ -374,7 +374,7 @@ func (g *gpm) DeleteService(ctx context.Context, name string) (*gpmv1.Service, e
 	return s, err
 }
 
-func (g *gpm) WatchServiceLog(ctx context.Context, name string, number int64, follow bool, sender Sender) error {
+func (g *gpm) WatchServiceLog(ctx context.Context, name string, number int64, follow bool, sender IOWriter) error {
 	f := filepath.Join(g.Cfg.Root, "logs", name, name+".log")
 	stat, _ := os.Stat(f)
 	if stat == nil {

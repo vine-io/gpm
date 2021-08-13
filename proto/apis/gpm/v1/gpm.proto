@@ -229,11 +229,6 @@ message PushIn {
   bool isOk = 6;
 }
 
-message PushResult {
-  string error = 1;
-  bool isOk = 2;
-}
-
 message TerminalIn {
   // +gen:required
   string command = 1;

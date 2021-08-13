@@ -31,7 +31,7 @@ import (
 type Gpm interface {
 	Init() error
 	Info(context.Context) (*gpmv1.GpmInfo, error)
-	UpdateSelf(context.Context, Stream) error
+	UpdateSelf(context.Context, IOStream) error
 	ListService(context.Context) ([]*gpmv1.Service, int64, error)
 	GetService(context.Context, string) (*gpmv1.Service, error)
 	CreateService(context.Context, *gpmv1.ServiceSpec) (*gpmv1.Service, error)
@@ -40,26 +40,31 @@ type Gpm interface {
 	StopService(context.Context, string) (*gpmv1.Service, error)
 	RebootService(context.Context, string) (*gpmv1.Service, error)
 	DeleteService(context.Context, string) (*gpmv1.Service, error)
-	WatchServiceLog(context.Context, string, int64, bool, Sender) error
+	WatchServiceLog(context.Context, string, int64, bool, IOWriter) error
 
-	InstallService(context.Context, Stream) error
+	InstallService(context.Context, IOStream) error
 	ListServiceVersions(context.Context, string) ([]*gpmv1.ServiceVersion, error)
-	UpgradeService(context.Context, Stream) error
+	UpgradeService(context.Context, IOStream) error
 	RollbackService(context.Context, string, string) error
 
 	Ls(context.Context, string) ([]*gpmv1.FileInfo, error)
-	Pull(context.Context, string, bool, Sender) error
-	Push(context.Context, Stream) error
+	Pull(context.Context, string, bool, IOWriter) error
+	Push(context.Context, IOReader) error
 	Exec(context.Context, *gpmv1.ExecIn) (*gpmv1.ExecResult, error)
-	Terminal(context.Context, Stream) error
+	Terminal(context.Context, IOStream) error
 }
 
-type Sender interface {
+type IOWriter interface {
 	Send(interface{}) error
 	Close() error
 }
 
-type Stream interface {
+type IOReader interface {
+	Recv() (interface{}, error)
+	Close() error
+}
+
+type IOStream interface {
 	Recv() (interface{}, error)
 	Send(msg interface{}) error
 	Close() error
