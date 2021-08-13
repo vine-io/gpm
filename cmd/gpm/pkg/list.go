@@ -28,9 +28,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/vine-io/gpm/pkg/runtime/client"
 	"github.com/lack-io/pkg/unit"
 	twr "github.com/olekukonko/tablewriter"
+	"github.com/vine-io/gpm/pkg/runtime/client"
 
 	"github.com/vine-io/cli"
 )

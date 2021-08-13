@@ -36,14 +36,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/lack-io/pkg/unit"
+	"github.com/shirou/gopsutil/mem"
+	proc "github.com/shirou/gopsutil/process"
 	"github.com/vine-io/gpm/pkg/dao"
 	"github.com/vine-io/gpm/pkg/runtime/config"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
-	"github.com/lack-io/pkg/unit"
 	log "github.com/vine-io/vine/lib/logger"
-	"github.com/shirou/gopsutil/mem"
-	proc "github.com/shirou/gopsutil/process"
 )
 
 const timeFormat = "20060102150405"
@@ -95,6 +95,7 @@ func (p *Process) Start() (int32, error) {
 		if err != nil {
 			return 0, err
 		}
+		p.StartTimestamp = time.Now().Unix()
 	}
 	pid = int32(p.Pid)
 

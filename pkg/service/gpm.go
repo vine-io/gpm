@@ -31,16 +31,16 @@ import (
 	"sync"
 	"time"
 
+	"github.com/hpcloud/tail"
+	"github.com/shirou/gopsutil/mem"
+	proc "github.com/shirou/gopsutil/process"
 	"github.com/vine-io/gpm/pkg/dao"
 	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/gpm/pkg/runtime/config"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
-	"github.com/hpcloud/tail"
 	"github.com/vine-io/vine"
 	verrs "github.com/vine-io/vine/proto/apis/errors"
-	"github.com/shirou/gopsutil/mem"
-	proc "github.com/shirou/gopsutil/process"
 )
 
 func init() {
@@ -280,7 +280,6 @@ func (g *gpm) startService(ctx context.Context, p *Process) (*gpmv1.Service, err
 	} else {
 		s.Pid = int64(pid)
 		s.Status = gpmv1.StatusRunning
-		s.StartTimestamp = now.Unix()
 	}
 
 	var e error
