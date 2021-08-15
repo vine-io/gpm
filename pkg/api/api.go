@@ -44,12 +44,12 @@ import (
 	regRouter "github.com/vine-io/vine/lib/api/router/registry"
 	apihttp "github.com/vine-io/vine/lib/api/server"
 	httpapi "github.com/vine-io/vine/lib/api/server/http"
+	"github.com/vine-io/vine/lib/config"
 	log "github.com/vine-io/vine/lib/logger"
 	"github.com/vine-io/vine/util/namespace"
 
 	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/gpm/pkg/runtime/client"
-	"github.com/vine-io/gpm/pkg/runtime/config"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 
@@ -69,7 +69,7 @@ const (
 type RestAPI struct {
 	S vine.Service `inject:""`
 
-	Cfg *config.Config `inject:""`
+	Cfg config.Config `inject:""`
 
 	apihttp.Server
 
@@ -80,7 +80,7 @@ func (r *RestAPI) Init(opts ...apihttp.Option) error {
 	// create the router
 	app := fiber.New(fiber.Config{DisableStartupMessage: true})
 
-	if r.Cfg.EnableOpenAPI {
+	if r.Cfg.Get("enable", "openapi").Bool(false) {
 		openAPI := openapi.New(r.S)
 		_ = mime.AddExtensionType(".svg", "image/svg+xml")
 		sfs, err := fs.New()
@@ -121,7 +121,7 @@ func (r *RestAPI) Init(opts ...apihttp.Option) error {
 	)
 
 	app.Group(APIPath, rp.Handle)
-	api := httpapi.NewServer(r.Cfg.APIAddress)
+	api := httpapi.NewServer(r.Cfg.Get("api", "address").String(""))
 	if err := api.Init(opts...); err != nil {
 		return err
 	}

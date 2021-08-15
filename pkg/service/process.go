@@ -40,9 +40,9 @@ import (
 	"github.com/shirou/gopsutil/mem"
 	proc "github.com/shirou/gopsutil/process"
 	"github.com/vine-io/gpm/pkg/dao"
-	"github.com/vine-io/gpm/pkg/runtime/config"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
+	"github.com/vine-io/vine/lib/config"
 	log "github.com/vine-io/vine/lib/logger"
 )
 
@@ -57,7 +57,7 @@ type Process struct {
 
 	pr *proc.Process
 
-	cfg *config.Config
+	cfg config.Config
 	db  *dao.DB
 
 	lw io.WriteCloser
@@ -68,7 +68,7 @@ type Process struct {
 func NewProcess(in *gpmv1.Service) *Process {
 	process := &Process{
 		Service: in,
-		cfg:     &config.Config{},
+		cfg:     config.DefaultConfig,
 		db:      &dao.DB{},
 		done:    make(chan struct{}, 1),
 	}
@@ -131,7 +131,7 @@ func (p *Process) run() (int32, error) {
 		injectSysProcAttr(cmd, p.SysProcAttr)
 	}
 
-	root := filepath.Join(p.cfg.Root, "logs", p.Name)
+	root := filepath.Join(p.cfg.Get("root").String(""), "logs", p.Name)
 	_ = os.MkdirAll(root, 0o777)
 
 	flog := filepath.Join(root, p.Name+".log")
@@ -211,7 +211,7 @@ func (p *Process) rotating() {
 			now := time.Now()
 			param := p.Log
 			// 日志目录
-			root := filepath.Join(p.cfg.Root, "logs", p.Name)
+			root := filepath.Join(p.cfg.Get("root").String(""), "logs", p.Name)
 			// 当前日志文件
 			plog := filepath.Join(root, p.Name+".log")
 
