@@ -52,7 +52,7 @@ var _ Gpm = (*gpm)(nil)
 type gpm struct {
 	vine.Service `inject:""`
 
-	DB  *dao.DB        `inject:""`
+	DB *dao.DB `inject:""`
 
 	up time.Time
 	sync.RWMutex

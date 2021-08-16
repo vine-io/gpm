@@ -58,7 +58,7 @@ var (
 	EnableOpenAPI = true
 	EnableLog     = false
 	Address       = ":7700"
-	ROOT          = ""
+	ROOT          = "/opt/gpm"
 
 	flags = []cli.Flag{
 		&cli.StringFlag{
@@ -66,6 +66,7 @@ var (
 			Usage:       "the root directory of gpmd",
 			EnvVars:     []string{"VINE_ROOT"},
 			Destination: &ROOT,
+			Value:       ROOT,
 		},
 		&cli.BoolFlag{
 			Name:        "enable-log",
