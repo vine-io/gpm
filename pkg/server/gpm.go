@@ -45,7 +45,7 @@ import (
 	vserver "github.com/vine-io/vine/core/server"
 	grpcServer "github.com/vine-io/vine/core/server/grpc"
 	apihttp "github.com/vine-io/vine/lib/api/server"
-	memCfg "github.com/vine-io/vine/lib/config/memory"
+	"github.com/vine-io/vine/lib/config"
 	"github.com/vine-io/vine/lib/config/source"
 	ccli "github.com/vine-io/vine/lib/config/source/cli"
 	log "github.com/vine-io/vine/lib/logger"
@@ -189,13 +189,8 @@ func (s *server) Init() error {
 
 	aopts = append(aopts, apihttp.EnableCORS(true))
 
-	cfg := memCfg.NewConfig()
-	if err = cfg.Load(clisrc); err != nil {
+	if err = config.Load(clisrc); err != nil {
 		log.Fatal(err)
-	}
-
-	if err = inject.Provide(cfg); err != nil {
-		return err
 	}
 
 	db := new(dao.DB)

@@ -69,8 +69,6 @@ const (
 type RestAPI struct {
 	S vine.Service `inject:""`
 
-	Cfg config.Config `inject:""`
-
 	apihttp.Server
 
 	app *fiber.App
@@ -80,7 +78,7 @@ func (r *RestAPI) Init(opts ...apihttp.Option) error {
 	// create the router
 	app := fiber.New(fiber.Config{DisableStartupMessage: true})
 
-	if r.Cfg.Get("enable", "openapi").Bool(false) {
+	if config.Get("enable", "openapi").Bool(false) {
 		openAPI := openapi.New(r.S)
 		_ = mime.AddExtensionType(".svg", "image/svg+xml")
 		sfs, err := fs.New()
@@ -121,7 +119,7 @@ func (r *RestAPI) Init(opts ...apihttp.Option) error {
 	)
 
 	app.Group(APIPath, rp.Handle)
-	api := httpapi.NewServer(r.Cfg.Get("api", "address").String(""))
+	api := httpapi.NewServer(config.Get("api", "address").String(""))
 	if err := api.Init(opts...); err != nil {
 		return err
 	}

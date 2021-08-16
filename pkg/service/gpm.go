@@ -52,7 +52,6 @@ var _ Gpm = (*gpm)(nil)
 type gpm struct {
 	vine.Service `inject:""`
 
-	Cfg config.Config `inject:""`
 	DB  *dao.DB        `inject:""`
 
 	up time.Time
@@ -63,7 +62,7 @@ type gpm struct {
 func (g *gpm) Init() error {
 	var err error
 
-	if err = os.MkdirAll(filepath.Join(g.Cfg.Get("root").String(""), "services"), 0o777); err != nil {
+	if err = os.MkdirAll(filepath.Join(config.Get("root").String(""), "services"), 0o777); err != nil {
 		return err
 	}
 	ctx := context.Background()
@@ -375,7 +374,7 @@ func (g *gpm) DeleteService(ctx context.Context, name string) (*gpmv1.Service, e
 }
 
 func (g *gpm) WatchServiceLog(ctx context.Context, name string, number int64, follow bool, sender IOWriter) error {
-	f := filepath.Join(g.Cfg.Get("root").String(""), "logs", name, name+".log")
+	f := filepath.Join(config.Get("root").String(""), "logs", name, name+".log")
 	stat, _ := os.Stat(f)
 	if stat == nil {
 		return verrs.NotFound(g.Name(), "service '%s' log not exists", name)

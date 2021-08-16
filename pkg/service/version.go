@@ -35,6 +35,7 @@ import (
 	"time"
 
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
+	"github.com/vine-io/vine/lib/config"
 	log "github.com/vine-io/vine/lib/logger"
 	verrs "github.com/vine-io/vine/proto/apis/errors"
 )
@@ -74,8 +75,8 @@ func (g *gpm) InstallService(ctx context.Context, stream IOStream) error {
 				return verrs.Conflict(g.Name(), "service '%s' already exists", spec.Name)
 			}
 
-			_ = os.MkdirAll(filepath.Join(g.Cfg.Get("root").String(""), "packages", spec.Name), 0o755)
-			dst = filepath.Join(g.Cfg.Get("root").String(""), "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
+			_ = os.MkdirAll(filepath.Join(config.Get("root").String(""), "packages", spec.Name), 0o755)
+			dst = filepath.Join(config.Get("root").String(""), "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
 			file, err = os.Create(dst)
 			if err != nil {
 				return err
@@ -208,8 +209,8 @@ func (g *gpm) UpgradeService(ctx context.Context, stream IOStream) error {
 				return verrs.Conflict(g.Name(), "version %s already exists", version)
 			}
 
-			_ = os.MkdirAll(filepath.Join(g.Cfg.Get("root").String(""), "packages", name), 0o755)
-			dst = filepath.Join(g.Cfg.Get("root").String(""), "packages", name, name+"-"+version+".tar.gz")
+			_ = os.MkdirAll(filepath.Join(config.Get("root").String(""), "packages", name), 0o755)
+			dst = filepath.Join(config.Get("root").String(""), "packages", name, name+"-"+version+".tar.gz")
 			log.Infof("save package: %v", dst)
 			file, err = os.Create(dst)
 			if err != nil {
@@ -300,7 +301,7 @@ CHUNKED:
 
 	vf := version + "@" + time.Now().Format("20060102150405")
 	log.Infof("service %s append version %s", service.Name, version)
-	_ = ioutil.WriteFile(filepath.Join(g.Cfg.Get("root").String(""), "services", name, "versions", vf), []byte(""), 0o777)
+	_ = ioutil.WriteFile(filepath.Join(config.Get("root").String(""), "services", name, "versions", vf), []byte(""), 0o777)
 
 	service.Version = version
 	g.DB.UpdateService(ctx, service)
