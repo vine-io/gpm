@@ -13,6 +13,7 @@ import (
 
 	json "github.com/json-iterator/go"
 	"github.com/vine-io/vine/lib/config"
+	"gopkg.in/yaml.v3"
 
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 )
@@ -22,7 +23,7 @@ var (
 	ErrNotFound = errors.New("resource not found")
 )
 
-type DB struct {}
+type DB struct{}
 
 func (db *DB) FindAllServices(ctx context.Context) ([]*gpmv1.Service, error) {
 	var (
@@ -41,10 +42,14 @@ func (db *DB) FindAllServices(ctx context.Context) ([]*gpmv1.Service, error) {
 				return nil
 			}
 
-			sf := filepath.Join(path, d.Name()+".json")
+			sf := filepath.Join(path, d.Name()+".yml")
 			stat, _ := os.Stat(sf)
 			if stat == nil {
-				return nil
+				sf = filepath.Join(path, d.Name()+".json")
+				stat, _ = os.Stat(sf)
+				if stat == nil {
+					return nil
+				}
 			}
 
 			b, err := ioutil.ReadFile(sf)
@@ -52,9 +57,18 @@ func (db *DB) FindAllServices(ctx context.Context) ([]*gpmv1.Service, error) {
 				return nil
 			}
 			s := new(gpmv1.Service)
-			err = json.Unmarshal(b, &s)
-			if err != nil {
-				return nil
+
+			switch filepath.Ext(sf) {
+			case ".yml":
+				err = yaml.Unmarshal(b, &s)
+				if err != nil {
+					return nil
+				}
+			case ".json":
+				err = json.Unmarshal(b, &s)
+				if err != nil {
+					return nil
+				}
 			}
 
 			outs = append(outs, s)
@@ -86,11 +100,15 @@ func (db *DB) FindService(ctx context.Context, name string) (*gpmv1.Service, err
 	)
 
 	go func() {
-		f := filepath.Join(config.Get("root").String(""), "services", name, name+".json")
+		f := filepath.Join(config.Get("root").String(""), "services", name, name+".yml")
 		stat, _ := os.Stat(f)
 		if stat == nil {
-			ech <- fmt.Errorf("%w: service '%s'", ErrNotFound, name)
-			return
+			f = filepath.Join(config.Get("root").String(""), "services", name, name+".json")
+			stat, _ = os.Stat(f)
+			if stat == nil {
+				ech <- fmt.Errorf("%w: service '%s'", ErrNotFound, name)
+				return
+			}
 		}
 
 		b, err := ioutil.ReadFile(f)
@@ -98,9 +116,18 @@ func (db *DB) FindService(ctx context.Context, name string) (*gpmv1.Service, err
 			ech <- err
 			return
 		}
-		if err = json.Unmarshal(b, &out); err != nil {
-			ech <- err
-			return
+
+		switch filepath.Ext(f) {
+		case ".json":
+			if err = json.Unmarshal(b, &out); err != nil {
+				ech <- err
+				return
+			}
+		case ".yml":
+			if err = yaml.Unmarshal(b, &out); err != nil {
+				ech <- err
+				return
+			}
 		}
 
 		done <- struct{}{}
@@ -182,12 +209,12 @@ func (db *DB) CreateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 		version := s.Version + "@" + time.Now().Format("20060102150405")
 		_ = ioutil.WriteFile(filepath.Join(config.Get("root").String(""), "services", s.Name, "versions", version), []byte(""), 0o777)
 
-		b, err := json.Marshal(s)
+		b, err := yaml.Marshal(s)
 		if err != nil {
 			ech <- err
 			return
 		}
-		f := filepath.Join(config.Get("root").String(""), "services", s.Name, s.Name+".json")
+		f := filepath.Join(config.Get("root").String(""), "services", s.Name, s.Name+".yml")
 		if err = ioutil.WriteFile(f, b, 0o777); err != nil {
 			ech <- err
 			return
@@ -215,12 +242,12 @@ func (db *DB) UpdateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 	)
 
 	go func() {
-		b, err := json.Marshal(s)
+		b, err := yaml.Marshal(s)
 		if err != nil {
 			ech <- err
 			return
 		}
-		f := filepath.Join(config.Get("root").String(""), "services", s.Name, s.Name+".json")
+		f := filepath.Join(config.Get("root").String(""), "services", s.Name, s.Name+".yml")
 		if err = ioutil.WriteFile(f, b, 0o777); err != nil {
 			ech <- err
 			return
