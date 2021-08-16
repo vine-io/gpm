@@ -35,8 +35,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/cli"
+	"github.com/vine-io/gpm/pkg/runtime"
 )
 
 //go:embed testdata/gpmd
@@ -49,9 +49,9 @@ const (
 )
 
 var gpmdTmp = `#! /bin/bash
-# =======================
+# ===========================
 # start gpmd process by gpm
-# =======================
+# ===========================
 
 gpm run --server-address=0.0.0.0:7700 --enable-log
 `

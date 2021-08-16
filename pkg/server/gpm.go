@@ -190,7 +190,7 @@ func (s *server) Init() error {
 	aopts = append(aopts, apihttp.EnableCORS(true))
 
 	cfg := memCfg.NewConfig()
-	if err := cfg.Load(clisrc); err != nil {
+	if err = cfg.Load(clisrc); err != nil {
 		log.Fatal(err)
 	}
 
