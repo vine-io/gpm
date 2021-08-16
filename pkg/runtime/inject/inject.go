@@ -23,7 +23,7 @@
 package inject
 
 import (
-	"github.com/lack-io/pkg/inject"
+	"github.com/vine-io/pkg/inject"
 	log "github.com/vine-io/vine/lib/logger"
 )
 

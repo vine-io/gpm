@@ -11,8 +11,8 @@ require (
 	github.com/google/uuid v1.2.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/json-iterator/go v1.1.11
-	github.com/lack-io/pkg/inject v0.2.0
-	github.com/lack-io/pkg/unit v0.2.0
+	github.com/vine-io/pkg/inject v0.1.0
+	github.com/vine-io/pkg/unit v0.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/rakyll/statik v0.1.7
 	github.com/schollz/progressbar/v3 v3.8.2
