@@ -53,7 +53,7 @@ var gpmdTmp = `#! /bin/bash
 # start gpmd process by gpm
 # ===========================
 
-gpm run --server-address=0.0.0.0:7700 --enable-log
+gpm run --args '--server-address=0.0.0.0:7700' --args '--enable-log'
 `
 
 func deploy(c *cli.Context) error {
