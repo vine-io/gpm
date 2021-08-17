@@ -20,7 +20,7 @@ pb = "github.com/vine-io/gpm/proto/apis/gpm/v1/gpm.proto"
 type = "api"
 group = "gpm"
 version = "v1"
-plugins = ["gogo", "validator", "dao", "deepcopy"]
+plugins = ["gogo", "validator", "deepcopy"]
 
 [[proto]]
 name = "gpm"
