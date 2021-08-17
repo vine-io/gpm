@@ -28,9 +28,9 @@ import (
 	"sort"
 	"time"
 
+	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/cmd/gpm/pkg"
 	"github.com/vine-io/gpm/pkg/runtime"
-	"github.com/vine-io/cli"
 	verrs "github.com/vine-io/vine/proto/apis/errors"
 )
 

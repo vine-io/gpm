@@ -28,11 +28,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/olekukonko/tablewriter"
+	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/pkg/runtime/client"
 	"github.com/vine-io/pkg/unit"
-	"github.com/olekukonko/tablewriter"
-
-	"github.com/vine-io/cli"
 )
 
 func lsBash(c *cli.Context) error {

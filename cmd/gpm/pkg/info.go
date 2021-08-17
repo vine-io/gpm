@@ -28,11 +28,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/vine-io/gpm/pkg/runtime/client"
 	json "github.com/json-iterator/go"
-	"github.com/vine-io/cli"
-	"github.com/vine-io/pkg/unit"
 	tw "github.com/olekukonko/tablewriter"
+	"github.com/vine-io/cli"
+	"github.com/vine-io/gpm/pkg/runtime/client"
+	"github.com/vine-io/pkg/unit"
 	"gopkg.in/yaml.v3"
 )
 
@@ -65,7 +65,7 @@ func infoService(c *cli.Context) error {
 			t.Append([]string{"CPU", fmt.Sprintf("%.2f%%", s.Stat.CpuPercent)})
 			t.Append([]string{"Memory", fmt.Sprintf("%s/%.1f%%", unit.ConvAuto(int64(s.Stat.Memory), 2), s.Stat.MemPercent)})
 		}
-		t.Append([]string{"UpTime", (time.Duration(s.UpTime)*time.Second).String()})
+		t.Append([]string{"UpTime", (time.Duration(s.UpTime) * time.Second).String()})
 		t.SetColumnColor(tw.Colors{tw.Bold}, tw.Colors{})
 		t.Render()
 	case "json":

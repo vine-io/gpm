@@ -28,9 +28,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/pkg/runtime/client"
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
-	"github.com/vine-io/cli"
 )
 
 func editService(c *cli.Context) error {

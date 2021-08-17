@@ -27,8 +27,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vine-io/gpm/pkg/runtime/client"
 	"github.com/vine-io/cli"
+	"github.com/vine-io/gpm/pkg/runtime/client"
 )
 
 func stopService(c *cli.Context) error {

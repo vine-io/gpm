@@ -29,8 +29,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/vine-io/gpm/pkg/runtime/client"
 	"github.com/vine-io/cli"
+	"github.com/vine-io/gpm/pkg/runtime/client"
 	"google.golang.org/grpc/status"
 )
 

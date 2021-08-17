@@ -28,10 +28,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/vine-io/gpm/pkg/runtime/client"
 	"github.com/olekukonko/tablewriter"
-
 	"github.com/vine-io/cli"
+	"github.com/vine-io/gpm/pkg/runtime/client"
 )
 
 func versionService(c *cli.Context) error {

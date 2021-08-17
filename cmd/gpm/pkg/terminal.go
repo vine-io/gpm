@@ -30,10 +30,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/vine-io/gpm/pkg/runtime/client"
-	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 	"github.com/vine-io/cli"
 	"google.golang.org/grpc/status"
+
+	"github.com/vine-io/gpm/pkg/runtime/client"
+	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
 )
 
 type Sender struct {

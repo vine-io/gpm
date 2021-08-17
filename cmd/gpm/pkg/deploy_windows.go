@@ -37,9 +37,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/gpm/pkg/runtime/client"
-	"github.com/vine-io/cli"
 )
 
 //go:embed testdata/nssm.exe
@@ -100,7 +100,7 @@ func deploy(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("create gpm link: %v", err)
 	}
-	if filepath.Base(link) != "gpm" + "-" +runtime.GitTag+".exe" {
+	if filepath.Base(link) != "gpm"+"-"+runtime.GitTag+".exe" {
 		os.Remove(link)
 		fmt.Fprintf(outE, "remove old version: %v\n", link)
 	}
@@ -123,13 +123,13 @@ func deploy(c *cli.Context) error {
 	if err != nil {
 		return fmt.Errorf("create gpmd link: %v", err)
 	}
-	if filepath.Base(link) != "gpmd" + "-" +runtime.GitTag+".exe" {
+	if filepath.Base(link) != "gpmd"+"-"+runtime.GitTag+".exe" {
 		os.Remove(link)
 		fmt.Fprintf(outE, "remove old version: %v\n", link)
 	}
 
 	// 安装 nssm.exe
-	stat, _ := os.Stat(root+"\\bin\\nssm.exe")
+	stat, _ := os.Stat(root + "\\bin\\nssm.exe")
 	if stat == nil {
 		buf, err = f.ReadFile("testdata/nssm.exe")
 		if err != nil {

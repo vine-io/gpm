@@ -36,12 +36,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/vine-io/pkg/unit"
 	"github.com/shirou/gopsutil/mem"
 	proc "github.com/shirou/gopsutil/process"
 	"github.com/vine-io/gpm/pkg/dao"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
+	"github.com/vine-io/pkg/unit"
 	"github.com/vine-io/vine/lib/config"
 	log "github.com/vine-io/vine/lib/logger"
 )
@@ -57,7 +57,7 @@ type Process struct {
 
 	pr *proc.Process
 
-	db  *dao.DB
+	db *dao.DB
 
 	lw io.WriteCloser
 
