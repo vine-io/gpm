@@ -110,14 +110,16 @@ func (p *Process) Start() (int32, error) {
 }
 
 func (p *Process) run() (int32, error) {
+	log.Infof("process command: %s %s", p.Bin, strings.Join(p.Args, " "))
 	cmd := exec.Command(p.Bin, p.Args...)
 
+	cmd.Env = os.Environ()
 	if p.Env != nil {
 		env := make([]string, 0)
 		for k, v := range p.Env {
 			env = append(env, fmt.Sprintf("%s=%s", k, v))
 		}
-		cmd.Env = env
+		cmd.Env = append(cmd.Env, env...)
 	}
 
 	if p.Dir != "" {

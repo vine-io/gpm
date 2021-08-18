@@ -11,6 +11,14 @@ build-tag:
 	sed -i "" "s/BuildDate  = ".*"/BuildDate  = \"$(BUILD_DATE)\"/g" pkg/runtime/doc.go
 
 install:
+	go install github.com/vine-io/vine/cmd/vine
+	go install github.com/vine-io/vine/cmd/protoc-gen-gogo
+	go install github.com/vine-io/vine/cmd/protoc-gen-vine
+	go install github.com/vine-io/vine/cmd/protoc-gen-deepcopy
+	go install github.com/vine-io/vine/cmd/protoc-gen-validator
+	go install github.com/vine-io/vine/cmd/protoc-gen-dao
+
+vendor:
 	go mod vendor
 
 build-darwin:
@@ -44,4 +52,4 @@ tar: build
 clean:
 	rm -fr vendor
 
-.PHONY: build-tag install build-darwin build-windows build-linux build tar clean
+.PHONY: build-tag vendor install build-darwin build-windows build-linux build tar clean
