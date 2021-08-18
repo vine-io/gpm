@@ -19,8 +19,8 @@ require (
 	github.com/shirou/gopsutil v3.21.6+incompatible
 	github.com/tklauser/go-sysconf v0.3.7 // indirect
 	github.com/vine-io/cli v1.3.0
-	github.com/vine-io/plugins/logger/zap v0.20.15
-	github.com/vine-io/vine v0.20.15
+	github.com/vine-io/plugins/logger/zap v0.22.0
+	github.com/vine-io/vine v0.22.0
 	google.golang.org/grpc v1.38.0
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b

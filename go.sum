@@ -168,6 +168,7 @@ github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N
 github.com/olekukonko/tablewriter v0.0.5/go.mod h1:hPp6KlRPjbx+hW8ykQs1w3UBbZlj6HuIJcUGPhkA7kY=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c h1:rp5dCmg/yLR3mgFuSOe4oEnDDmGLROTvMragMUXpTQw=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
+github.com/patrickmn/go-cache v2.1.0+incompatible h1:HRMgzkcYKYpi3C8ajMPV8OFXaaRUnok+kx1WdO15EQc=
 github.com/patrickmn/go-cache v2.1.0+incompatible/go.mod h1:3Qf8kWWT7OJRJbdiICTKqZju1ZixQ/KpMGzzAfe6+WQ=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
@@ -242,8 +243,12 @@ github.com/vine-io/pkg/unit v0.1.0 h1:SlvVbSnDovLTsVzb4ikJEJf8oaxLX3Bjyq+QACLUlV
 github.com/vine-io/pkg/unit v0.1.0/go.mod h1:nyfkjNg2pEYlP7CxfexM1dpUuqGhDxBidLu6gJCkHPE=
 github.com/vine-io/plugins/logger/zap v0.20.15 h1:QGwnLs3UCKrPBWuYdPdnzhNTKS4cGJ2dSx6xrafPs5w=
 github.com/vine-io/plugins/logger/zap v0.20.15/go.mod h1:l5mZqC9gnDrSLS1f3cIHBrNlwgQzRtEeIzTpZg+z/fY=
+github.com/vine-io/plugins/logger/zap v0.22.0 h1:wnVUjz0icq9BmWanoYZVGZtYr53ThdO6v4okq7t/SsA=
+github.com/vine-io/plugins/logger/zap v0.22.0/go.mod h1:kdvg7ZdfvY9thyKV5t2bFbjGtAN2NgASgZug87mCfPo=
 github.com/vine-io/vine v0.20.15 h1:uAUbqEUwIAkaFEK1CwjRRu1f2UeCNIygHZmFpAyxgNY=
 github.com/vine-io/vine v0.20.15/go.mod h1:Z7q+qTgVKc96vSsL7XfxUFXMMdWI30kXt7P9auLkDLM=
+github.com/vine-io/vine v0.22.0 h1:jIRPVVt3PpzisRk2KN4kTjkjRsLEpBjd4fbMfScmJa4=
+github.com/vine-io/vine v0.22.0/go.mod h1:Z7q+qTgVKc96vSsL7XfxUFXMMdWI30kXt7P9auLkDLM=
 github.com/xanzy/ssh-agent v0.2.1/go.mod h1:mLlQY/MoOhWBj+gOGMQkOeiEvkx+8pJSI+0Bx9h2kr4=
 github.com/xlab/treeprint v1.0.0/go.mod h1:IoImgRak9i3zJyuxOKUP1v4UZd1tMoKkq/Cimt1uhCg=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
