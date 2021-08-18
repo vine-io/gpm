@@ -31,7 +31,6 @@ import (
 	gruntime "runtime"
 	"time"
 
-	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/pkg/api"
 	"github.com/vine-io/gpm/pkg/dao"
 	"github.com/vine-io/gpm/pkg/runtime"
@@ -39,6 +38,8 @@ import (
 	"github.com/vine-io/gpm/pkg/runtime/ssl"
 	"github.com/vine-io/gpm/pkg/service"
 	pb "github.com/vine-io/gpm/proto/service/gpm/v1"
+
+	"github.com/vine-io/cli"
 	"github.com/vine-io/plugins/logger/zap"
 	"github.com/vine-io/vine"
 	grpcClient "github.com/vine-io/vine/core/client/grpc"
