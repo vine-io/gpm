@@ -25,16 +25,13 @@ package api
 import (
 	"fmt"
 	"io"
-	"mime"
 	"net/http"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	"github.com/rakyll/statik/fs"
 	pbr "github.com/schollz/progressbar/v3"
-	"github.com/vine-io/vine"
 	vclient "github.com/vine-io/vine/core/client"
+	"github.com/vine-io/vine/core/registry"
 	ahandler "github.com/vine-io/vine/lib/api/handler"
 	"github.com/vine-io/vine/lib/api/handler/openapi"
 	arpc "github.com/vine-io/vine/lib/api/handler/rpc"
@@ -67,8 +64,6 @@ const (
 )
 
 type RestAPI struct {
-	S vine.Service `inject:""`
-
 	apihttp.Server
 
 	app *fiber.App
@@ -79,18 +74,7 @@ func (r *RestAPI) Init(opts ...apihttp.Option) error {
 	app := fiber.New(fiber.Config{DisableStartupMessage: true})
 
 	if config.Get("enable", "openapi").Bool(false) {
-		openAPI := openapi.New(r.S)
-		_ = mime.AddExtensionType(".svg", "image/svg+xml")
-		sfs, err := fs.New()
-		if err != nil {
-			log.Fatalf("Starting OpenAPI: %v", err)
-		}
-		prefix := "/openapi-ui/"
-		app.All(prefix, openAPI.OpenAPIHandler)
-		app.Use(prefix, filesystem.New(filesystem.Config{Root: sfs}))
-		app.Get("/openapi.json", openAPI.OpenAPIJOSNHandler)
-		app.Get("/services", openAPI.OpenAPIServiceHandler)
-		log.Infof("Starting OpenAPI at %v", prefix)
+		openapi.RegisterOpenAPI(app)
 	}
 
 	// TODO: more api
@@ -110,12 +94,12 @@ func (r *RestAPI) Init(opts ...apihttp.Option) error {
 	rt := regRouter.NewRouter(
 		router.WithHandler(arpc.Handler),
 		router.WithResolver(rr),
-		router.WithRegistry(r.S.Options().Registry),
+		router.WithRegistry(registry.DefaultRegistry),
 	)
 	rp := arpc.NewHandler(
 		ahandler.WithNamespace(runtime.Namespace),
 		ahandler.WithRouter(rt),
-		ahandler.WithClient(r.S.Client()),
+		ahandler.WithClient(vclient.DefaultClient),
 	)
 
 	app.Group(APIPath, rp.Handle)
@@ -140,7 +124,7 @@ func (r *RestAPI) getEndpointsHandler() fiber.Handler {
 
 		endpoints := make([]map[string]string, 0)
 		keys := make(map[string]struct{}, 0)
-		list, _ := r.S.Options().Registry.GetService(runtime.GpmName)
+		list, _ := registry.GetService(runtime.GpmName)
 		for _, item := range list {
 			for _, e := range item.Endpoints {
 				if _, ok := keys[e.Name]; ok {
