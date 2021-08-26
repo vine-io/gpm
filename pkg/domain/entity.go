@@ -20,21 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package pkg
+package domain
 
-import (
-	"github.com/vine-io/gpm/pkg/interfaces"
-	log "github.com/vine-io/vine/lib/logger"
-)
+type IOWriter interface {
+	Send(interface{}) error
+	Close() error
+}
 
-func Run() {
-	app := interfaces.New()
+type IOReader interface {
+	Recv() (interface{}, error)
+	Close() error
+}
 
-	if err := app.Init(); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := app.Run(); err != nil {
-		log.Fatal(err)
-	}
+type IOStream interface {
+	Recv() (interface{}, error)
+	Send(msg interface{}) error
+	Close() error
 }

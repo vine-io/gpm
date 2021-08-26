@@ -25,10 +25,10 @@ package client
 import (
 	"context"
 
+	pb "github.com/vine-io/gpm/api/service/gpm/v1"
+	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/gpm/pkg/runtime/ssl"
-	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
-	pb "github.com/vine-io/gpm/proto/service/gpm/v1"
 	"github.com/vine-io/vine/core/client"
 	"github.com/vine-io/vine/core/client/grpc"
 )

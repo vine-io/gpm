@@ -25,8 +25,8 @@ package client
 import (
 	"context"
 
-	gpmv1 "github.com/vine-io/gpm/proto/apis/gpm/v1"
-	pb "github.com/vine-io/gpm/proto/service/gpm/v1"
+	pb "github.com/vine-io/gpm/api/service/gpm/v1"
+	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 )
 
 type UpdateStream struct {

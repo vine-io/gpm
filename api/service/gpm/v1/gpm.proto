@@ -1,0 +1,243 @@
+syntax = "proto3";
+
+package gpmv1;
+
+option go_package = "github.com/vine-io/gpm/api/service/gpm/v1;gpmv1";
+
+import "github.com/vine-io/gpm/api/types/gpm/v1/gpm.proto";
+
+// +gen:openapi
+service GpmService {
+  // gpm 检测 gpm 服务状态
+  rpc Healthz(Empty) returns (Empty);
+  // gpm 升级
+  rpc UpdateSelf(stream UpdateSelfReq) returns (stream UpdateSelfRsp);
+  // +gen:summary=gpm 信息
+  // +gen:get=/api/v1/info
+  rpc Info(InfoReq) returns (InfoRsp);
+  // +gen:summary=查询所有服务
+  // +gen:get=/api/v1/Service
+  rpc ListService(ListServiceReq) returns (ListServiceRsp);
+  // +gen:summary=查询单个服务
+  // +gen:get=/api/v1/Service/{name}
+  rpc GetService(GetServiceReq) returns (GetServiceRsp);
+  // +gen:summary=新建服务
+  // +gen:post=/api/v1/Service
+  rpc CreateService(CreateServiceReq) returns (CreateServiceRsp);
+  // +gen:summary=修改服务信息
+  // +gen:patch=/api/v1/Service/{name}
+  rpc EditService(EditServiceReq) returns (EditServiceRsp);
+  // +gen:summary=启动服务
+  // +gen:patch=/api/v1/Service/{name}/action/start
+  rpc StartService(StartServiceReq) returns (StartServiceRsp);
+  // +gen:summary=停止服务
+  // +gen:patch=/api/v1/Service/{name}/action/stop
+  rpc StopService(StopServiceReq) returns (StopServiceRsp);
+  // +gen:summary=重启服务
+  // +gen:patch=/api/v1/Service/{name}/action/reboot
+  rpc RebootService(RebootServiceReq) returns (RebootServiceRsp);
+  // +gen:summary=删除服务
+  // +gen:delete=/api/v1/Service/{name}
+  rpc DeleteService(DeleteServiceReq) returns (DeleteServiceRsp);
+
+  // 动态监听服务日志
+  rpc WatchServiceLog(WatchServiceLogReq) returns (stream WatchServiceLogRsp);
+
+  // 远程安装服务
+  rpc InstallService(stream InstallServiceReq) returns (stream InstallServiceRsp);
+  // +gen:summary=查看服务历史版本
+  // +gen:get=/api/v1/Service/{name}/versions
+  rpc ListServiceVersions(ListServiceVersionsReq) returns (ListServiceVersionsRsp);
+  // 升级服务
+  rpc UpgradeService(stream UpgradeServiceReq) returns (stream UpgradeServiceRsp);
+  // +gen:summary=回滚服务
+  // +gen:post=/api/v1/Service/{name}/rollback
+  rpc RollBackService(RollbackServiceReq) returns (RollbackServiceRsp);
+
+  // +gen:summary=获取目录信息下文件列表
+  // +gen:get=/api/v1/Action/ls
+  rpc Ls(LsReq) returns (LsRsp);
+  // 拉取文件
+  rpc Pull(PullReq) returns (stream PullRsp);
+  // 推送文件
+  rpc Push(stream PushReq) returns (stream PushRsp);
+  // +gen:summary=远程执行命令
+  // +gen:post=/api/v1/Action/exec
+  rpc Exec(ExecReq) returns (ExecRsp);
+  // 远程命令行交互
+  rpc Terminal(stream TerminalReq) returns (stream TerminalRsp);
+}
+
+message Empty {}
+
+message UpdateSelfReq {
+  gpmv1.UpdateIn in = 1;
+}
+
+message UpdateSelfRsp {
+  gpmv1.UpdateResult result = 2;
+}
+
+message InfoReq {}
+
+message InfoRsp {
+  gpmv1.GpmInfo gpm = 1;
+}
+
+message ListServiceReq {}
+
+message ListServiceRsp {
+  repeated gpmv1.Service services = 1;
+  int64 total = 2;
+}
+
+message GetServiceReq {
+  // 服务名称
+  // +gen:required
+  string name = 1;
+}
+
+message GetServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message CreateServiceReq {
+  // +gen:required
+  gpmv1.ServiceSpec spec = 1;
+}
+
+message CreateServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message EditServiceReq {
+  string name = 1;
+  // +gen:required
+  gpmv1.EditServiceSpec spec = 2;
+}
+
+message EditServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message StartServiceReq {
+  // +gen:required
+  string name = 1;
+}
+
+message StartServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message StopServiceReq {
+  // +gen:required
+  string name = 1;
+}
+
+message StopServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message RebootServiceReq {
+  // +gen:required
+  string name = 1;
+}
+
+message RebootServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message DeleteServiceReq {
+  // +gen:required
+  string name = 1;
+}
+
+message DeleteServiceRsp {
+  gpmv1.Service service = 1;
+}
+
+message WatchServiceLogReq {
+  // +gen:required
+  string name = 1;
+  int64 number = 2;
+  bool follow = 3;
+}
+
+message WatchServiceLogRsp {
+  gpmv1.ServiceLog log = 1;
+}
+
+message InstallServiceReq {
+  gpmv1.InstallServiceIn in = 1;
+}
+
+message InstallServiceRsp {
+  gpmv1.InstallServiceResult result = 1;
+}
+
+message ListServiceVersionsReq {
+  // +gen:required
+  string name = 1;
+}
+
+message ListServiceVersionsRsp {
+  repeated gpmv1.ServiceVersion versions = 1;
+}
+
+message UpgradeServiceReq {
+  gpmv1.UpgradeServiceIn in = 1;
+}
+
+message UpgradeServiceRsp {
+  gpmv1.UpgradeServiceResult result = 1;
+}
+
+message RollbackServiceReq {
+  // +gen:required
+  string name = 1;
+  string revision = 2;
+}
+
+message RollbackServiceRsp {}
+
+message LsReq {
+  // +gen:required
+  string path = 1;
+}
+
+message LsRsp {
+  repeated gpmv1.FileInfo files = 1;
+}
+
+message PullReq {
+  string name = 1;
+  bool dir = 2;
+}
+
+message PullRsp {
+  gpmv1.PullResult result = 1;
+}
+
+message PushReq {
+  gpmv1.PushIn in = 1;
+}
+
+message PushRsp {}
+
+message ExecReq {
+  // +gen:required
+  gpmv1.ExecIn in = 1;
+}
+
+message ExecRsp {
+  gpmv1.ExecResult result = 1;
+}
+
+message TerminalReq {
+  // +gen:required
+  gpmv1.TerminalIn in = 1;
+}
+
+message TerminalRsp {
+  gpmv1.TerminalResult result = 2;
+}

@@ -16,7 +16,7 @@ flags = [
 
 [[proto]]
 name = "gpm"
-pb = "github.com/vine-io/gpm/proto/apis/gpm/v1/gpm.proto"
+pb = "github.com/vine-io/gpm/api/types/gpm/v1/gpm.proto"
 type = "api"
 group = "gpm"
 version = "v1"
@@ -24,7 +24,7 @@ plugins = ["gogo", "validator", "deepcopy"]
 
 [[proto]]
 name = "gpm"
-pb = "github.com/vine-io/gpm/proto/service/gpm/v1/gpm.proto"
+pb = "github.com/vine-io/gpm/api/service/gpm/v1/gpm.proto"
 type = "service"
 group = "gpm"
 version = "v1"
