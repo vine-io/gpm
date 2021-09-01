@@ -26,7 +26,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"io/fs"
 	"io/ioutil"
 	"os"
@@ -58,8 +57,6 @@ type Process struct {
 	pr *proc.Process
 
 	db *repo.DB
-
-	lw io.WriteCloser
 
 	done chan struct{}
 }
@@ -136,14 +133,13 @@ func (p *Process) run() (int32, error) {
 	flog := filepath.Join(root, p.Name+".log")
 	_ = os.Rename(flog, filepath.Join(root, fmt.Sprintf("%s.log-%s", p.Name, time.Now().Format(timeFormat))))
 
-	var err error
-	p.lw, err = os.OpenFile(flog, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0o777)
+	lw, err := os.OpenFile(flog, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0o777)
 	if err != nil {
 		return 0, err
 	}
 
-	cmd.Stdout = p.lw
-	cmd.Stderr = p.lw
+	cmd.Stdout = lw
+	cmd.Stderr = lw
 
 	err = cmd.Start()
 	if err != nil {
@@ -157,9 +153,9 @@ func (p *Process) run() (int32, error) {
 			break
 		}
 		time.Sleep(time.Millisecond * 300)
-		p.lw.Close()
 	}
 
+	_ = lw.Close()
 	p.pr, _ = proc.NewProcess(int32(pr.Pid))
 	p.Pid = int64(pr.Pid)
 	return p.pr.Pid, nil
@@ -167,7 +163,7 @@ func (p *Process) run() (int32, error) {
 
 func (p *Process) watching() {
 	log.Infof("start service %s(%d) watching", p.Name, p.Pid)
-	timer := time.NewTicker(time.Second * 2)
+	timer := time.NewTicker(time.Second * 5)
 	defer timer.Stop()
 	for {
 		select {
@@ -285,9 +281,6 @@ func (p *Process) kill() error {
 	p.Pid = 0
 	p.pr = nil
 
-	if p.lw != nil {
-		return p.lw.Close()
-	}
 	return nil
 }
 
@@ -315,9 +308,6 @@ func (p *Process) stop() error {
 	p.Pid = 0
 	p.pr = nil
 
-	if p.lw != nil {
-		return p.lw.Close()
-	}
 	return nil
 }
 
