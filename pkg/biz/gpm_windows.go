@@ -20,15 +20,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// +build linux
+// +build windows
 
-package domain
+package biz
 
 import (
 	"os"
 	"os/exec"
-	"os/user"
-	"strconv"
 	"strings"
 	"syscall"
 
@@ -36,64 +34,13 @@ import (
 )
 
 func fillService(service *gpmv1.Service) error {
-	fn := func(attr *gpmv1.SysProcAttr) {
-		u, err := user.Current()
-		if err == nil {
-			User, _ := user.LookupId(u.Uid)
-			Group, _ := user.LookupGroupId(u.Gid)
-			attr.User = User.Name
-			attr.Group = Group.Name
-			uid, _ := strconv.ParseInt(u.Uid, 10, 64)
-			gid, _ := strconv.ParseInt(Group.Gid, 10, 64)
-			attr.Uid = int32(uid)
-			attr.Gid = int32(gid)
-		}
-	}
-
-	attr := service.SysProcAttr
-	if attr == nil {
-		attr = &gpmv1.SysProcAttr{}
-		fn(attr)
-	} else {
-		if attr.User == "" || attr.Group == "" {
-			fn(attr)
-		}
-	}
-
-	if attr.Uid == 0 {
-		u, err := user.Lookup(attr.User)
-		if err != nil {
-			return err
-		}
-		uid, _ := strconv.ParseInt(u.Uid, 10, 64)
-		attr.Uid = int32(uid)
-	}
-	if attr.Gid == 0 {
-		group, err := user.LookupGroup(attr.Group)
-		if err != nil {
-			return err
-		}
-
-		gid, _ := strconv.ParseInt(group.Gid, 10, 64)
-		attr.Gid = int32(gid)
-	}
 
 	return nil
 }
 
 func injectSysProcAttr(cmd *exec.Cmd, attr *gpmv1.SysProcAttr) {
 	sysAttr := &syscall.SysProcAttr{
-		Setpgid: true,
-	}
-
-	if attr != nil {
-		sysAttr.Credential = &syscall.Credential{
-			Uid: uint32(attr.Uid),
-			Gid: uint32(attr.Gid),
-		}
-		if attr.Chroot != "" {
-			sysAttr.Chroot = attr.Chroot
-		}
+		HideWindow: true,
 	}
 
 	cmd.SysProcAttr = sysAttr
@@ -102,18 +49,7 @@ func injectSysProcAttr(cmd *exec.Cmd, attr *gpmv1.SysProcAttr) {
 func execSysProcAttr(cmd *exec.Cmd, in *gpmv1.ExecIn) {
 
 	sysAttr := &syscall.SysProcAttr{
-		Setpgid: true,
-	}
-
-	u, _ := user.Lookup(in.User)
-	group, _ := user.LookupGroup(in.Group)
-	if u != nil && group != nil {
-		uid, _ := strconv.ParseInt(u.Uid, 10, 64)
-		gid, _ := strconv.ParseInt(group.Gid, 10, 64)
-		sysAttr.Credential = &syscall.Credential{
-			Uid: uint32(uid),
-			Gid: uint32(gid),
-		}
+		HideWindow: true,
 	}
 
 	cmd.Env = os.Environ()
@@ -126,32 +62,18 @@ func execSysProcAttr(cmd *exec.Cmd, in *gpmv1.ExecIn) {
 
 func adminCmd(cmd *exec.Cmd) {
 	sysAttr := &syscall.SysProcAttr{
-		Setpgid: true,
-		Credential: &syscall.Credential{
-			Uid: 0,
-			Gid: 0,
-		},
+		HideWindow: true,
 	}
+
 	cmd.Env = os.Environ()
 	cmd.SysProcAttr = sysAttr
 }
 
 func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
-	cmd := exec.Command("/bin/bash")
+	cmd := exec.Command("powershell.exe")
 
 	sysAttr := &syscall.SysProcAttr{
-		Setpgid: true,
-	}
-
-	u, _ := user.Lookup(in.User)
-	group, _ := user.LookupGroup(in.Group)
-	if u != nil && group != nil {
-		uid, _ := strconv.ParseInt(u.Uid, 10, 64)
-		gid, _ := strconv.ParseInt(group.Gid, 10, 64)
-		sysAttr.Credential = &syscall.Credential{
-			Uid: uint32(uid),
-			Gid: uint32(gid),
-		}
+		HideWindow: true,
 	}
 
 	cmd.SysProcAttr = sysAttr
@@ -168,5 +90,5 @@ func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
 }
 
 func beauty(b []byte) string {
-	return strings.TrimSuffix(string(b), "\n")
+	return strings.TrimSuffix(string(b), "\r\n")
 }

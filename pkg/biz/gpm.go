@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package domain
+package biz
 
 import (
 	"context"
@@ -40,7 +40,7 @@ import (
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	"github.com/vine-io/vine"
 	"github.com/vine-io/vine/lib/config"
-	verrs "github.com/vine-io/vine/proto/apis/errors"
+	verrs "github.com/vine-io/vine/lib/errors"
 )
 
 func init() {
@@ -404,6 +404,7 @@ func (g *manager) TailLog(ctx context.Context, name string, number int64, follow
 	for {
 		select {
 		case <-ctx.Done():
+			t.Stop()
 			return nil
 		case line, ok := <-t.Lines:
 			if !ok {

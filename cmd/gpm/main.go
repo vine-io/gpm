@@ -31,7 +31,7 @@ import (
 	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/cmd/gpm/pkg"
 	"github.com/vine-io/gpm/pkg/runtime"
-	verrs "github.com/vine-io/vine/proto/apis/errors"
+	verrs "github.com/vine-io/vine/lib/errors"
 )
 
 func main() {

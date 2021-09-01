@@ -193,7 +193,7 @@ func DeployCmd() *cli.Command {
 			},
 			&cli.StringSliceFlag{
 				Name:    "args",
-				Aliases: []string{"-A"},
+				Aliases: []string{"A"},
 				Usage:   "the specify args for gpmd",
 			},
 		},
@@ -238,7 +238,7 @@ func RunCmd() *cli.Command {
 		Flags: []cli.Flag{
 			&cli.StringSliceFlag{
 				Name:    "args",
-				Aliases: []string{"-A"},
+				Aliases: []string{"A"},
 				Usage:   "the specify args for gpmd",
 			},
 		},

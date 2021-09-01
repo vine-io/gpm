@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package domain
+package biz
 
 import (
 	"bytes"
@@ -36,8 +36,8 @@ import (
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	"github.com/vine-io/vine"
+	verrs "github.com/vine-io/vine/lib/errors"
 	log "github.com/vine-io/vine/lib/logger"
-	verrs "github.com/vine-io/vine/proto/apis/errors"
 )
 
 func init() {

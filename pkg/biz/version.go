@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package domain
+package biz
 
 import (
 	"archive/tar"
@@ -37,7 +37,7 @@ import (
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/vine/lib/config"
 	log "github.com/vine-io/vine/lib/logger"
-	verrs "github.com/vine-io/vine/proto/apis/errors"
+	verrs "github.com/vine-io/vine/lib/errors"
 )
 
 func (g *manager) Install(ctx context.Context, stream IOStream) error {

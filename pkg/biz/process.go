@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package domain
+package biz
 
 import (
 	"context"
@@ -157,6 +157,7 @@ func (p *Process) run() (int32, error) {
 			break
 		}
 		time.Sleep(time.Millisecond * 300)
+		p.lw.Close()
 	}
 
 	p.pr, _ = proc.NewProcess(int32(pr.Pid))

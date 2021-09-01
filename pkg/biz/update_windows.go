@@ -22,7 +22,7 @@
 
 // +build windows
 
-package domain
+package biz
 
 import (
 	"context"
@@ -38,7 +38,7 @@ import (
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/vine/lib/config"
 	log "github.com/vine-io/vine/lib/logger"
-	verrs "github.com/vine-io/vine/proto/apis/errors"
+	verrs "github.com/vine-io/vine/lib/errors"
 )
 
 func (g *manager) Update(ctx context.Context, stream IOStream) error {

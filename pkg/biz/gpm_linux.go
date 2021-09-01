@@ -20,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// +build darwin
+// +build linux
 
-package domain
+package biz
 
 import (
 	"os"
@@ -35,8 +35,7 @@ import (
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 )
 
-func fillService(s *gpmv1.Service) error {
-
+func fillService(service *gpmv1.Service) error {
 	fn := func(attr *gpmv1.SysProcAttr) {
 		u, err := user.Current()
 		if err == nil {
@@ -51,7 +50,7 @@ func fillService(s *gpmv1.Service) error {
 		}
 	}
 
-	attr := s.SysProcAttr
+	attr := service.SysProcAttr
 	if attr == nil {
 		attr = &gpmv1.SysProcAttr{}
 		fn(attr)
@@ -78,15 +77,13 @@ func fillService(s *gpmv1.Service) error {
 		gid, _ := strconv.ParseInt(group.Gid, 10, 64)
 		attr.Gid = int32(gid)
 	}
-	s.SysProcAttr = attr
 
 	return nil
 }
 
 func injectSysProcAttr(cmd *exec.Cmd, attr *gpmv1.SysProcAttr) {
 	sysAttr := &syscall.SysProcAttr{
-		Setpgid:    true,
-		Foreground: true,
+		Setpgid: true,
 	}
 
 	if attr != nil {

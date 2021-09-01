@@ -26,7 +26,7 @@ import (
 	"context"
 
 	pb "github.com/vine-io/gpm/api/service/gpm/v1"
-	verrs "github.com/vine-io/vine/proto/apis/errors"
+	verrs "github.com/vine-io/vine/lib/errors"
 )
 
 func (s *GpmAPI) Healthz(ctx context.Context, _ *pb.Empty, rsp *pb.Empty) error {

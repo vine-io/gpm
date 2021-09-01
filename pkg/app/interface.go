@@ -26,13 +26,13 @@ import (
 	"context"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
-	"github.com/vine-io/gpm/pkg/domain"
+	"github.com/vine-io/gpm/pkg/biz"
 )
 
 type GpmApp interface {
 	Init() error
 	Info(context.Context) (*gpmv1.GpmInfo, error)
-	UpdateSelf(context.Context, domain.IOStream) error
+	UpdateSelf(context.Context, biz.IOStream) error
 	ListService(context.Context) ([]*gpmv1.Service, int64, error)
 	GetService(context.Context, string) (*gpmv1.Service, error)
 	CreateService(context.Context, *gpmv1.ServiceSpec) (*gpmv1.Service, error)
@@ -41,18 +41,18 @@ type GpmApp interface {
 	StopService(context.Context, string) (*gpmv1.Service, error)
 	RebootService(context.Context, string) (*gpmv1.Service, error)
 	DeleteService(context.Context, string) (*gpmv1.Service, error)
-	WatchServiceLog(context.Context, string, int64, bool, domain.IOWriter) error
+	WatchServiceLog(context.Context, string, int64, bool, biz.IOWriter) error
 
-	InstallService(context.Context, domain.IOStream) error
+	InstallService(context.Context, biz.IOStream) error
 	ListServiceVersions(context.Context, string) ([]*gpmv1.ServiceVersion, error)
-	UpgradeService(context.Context, domain.IOStream) error
+	UpgradeService(context.Context, biz.IOStream) error
 	RollbackService(context.Context, string, string) error
 
 	Ls(context.Context, string) ([]*gpmv1.FileInfo, error)
-	Pull(context.Context, string, bool, domain.IOWriter) error
-	Push(context.Context, domain.IOReader) error
+	Pull(context.Context, string, bool, biz.IOWriter) error
+	Push(context.Context, biz.IOReader) error
 	Exec(context.Context, *gpmv1.ExecIn) (*gpmv1.ExecResult, error)
-	Terminal(context.Context, domain.IOStream) error
+	Terminal(context.Context, biz.IOStream) error
 }
 
 

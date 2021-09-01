@@ -26,7 +26,7 @@ import (
 	"context"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
-	"github.com/vine-io/gpm/pkg/domain"
+	"github.com/vine-io/gpm/pkg/biz"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 )
 
@@ -37,8 +37,8 @@ func init() {
 var _ GpmApp = (*gpmApp)(nil)
 
 type gpmApp struct {
-	G domain.Manager `inject:""`
-	T domain.FTP     `inject:""`
+	G biz.Manager `inject:""`
+	T biz.FTP     `inject:""`
 }
 
 func (g *gpmApp) Init() error {
@@ -49,7 +49,7 @@ func (g *gpmApp) Info(ctx context.Context) (*gpmv1.GpmInfo, error) {
 	return g.G.Info(ctx)
 }
 
-func (g *gpmApp) UpdateSelf(ctx context.Context, stream domain.IOStream) error {
+func (g *gpmApp) UpdateSelf(ctx context.Context, stream biz.IOStream) error {
 	return g.G.Update(ctx, stream)
 }
 
@@ -85,11 +85,11 @@ func (g *gpmApp) DeleteService(ctx context.Context, name string) (*gpmv1.Service
 	return g.G.Delete(ctx, name)
 }
 
-func (g *gpmApp) WatchServiceLog(ctx context.Context, name string, number int64, follow bool, sender domain.IOWriter) error {
+func (g *gpmApp) WatchServiceLog(ctx context.Context, name string, number int64, follow bool, sender biz.IOWriter) error {
 	return g.G.TailLog(ctx, name, number, follow, sender)
 }
 
-func (g *gpmApp) InstallService(ctx context.Context, stream domain.IOStream) error {
+func (g *gpmApp) InstallService(ctx context.Context, stream biz.IOStream) error {
 	return g.G.Install(ctx, stream)
 }
 
@@ -97,7 +97,7 @@ func (g *gpmApp) ListServiceVersions(ctx context.Context, name string) ([]*gpmv1
 	return g.G.ListVersions(ctx, name)
 }
 
-func (g *gpmApp) UpgradeService(ctx context.Context, stream domain.IOStream) error {
+func (g *gpmApp) UpgradeService(ctx context.Context, stream biz.IOStream) error {
 	return g.G.Upgrade(ctx, stream)
 }
 
@@ -109,11 +109,11 @@ func (g *gpmApp) Ls(ctx context.Context, root string) ([]*gpmv1.FileInfo, error)
 	return g.T.List(ctx, root)
 }
 
-func (g *gpmApp) Pull(ctx context.Context, name string, isDir bool, sender domain.IOWriter) error {
+func (g *gpmApp) Pull(ctx context.Context, name string, isDir bool, sender biz.IOWriter) error {
 	return g.T.Pull(ctx, name, isDir, sender)
 }
 
-func (g *gpmApp) Push(ctx context.Context, stream domain.IOReader) error {
+func (g *gpmApp) Push(ctx context.Context, stream biz.IOReader) error {
 	return g.T.Push(ctx, stream)
 }
 
@@ -121,6 +121,6 @@ func (g *gpmApp) Exec(ctx context.Context, in *gpmv1.ExecIn) (*gpmv1.ExecResult,
 	return g.T.Exec(ctx, in)
 }
 
-func (g *gpmApp) Terminal(ctx context.Context, stream domain.IOStream) error {
+func (g *gpmApp) Terminal(ctx context.Context, stream biz.IOStream) error {
 	return g.T.Terminal(ctx, stream)
 }
