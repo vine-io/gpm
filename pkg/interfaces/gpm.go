@@ -38,6 +38,7 @@ import (
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	"github.com/vine-io/gpm/pkg/runtime/ssl"
 	"github.com/vine-io/plugins/logger/zap"
+	"github.com/vine-io/vine/core/registry/memory"
 	"github.com/vine-io/vine/lib/config"
 
 	"github.com/vine-io/cli"
@@ -136,7 +137,9 @@ func (s *GpmAPI) Init() error {
 
 	var clisrc source.Source
 
+	memReg := memory.NewRegistry()
 	opts := []vine.Option{
+		vine.Registry(memReg),
 		vine.Name(runtime.GpmName),
 		vine.Id(runtime.GpmId),
 		vine.Version(runtime.GetVersion()),
