@@ -37,16 +37,16 @@ import (
 	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	"github.com/vine-io/gpm/pkg/runtime/ssl"
-	"github.com/vine-io/plugins/logger/zap"
-	"github.com/vine-io/vine/core/registry/memory"
-	"github.com/vine-io/vine/lib/config"
 
 	"github.com/vine-io/cli"
+	"github.com/vine-io/plugins/logger/zap"
 	"github.com/vine-io/vine"
 	grpcClient "github.com/vine-io/vine/core/client/grpc"
+	"github.com/vine-io/vine/core/registry/memory"
 	vserver "github.com/vine-io/vine/core/server"
 	grpcServer "github.com/vine-io/vine/core/server/grpc"
 	apihttp "github.com/vine-io/vine/lib/api/server"
+	"github.com/vine-io/vine/lib/config"
 	"github.com/vine-io/vine/lib/config/source"
 	ccli "github.com/vine-io/vine/lib/config/source/cli"
 	log "github.com/vine-io/vine/lib/logger"
@@ -137,9 +137,8 @@ func (s *GpmAPI) Init() error {
 
 	var clisrc source.Source
 
-	memReg := memory.NewRegistry()
 	opts := []vine.Option{
-		vine.Registry(memReg),
+		vine.Registry(memory.NewRegistry()),
 		vine.Name(runtime.GpmName),
 		vine.Id(runtime.GpmId),
 		vine.Version(runtime.GetVersion()),
