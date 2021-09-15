@@ -131,6 +131,8 @@ compress /opt/test/pp/bin
 compress /opt/test/pp/bin/test
 tar /tmp/test.tar.gz successfully
 ```
+> 推荐先 cd 到指定目录的上级目标，再执行 tar 子命令。
+
 安装服务 
 ```shell
 $ gpm --host 192.168.1.10:7700 install --package /tmp/test.tar.gz --name test --dir /opt/test --bin /opt/test/bin/test --auto-restart --version v1.0.0
