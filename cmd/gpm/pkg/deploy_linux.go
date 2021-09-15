@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//go:build linux
 // +build linux
 
 package pkg
@@ -174,6 +175,9 @@ func run(c *cli.Context) error {
 
 	outE := os.Stdout
 	args := c.StringSlice("args")
+	if len(args) == 0 {
+		args = append(args, "--server-address=0.0.0.0:7700", "--enable-log")
+	}
 	cmd := exec.Command("gpmd", args...)
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("gpmd start: %v", err)

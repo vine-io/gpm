@@ -36,8 +36,8 @@ import (
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/vine/lib/config"
-	log "github.com/vine-io/vine/lib/logger"
 	verrs "github.com/vine-io/vine/lib/errors"
+	log "github.com/vine-io/vine/lib/logger"
 )
 
 func (g *manager) Install(ctx context.Context, stream IOStream) error {
@@ -129,9 +129,9 @@ CHUNKED:
 			}
 		}
 		if hdr.FileInfo().IsDir() {
-			_ = os.MkdirAll(filepath.Join(dir, hdr.Name), os.ModePerm)
+			_ = os.MkdirAll(filepath.Join(dir, "..", hdr.Name), os.ModePerm)
 		} else {
-			fname := filepath.Join(dir, hdr.Name)
+			fname := filepath.Join(dir, "..", hdr.Name)
 			f, e1 := createFile(fname)
 			if e1 != nil {
 				return e1
