@@ -213,7 +213,7 @@ func run(c *cli.Context) error {
 	}
 	bb.WriteString(fmt.Sprintf("\r\n\r\n%s\\bin\\nssm.exe remove gpmd confirm\r\n", root))
 	bb.WriteString(nssmShell)
-	startBat := filepath.Join(os.TempDir(), "start.bat")
+	startBat := filepath.Join(root, "start.bat")
 	defer os.Remove(startBat)
 	_ = ioutil.WriteFile(startBat, bb.Bytes(), 0o777)
 	_, err := exec.Command("cmd", "/C", startBat).CombinedOutput()

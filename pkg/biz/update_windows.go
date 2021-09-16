@@ -37,8 +37,8 @@ import (
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/vine/lib/config"
-	log "github.com/vine-io/vine/lib/logger"
 	verrs "github.com/vine-io/vine/lib/errors"
+	log "github.com/vine-io/vine/lib/logger"
 )
 
 func (g *manager) Update(ctx context.Context, stream IOStream) error {
@@ -98,7 +98,7 @@ EXIT:
 	_ = file.Close()
 
 	go func() {
-		args := []string{"deploy", "--run", "--args", fmt.Sprintf(`"--server-address=%s"`, config.Get("server", "address").String(""))}
+		args := []string{"deploy", "--run", "--args", fmt.Sprintf(`"--server-address=%s"`, config.Get("server", "address").String("0.0.0.0:7700"))}
 		if config.Get("enable", "log").Bool(false) {
 			args = append(args, fmt.Sprintf(`--args "--enable-log"`))
 		}
