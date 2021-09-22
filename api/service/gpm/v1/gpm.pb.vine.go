@@ -964,6 +964,9 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Type:   "integer",
 							Format: "int32",
 						},
+						"headerTrimPrefix": &registry.Schema{
+							Type: "string",
+						},
 					},
 					Required: []string{"name", "bin", "version"},
 				},

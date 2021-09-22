@@ -128,10 +128,14 @@ CHUNKED:
 				return e
 			}
 		}
+		hname := hdr.Name
+		if spec.HeaderTrimPrefix != "" {
+			hname = strings.TrimPrefix(hname, spec.HeaderTrimPrefix)
+		}
+		fname := filepath.Join(dir, hname)
 		if hdr.FileInfo().IsDir() {
-			_ = os.MkdirAll(filepath.Join(dir, "..", hdr.Name), os.ModePerm)
+			_ = os.MkdirAll(fname, os.ModePerm)
 		} else {
-			fname := filepath.Join(dir, "..", hdr.Name)
 			f, e1 := createFile(fname)
 			if e1 != nil {
 				return e1

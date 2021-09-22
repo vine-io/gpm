@@ -76,6 +76,10 @@ message ServiceSpec {
   string version = 8;
   // 是否自启动, 默认为 false
   int32 autoRestart = 9;
+  // tar 头部路径
+  // headerTrimPrefix 不为空时, 解压 tar 包时，内部文件的路径会发生变化
+  // 如 dir=/opt/test/a, hdr=b/bin/test, headerTrimPrefix=b, test 文件的路径为 /opt/test/a/bin/test
+  string headerTrimPrefix = 10;
 }
 
 message EditServiceSpec {

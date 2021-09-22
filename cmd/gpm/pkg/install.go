@@ -57,6 +57,7 @@ func installService(c *cli.Context) error {
 	spec.Bin = c.String("bin")
 	spec.Args = c.StringSlice("args")
 	spec.Dir = c.String("dir")
+	spec.HeaderTrimPrefix = c.String("header-prefix")
 	env := c.StringSlice("env")
 	spec.SysProcAttr.User = c.String("user")
 	spec.SysProcAttr.Group = c.String("group")
@@ -231,6 +232,11 @@ func InstallServiceCmd() *cli.Command {
 				Name:  "auto-restart",
 				Usage: "Whether auto restart service when it crashing",
 				Value: true,
+			},
+			&cli.StringFlag{
+				Name:  "header-prefix",
+				Usage: "specify the version for gzip header",
+				Value: "",
 			},
 		},
 	}
