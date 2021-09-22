@@ -47,14 +47,57 @@ const (
 	gpm           = "/usr/local/sbin/gpm"
 	gpmd          = "/usr/local/sbin/gpmd"
 	autoStartFile = "/etc/rc.d/init.d/gpmd"
+	gpmdConf      = "/etc/gpm/gpmd.conf"
 )
 
-var gpmdTmp = `#! /bin/bash
-# ===========================
-# start gpmd process by gpm
-# ===========================
+var gpmdTmp = `#!/bin/bash
+# chkconfig: - 30 21
+# description: gpmd service.
+# Source Function Library
+# gpmd Settings
 
-gpm run --args '--server-address=0.0.0.0:7700' --args '--enable-log'
+CONF=$(cat /etc/gpm/gpmd.conf)
+RETVAL=0
+prog="gpmd"
+
+start() {
+     echo -n $"Starting $prog: "
+     /usr/local/sbin/gpm run $CONF
+     RETVAL=$?
+     echo
+     return $RETVAL
+}
+
+stop() {
+     echo -n $"Stopping $prog: "
+     ps aux | grep "gpmd" | grep -v "grep" | awk -F' ' '{print $2}' |xargs kill -9 
+     RETVAL=$?
+     echo
+     return $RETVAL
+ }
+
+restart(){
+     stop
+     start
+}
+
+
+case "$1" in
+ start)
+     start
+     ;;
+ stop)
+     stop
+     ;;
+ restart)
+     restart
+     ;;
+ *)
+     echo $"Usage: $0 {start|stop|restart}"
+     RETVAL=1
+ esac
+
+ exit $RETVAL
 `
 
 func deploy(c *cli.Context) error {
@@ -146,6 +189,9 @@ func deploy(c *cli.Context) error {
 		fmt.Fprintf(outE, "start gpmd successfully!\n")
 	}
 
+	_ = os.MkdirAll("/etc/gpm", 0o755)
+	text := `--args "--server-address=0.0.0.0:7700" --args "--enable-log"`
+	ioutil.WriteFile(gpmdConf, []byte(text), 0o755)
 	_ = ioutil.WriteFile(autoStartFile, []byte(gpmdTmp), 0o777)
 
 	fmt.Fprintf(outE, "install gpm successfully!\n")
@@ -185,12 +231,11 @@ func run(c *cli.Context) error {
 
 	stat, _ := os.Stat(autoStartFile)
 	if stat != nil {
-		text := "gpm run "
+		text := ""
 		for _, arg := range args {
 			text += fmt.Sprintf(`--args "%s" `, arg)
 		}
-		shell := fmt.Sprintf(`sed -i s'/gpm run.*/%s/' %s`, text, autoStartFile)
-		exec.Command("/bin/bash", "-c", shell).CombinedOutput()
+		ioutil.WriteFile(gpmdConf, []byte(text), 0o755)
 	}
 
 	fmt.Fprintf(outE, "start gpmd successfully!\n")

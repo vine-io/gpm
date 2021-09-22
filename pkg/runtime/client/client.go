@@ -35,8 +35,6 @@ import (
 
 type SimpleClient struct {
 	cc pb.GpmService
-
-	addr string
 }
 
 func New() *SimpleClient {
