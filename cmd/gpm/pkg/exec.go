@@ -31,6 +31,7 @@ import (
 	"github.com/vine-io/cli"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/runtime/client"
+	verrs "github.com/vine-io/vine/lib/errors"
 )
 
 func execBash(c *cli.Context) error {
@@ -63,7 +64,7 @@ func execBash(c *cli.Context) error {
 
 	result, err := cc.Exec(ctx, in, opts...)
 	if err != nil {
-		return err
+		return fmt.Errorf("%v", verrs.FromErr(err).Detail)
 	}
 
 	fmt.Fprintln(outE, result.Result)
