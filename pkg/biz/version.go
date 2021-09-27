@@ -30,6 +30,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 	"time"
@@ -372,7 +373,17 @@ func (g *manager) Rollback(ctx context.Context, name string, version string) err
 }
 
 func createFile(name string) (*os.File, error) {
-	err := os.MkdirAll(string([]rune(name)[0:strings.LastIndex(name, "/")]), 0o755)
+	lIndex := 0
+	switch runtime.GOOS {
+	case "windows":
+		lIndex = strings.LastIndex(name, "\\")
+	default:
+		lIndex = strings.LastIndex(name, "/")
+	}
+	if lIndex == -1 {
+		lIndex = len(name)
+	}
+	err := os.MkdirAll(string([]rune(name)[0:lIndex]), 0o755)
 	if err != nil {
 		return nil, err
 	}

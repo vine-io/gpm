@@ -31,6 +31,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"syscall"
 	"time"
@@ -299,7 +300,11 @@ func (p *Process) stop() error {
 	if err != nil {
 		return err
 	}
-	err = pr.Signal(syscall.SIGINT)
+	if runtime.GOOS == "windows" {
+		err = pr.Kill()
+	} else {
+		err = pr.Signal(syscall.SIGINT)
+	}
 	if err != nil {
 		return err
 	}
