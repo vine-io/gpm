@@ -21,11 +21,17 @@ install:
 vendor:
 	go mod vendor
 
-build-darwin:
+build-darwin-amd64:
 	mkdir -p cmd/gpm/pkg/testdata
 	mkdir -p _output/darwin
 	GOOS=darwin GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
 	GOOS=darwin GOARCH=amd64 go build -o _output/darwin/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
+
+build-darwin-arm64:
+	mkdir -p cmd/gpm/pkg/testdata
+	mkdir -p _output/darwin
+	GOOS=darwin GOARCH=arm64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
+	GOOS=darwin GOARCH=arm64 go build -o _output/darwin/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
 
 build-windows:
 	mkdir -p cmd/gpm/pkg/testdata
@@ -34,20 +40,38 @@ build-windows:
 	GOOS=windows GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd.exe -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
 	GOOS=windows GOARCH=amd64 go build -o _output/windows/gpm.exe -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
 
-build-linux:
+build-linux-amd64:
 	mkdir -p cmd/gpm/pkg/testdata
 	mkdir -p _output/linux
 	GOOS=linux GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
 	GOOS=linux GOARCH=amd64 go build -o _output/linux/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
 
-build: build-darwin build-linux build-windows
+build-linux-arm64:
+	mkdir -p cmd/gpm/pkg/testdata
+	mkdir -p _output/linux
+	GOOS=linux GOARCH=arm64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w" cmd/gpmd/main.go
+	GOOS=linux GOARCH=arm64 go build -o _output/linux/gpm -a -installsuffix cgo -ldflags "-s -w" cmd/gpm/main.go
 
-tar: build
+build-amd: build-darwin-amd64 build-linux-amd64 build-windows
+
+build-arm: build-darwin-arm64 build-linux-arm64 build-windows
+
+build: build-amd build-arm
+
+tar-amd: build-amd
 	cd _output && \
-	tar -zcvf gpm-darwin-$(GIT_TAG).tar.gz darwin/* && \
-	tar -zcvf gpm-linux-$(GIT_TAG).tar.gz linux/*  && \
+	tar -zcvf gpm-darwin-amd64-$(GIT_TAG).tar.gz darwin/* && \
+	tar -zcvf gpm-linux-amd64-$(GIT_TAG).tar.gz linux/*  && \
 	zip gpm-windows-$(GIT_TAG).zip windows/* && \
 	rm -fr darwin/ linux/ windows/
+
+tar-arm: build-arm
+	cd _output && \
+	tar -zcvf gpm-darwin-arm64-$(GIT_TAG).tar.gz darwin/* && \
+	tar -zcvf gpm-linux-arm64-$(GIT_TAG).tar.gz linux/*  && \
+	rm -fr darwin/ linux/
+
+tar: tar-amd tar-arm
 
 clean:
 	rm -fr vendor
