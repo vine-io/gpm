@@ -23,13 +23,19 @@
 package pkg
 
 import (
+	"strings"
+
 	"github.com/vine-io/cli"
 	vclient "github.com/vine-io/vine/core/client"
 )
 
 func getCallOptions(c *cli.Context) []vclient.CallOption {
+	host := c.String("host")
+	if index := strings.Index(host, ":"); index == -1 {
+		host += ":7700"
+	}
 	return []vclient.CallOption{
-		vclient.WithAddress(c.String("host")),
+		vclient.WithAddress(),
 		vclient.WithDialTimeout(c.Duration("dial-timeout")),
 		vclient.WithRequestTimeout(c.Duration("request-timeout")),
 		vclient.WithStreamTimeout(c.Duration("request-timeout")),
