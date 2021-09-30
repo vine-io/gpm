@@ -35,7 +35,7 @@ func getCallOptions(c *cli.Context) []vclient.CallOption {
 		host += ":7700"
 	}
 	return []vclient.CallOption{
-		vclient.WithAddress(),
+		vclient.WithAddress(host),
 		vclient.WithDialTimeout(c.Duration("dial-timeout")),
 		vclient.WithRequestTimeout(c.Duration("request-timeout")),
 		vclient.WithStreamTimeout(c.Duration("request-timeout")),
