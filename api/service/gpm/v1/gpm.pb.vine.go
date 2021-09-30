@@ -904,6 +904,10 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Type:   "integer",
 							Format: "int32",
 						},
+						"installFlag": &registry.Schema{
+							Type:   "integer",
+							Format: "int32",
+						},
 						"creationTimestamp": &registry.Schema{
 							Type:   "integer",
 							Format: "int64",
@@ -966,6 +970,10 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 						"headerTrimPrefix": &registry.Schema{
 							Type: "string",
+						},
+						"installFlag": &registry.Schema{
+							Type:   "integer",
+							Format: "int32",
 						},
 					},
 					Required: []string{"name", "bin", "version"},

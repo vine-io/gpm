@@ -150,6 +150,7 @@ CHUNKED:
 		}
 	}
 
+	spec.InstallFlag = 1
 	_, err = g.Create(ctx, spec)
 	if err != nil {
 		return err

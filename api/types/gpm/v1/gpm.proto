@@ -26,6 +26,8 @@ message Service {
   string version = 9;
   // 是否自启动, 默认为 false
   int32 autoRestart = 10;
+  // 是否为 install 服务, gpmd 设置
+  int32 installFlag = 11;
   // 创建时间
   int64 creationTimestamp = 21;
   // 修改时间
@@ -80,6 +82,8 @@ message ServiceSpec {
   // headerTrimPrefix 不为空时, 解压 tar 包时，内部文件的路径会发生变化
   // 如 dir=/opt/test/a, hdr=b/bin/test, headerTrimPrefix=b, test 文件的路径为 /opt/test/a/bin/test
   string headerTrimPrefix = 10;
+  // 是否为 install 服务, gpmd 设置
+  int32 installFlag = 11;
 }
 
 message EditServiceSpec {

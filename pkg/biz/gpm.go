@@ -41,6 +41,7 @@ import (
 	"github.com/vine-io/vine"
 	"github.com/vine-io/vine/lib/config"
 	verrs "github.com/vine-io/vine/lib/errors"
+	log "github.com/vine-io/vine/lib/logger"
 )
 
 func init() {
@@ -156,6 +157,7 @@ func (g *manager) Create(ctx context.Context, spec *gpmv1.ServiceSpec) (*gpmv1.S
 		Log:         spec.Log,
 		Version:     spec.Version,
 		AutoRestart: spec.AutoRestart,
+		InstallFlag: spec.InstallFlag,
 	}
 
 	err := fillService(service)
@@ -368,7 +370,19 @@ func (g *manager) Delete(ctx context.Context, name string) (*gpmv1.Service, erro
 	g.Unlock()
 
 	err = g.DB.DeleteService(ctx, s.Name)
-	return s, err
+	if err != nil {
+		return nil, err
+	}
+
+	if s.InstallFlag == 1 {
+		log.Infof("remove %s directory", s.Name)
+		link, _ := os.Readlink(s.Dir)
+		if link != "" {
+			_ = os.RemoveAll(link)
+		}
+		_ = os.RemoveAll(s.Dir)
+	}
+	return s, nil
 }
 
 func (g *manager) TailLog(ctx context.Context, name string, number int64, follow bool, sender IOWriter) error {
