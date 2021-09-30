@@ -1,5 +1,3 @@
-# gpm 文档
-
 ## 什么是 gpm
 `gpm` (golang process manager) Go 语言版本的进程管理工具。分为 gpmd (管理进程) 和 gpm (客户端工具)。
 得益于 Go 优秀的跨平台功能，`gpm` 目前支持 mac、linux、windows 三种平台。

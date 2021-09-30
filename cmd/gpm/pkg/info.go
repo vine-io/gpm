@@ -26,6 +26,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 
 	json "github.com/json-iterator/go"
@@ -33,6 +34,7 @@ import (
 	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/pkg/runtime/client"
 	"github.com/vine-io/pkg/unit"
+	log "github.com/vine-io/vine/lib/logger"
 	"gopkg.in/yaml.v3"
 )
 
@@ -50,6 +52,15 @@ func infoService(c *cli.Context) error {
 
 	switch output {
 	case "wide":
+		if runtime.GOOS == "windows" {
+			log.Infof("'wide' don't support windows")
+			b, err := json.MarshalIndent(s, "", "  ")
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(outE, "%s\r\n", string(b))
+			return nil
+		}
 		t := tw.NewWriter(os.Stdout)
 		t.SetHeader([]string{"Property", "Value"})
 		t.SetBorder(false)

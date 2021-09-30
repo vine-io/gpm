@@ -26,6 +26,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -56,6 +57,13 @@ func getService(c *cli.Context) error {
 
 	switch output {
 	case "wide":
+		if runtime.GOOS == "windows" {
+			b, err := json.MarshalIndent(s, "", "  ")
+			if err != nil {
+				return err
+			}
+			fmt.Fprintf(outE, "%s\r\n", string(b))
+		}
 		t := tw.NewWriter(os.Stdout)
 		t.SetHeader([]string{"Property", "Value"})
 		t.SetBorder(false)
