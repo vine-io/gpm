@@ -39,19 +39,21 @@ import (
 
 func upgradeService(c *cli.Context) error {
 
+	spec := &gpmv1.UpgradeSpec{}
 	pack := c.String("package")
 	if len(pack) == 0 {
 		return fmt.Errorf("missing package")
 	}
 
-	name := c.String("name")
-	v := c.String("version")
-	if name == "" {
+	spec.Name = c.String("name")
+	spec.Version = c.String("version")
+	if spec.Name == "" {
 		return fmt.Errorf("missing name")
 	}
-	if v == "" {
+	if spec.Version == "" {
 		return fmt.Errorf("missing version")
 	}
+	spec.HeaderTrimPrefix = c.String("header-prefix")
 
 	opts := getCallOptions(c)
 	cc := client.New()
@@ -61,7 +63,7 @@ func upgradeService(c *cli.Context) error {
 	buf := make([]byte, 1024*32)
 	outE := os.Stdout
 
-	svc, err := cc.GetService(ctx, name, opts...)
+	svc, err := cc.GetService(ctx, spec.Name, opts...)
 	if err != nil {
 		return err
 	}
@@ -71,7 +73,7 @@ func upgradeService(c *cli.Context) error {
 		return err
 	}
 
-	s, err := cc.UpgradeService(ctx, name, v, opts...)
+	s, err := cc.UpgradeService(ctx, spec, opts...)
 	if err != nil {
 		return err
 	}
@@ -144,7 +146,7 @@ func upgradeService(c *cli.Context) error {
 	case <-done:
 	}
 
-	fmt.Fprintf(outE, "upgrade service %s %s -> %s\n", name, svc.Version, v)
+	fmt.Fprintf(outE, "upgrade service %s %s -> %s\n", spec.Name, svc.Version, spec.Version)
 	return nil
 }
 
@@ -169,6 +171,11 @@ func UpgradeServiceCmd() *cli.Command {
 				Name:    "version",
 				Aliases: []string{"V"},
 				Usage:   "specify the version for service",
+			},
+			&cli.StringFlag{
+				Name:  "header-prefix",
+				Usage: "specify the version for gzip header",
+				Value: "",
 			},
 		},
 	}

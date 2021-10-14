@@ -120,11 +120,11 @@ func (w *InstallStream) Close() error {
 type UpgradeStream struct {
 	s pb.GpmService_UpgradeServiceService
 
-	name, version string
+	spec *gpmv1.UpgradeSpec
 }
 
-func NewUpgradeStream(s pb.GpmService_UpgradeServiceService, name, version string) *UpgradeStream {
-	return &UpgradeStream{s: s, name: name, version: version}
+func NewUpgradeStream(s pb.GpmService_UpgradeServiceService, spec *gpmv1.UpgradeSpec) *UpgradeStream {
+	return &UpgradeStream{s: s, spec: spec}
 }
 
 func (s *UpgradeStream) Context() context.Context {
@@ -134,9 +134,8 @@ func (s *UpgradeStream) Context() context.Context {
 func (s *UpgradeStream) Send(pack *gpmv1.Package) error {
 	err := s.s.Send(&pb.UpgradeServiceReq{
 		In: &gpmv1.UpgradeServiceIn{
-			Name:    s.name,
-			Version: s.version,
-			Pack:    pack,
+			Spec: s.spec,
+			Pack: pack,
 		},
 	})
 	return err

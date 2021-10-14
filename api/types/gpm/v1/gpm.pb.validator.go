@@ -55,6 +55,21 @@ func (m *ServiceSpec) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
+func (m *UpgradeSpec) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *UpgradeSpec) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	if len(m.Version) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sversion' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
 func (m *EditServiceSpec) Validate() error {
 	return m.ValidateE("")
 }
@@ -145,11 +160,10 @@ func (m *UpgradeServiceIn) Validate() error {
 
 func (m *UpgradeServiceIn) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if len(m.Name) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
-	}
-	if len(m.Version) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sversion' is required", prefix))
+	if m.Spec == nil {
+		errs = append(errs, fmt.Errorf("field '%sspec' is required", prefix))
+	} else {
+		errs = append(errs, m.Spec.ValidateE(prefix+"spec."))
 	}
 	if m.Pack == nil {
 		errs = append(errs, fmt.Errorf("field '%spack' is required", prefix))

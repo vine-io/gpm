@@ -161,12 +161,12 @@ func (s *SimpleClient) ListServiceVersions(ctx context.Context, name string, opt
 	return rsp.Versions, nil
 }
 
-func (s *SimpleClient) UpgradeService(ctx context.Context, name, version string, opts ...client.CallOption) (*UpgradeStream, error) {
+func (s *SimpleClient) UpgradeService(ctx context.Context, spec *gpmv1.UpgradeSpec, opts ...client.CallOption) (*UpgradeStream, error) {
 	stream, err := s.cc.UpgradeService(ctx, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return NewUpgradeStream(stream, name, version), nil
+	return NewUpgradeStream(stream, spec), nil
 }
 
 func (s *SimpleClient) RollBackService(ctx context.Context, name, revision string, opts ...client.CallOption) error {

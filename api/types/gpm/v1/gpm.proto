@@ -86,6 +86,20 @@ message ServiceSpec {
   int32 installFlag = 11;
 }
 
+message UpgradeSpec {
+  // 服务名称
+  // +gen:required
+  string name = 1;
+
+  // +gen:required
+  string version = 2;
+
+  // tar 头部路径
+  // headerTrimPrefix 不为空时, 解压 tar 包时，内部文件的路径会发生变化
+  // 如 dir=/opt/test/a, hdr=b/bin/test, headerTrimPrefix=b, test 文件的路径为 /opt/test/a/bin/test
+  string headerTrimPrefix = 3;
+}
+
 message EditServiceSpec {
   // 执行器路径
   string bin = 1;
@@ -154,15 +168,11 @@ message InstallServiceResult {
 }
 
 message UpgradeServiceIn {
-  // 服务名称
   // +gen:required
-  string name = 1;
+  gpmv1.UpgradeSpec spec = 1;
 
   // +gen:required
-  string version = 2;
-
-  // +gen:required
-  gpmv1.Package pack = 21;
+  gpmv1.Package pack = 2;
 }
 
 message UpgradeServiceResult {

@@ -180,8 +180,7 @@ func (g *manager) Upgrade(ctx context.Context, stream IOStream) error {
 		file    *os.File
 		err     error
 		dst     string
-		name    string
-		version string
+		spec    *gpmv1.UpgradeSpec
 		service *gpmv1.Service
 	)
 
@@ -198,7 +197,7 @@ func (g *manager) Upgrade(ctx context.Context, stream IOStream) error {
 			return err
 		}
 		b := data.(*gpmv1.UpgradeServiceIn)
-		name, version = b.Name, b.Version
+		spec = b.Spec
 		pack := b.Pack
 
 		if file == nil {
@@ -206,17 +205,17 @@ func (g *manager) Upgrade(ctx context.Context, stream IOStream) error {
 				return verrs.BadRequest(g.Name(), err.Error())
 			}
 
-			service, err = g.getService(ctx, name)
+			service, err = g.getService(ctx, spec.Name)
 			if err != nil {
 				return err
 			}
 
-			if service.Version == version {
-				return verrs.Conflict(g.Name(), "version %s already exists", version)
+			if service.Version == spec.Version {
+				return verrs.Conflict(g.Name(), "version %s already exists", spec.Version)
 			}
 
-			_ = os.MkdirAll(filepath.Join(config.Get("root").String(""), "packages", name), 0o755)
-			dst = filepath.Join(config.Get("root").String(""), "packages", name, name+"-"+version+".tar.gz")
+			_ = os.MkdirAll(filepath.Join(config.Get("root").String(""), "packages", spec.Name), 0o755)
+			dst = filepath.Join(config.Get("root").String(""), "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
 			log.Infof("save package: %v", dst)
 			file, err = os.Create(dst)
 			if err != nil {
@@ -263,7 +262,7 @@ CHUNKED:
 	}
 
 	dir := service.Dir
-	root := dir + "_" + version
+	root := dir + "_" + spec.Version
 	_ = os.MkdirAll(root, 0o755)
 	_ = os.Remove(dir)
 	log.Infof("relink %s -> %s", dir, root)
@@ -290,26 +289,33 @@ CHUNKED:
 				return e
 			}
 		}
-		fname := filepath.Join(dir, hdr.Name)
-		f, e1 := createFile(fname)
-		if e1 != nil {
-			//outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
-			return e1
+
+		hname := hdr.Name
+		if spec.HeaderTrimPrefix != "" {
+			hname = strings.TrimPrefix(hname, spec.HeaderTrimPrefix)
 		}
-		_, e1 = io.Copy(f, tr)
-		if e1 != nil && e1 != io.EOF {
-			//outs <- &gpmv1.UpgradeServiceResult{Error: e.Error()}
+		fname := filepath.Join(dir, hname)
+		if hdr.FileInfo().IsDir() {
+			_ = os.MkdirAll(fname, os.ModePerm)
+		} else {
+			f, e1 := createFile(fname)
+			if e1 != nil {
+				return e1
+			}
+			_, e1 = io.Copy(f, tr)
+			if e1 != nil && e1 != io.EOF {
+				f.Close()
+				return e1
+			}
 			f.Close()
-			return e1
 		}
-		f.Close()
 	}
 
-	vf := version + "@" + time.Now().Format("20060102150405")
-	log.Infof("service %s append version %s", service.Name, version)
-	_ = ioutil.WriteFile(filepath.Join(config.Get("root").String(""), "services", name, "versions", vf), []byte(""), 0o777)
+	vf := spec.Version + "@" + time.Now().Format("20060102150405")
+	log.Infof("service %s append version %s", service.Name, spec.Version)
+	_ = ioutil.WriteFile(filepath.Join(config.Get("root").String(""), "services", spec.Name, "versions", vf), []byte(""), 0o777)
 
-	service.Version = version
+	service.Version = spec.Version
 	g.DB.UpdateService(ctx, service)
 
 	p = NewProcess(service)
