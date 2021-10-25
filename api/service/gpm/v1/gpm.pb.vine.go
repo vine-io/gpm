@@ -839,9 +839,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 				"v1.ExecResult": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
-						"result": &registry.Schema{
-							Type: "string",
-						},
+						"result": &registry.Schema{},
 					},
 				},
 				"v1.FileInfo": &registry.Model{

@@ -25,11 +25,11 @@
 package biz
 
 import (
+	"bytes"
 	"os"
 	"os/exec"
 	"os/user"
 	"strconv"
-	"strings"
 	"syscall"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
@@ -170,6 +170,6 @@ func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
 	return cmd
 }
 
-func beauty(b []byte) string {
-	return strings.TrimSuffix(string(b), "\n")
+func beauty(b []byte) []byte {
+	return bytes.TrimSuffix(b, []byte("\n"))
 }

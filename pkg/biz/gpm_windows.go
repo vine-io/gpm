@@ -20,17 +20,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//go:build windows
 // +build windows
 
 package biz
 
 import (
+	"bytes"
+	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 	"syscall"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/encoding/simplifiedchinese"
 )
 
 func fillService(service *gpmv1.Service) error {
@@ -89,6 +93,8 @@ func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
 	return cmd
 }
 
-func beauty(b []byte) string {
-	return strings.TrimSuffix(string(b), "\r\n")
+func beauty(b []byte) []byte {
+	reader := transform.NewReader(bytes.NewReader(bytes.TrimSuffix(b, []byte("\r\n"))), simplifiedchinese.GBK.NewEncoder())
+	d, _ := ioutil.ReadAll(reader)
+	return d
 }

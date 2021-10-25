@@ -226,7 +226,7 @@ message ExecIn {
 }
 
 message ExecResult {
-  string result = 1;
+  bytes result = 1;
 }
 
 message PullResult {
@@ -258,6 +258,6 @@ message TerminalIn {
 message TerminalResult {
   bytes stdout = 1;
   bytes stderr = 2;
-  string error = 3;
+  bytes error = 3;
   bool isOk = 4;
 }

@@ -290,7 +290,18 @@ func (p *Process) Stop() error {
 		return ErrProcessNotFound
 	}
 
-	close(p.done)
+	go func() {
+		close(p.done)
+		defer func() {
+			if e := recover(); e != nil {
+				log.Errorf("close %s channel", p.Name)
+			}
+		}()
+	}()
+
+	if runtime.GOOS == "windows" {
+		return p.kill()
+	}
 
 	return p.stop()
 }
@@ -300,11 +311,9 @@ func (p *Process) stop() error {
 	if err != nil {
 		return err
 	}
-	if runtime.GOOS == "windows" {
-		err = pr.Kill()
-	} else {
-		err = pr.Signal(syscall.SIGINT)
-	}
+
+	err = pr.Signal(syscall.SIGINT)
+
 	if err != nil {
 		return err
 	}

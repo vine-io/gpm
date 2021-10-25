@@ -88,8 +88,8 @@ func terminalBash(c *cli.Context) error {
 		if err != nil {
 			return errors.New(status.Convert(err).Message())
 		}
-		if b.Error != "" {
-			fmt.Fprintf(outE, b.Error)
+		if text := string(b.Error); text != "" {
+			fmt.Fprintf(outE, text)
 		}
 		if b.Stderr != nil {
 			fmt.Fprintf(outE, string(b.Stderr))

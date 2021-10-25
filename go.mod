@@ -21,6 +21,7 @@ require (
 	github.com/vine-io/pkg/unit v0.1.0
 	github.com/vine-io/plugins/logger/zap v1.1.0
 	github.com/vine-io/vine v1.3.2
+	golang.org/x/text v0.3.5
 	google.golang.org/grpc v1.39.0
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b

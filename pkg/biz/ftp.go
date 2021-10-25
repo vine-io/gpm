@@ -246,7 +246,7 @@ func (s *sftp) Exec(ctx context.Context, in *gpmv1.ExecIn) (*gpmv1.ExecResult, e
 
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, verrs.InternalServerError(s.S.Name(), "exec %w: %v", err, beauty(b))
+		return nil, verrs.InternalServerError(s.S.Name(), "exec %v: %v", err, beauty(b))
 	}
 
 	out := &gpmv1.ExecResult{

@@ -67,7 +67,7 @@ func execBash(c *cli.Context) error {
 		return fmt.Errorf("%v", verrs.FromErr(err).Detail)
 	}
 
-	fmt.Fprintln(outE, result.Result)
+	fmt.Fprintln(outE, string(result.Result))
 
 	return nil
 }
