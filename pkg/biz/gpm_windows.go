@@ -20,7 +20,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-//go:build windows
 // +build windows
 
 package biz
@@ -33,8 +32,8 @@ import (
 	"syscall"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
-	"golang.org/x/text/transform"
 	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 )
 
 func fillService(service *gpmv1.Service) error {
