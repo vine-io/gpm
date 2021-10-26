@@ -20,12 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//go:build windows
 // +build windows
 
 package biz
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -72,8 +74,28 @@ func adminCmd(cmd *exec.Cmd) {
 	cmd.SysProcAttr = sysAttr
 }
 
-func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
-	cmd := exec.Command("powershell.exe")
+func startExec(ctx context.Context, in *gpmv1.ExecIn) *exec.Cmd {
+	cmd := exec.CommandContext(ctx, "cmd", "/C", in.Shell)
+
+	sysAttr := &syscall.SysProcAttr{
+		HideWindow: true,
+	}
+
+	cmd.SysProcAttr = sysAttr
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	for k, v := range in.Env {
+		cmd.Env = append(cmd.Env, k+"="+v)
+	}
+	home, err := os.UserHomeDir()
+	if err == nil {
+		cmd.Dir = home
+	}
+
+	return cmd
+}
+
+func startTerminal(ctx context.Context, in *gpmv1.TerminalIn) *exec.Cmd {
+	cmd := exec.CommandContext(ctx, "powershell.exe")
 
 	sysAttr := &syscall.SysProcAttr{
 		HideWindow: true,
@@ -93,7 +115,7 @@ func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
 }
 
 func beauty(b []byte) []byte {
-	reader := transform.NewReader(bytes.NewReader(bytes.TrimSuffix(b, []byte("\r\n"))), simplifiedchinese.GBK.NewEncoder())
+	reader := transform.NewReader(bytes.NewReader(bytes.TrimSuffix(b, []byte("\r\n"))), simplifiedchinese.GBK.NewDecoder())
 	d, _ := ioutil.ReadAll(reader)
 	return d
 }

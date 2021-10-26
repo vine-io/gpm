@@ -29,7 +29,6 @@ import (
 	"io"
 	"io/fs"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/google/uuid"
@@ -241,12 +240,12 @@ func (s *sftp) Push(ctx context.Context, stream IOReader) error {
 
 func (s *sftp) Exec(ctx context.Context, in *gpmv1.ExecIn) (*gpmv1.ExecResult, error) {
 
-	cmd := exec.CommandContext(ctx, in.Name, in.Args...)
+	cmd := startExec(ctx, in)
 	execSysProcAttr(cmd, in)
 
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, verrs.InternalServerError(s.S.Name(), "exec %v: %v", err, beauty(b))
+		return nil, verrs.InternalServerError(s.S.Name(), "exec %v: %v", err, string(beauty(b)))
 	}
 
 	out := &gpmv1.ExecResult{
@@ -287,7 +286,7 @@ func (s *sftp) Terminal(ctx context.Context, stream IOStream) error {
 	tid := uuid.New().String()
 
 	into := &wr{stream: stream}
-	cmd := startTerminal(b)
+	cmd := startTerminal(ctx, b)
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {

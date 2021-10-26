@@ -814,12 +814,8 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 				"v1.ExecIn": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+						"shell": &registry.Schema{
 							Type: "string",
-						},
-						"args": &registry.Schema{
-							Type:  "array",
-							Items: &registry.Schema{Type: "string"},
 						},
 						"dir": &registry.Schema{
 							Type: "string",
@@ -834,7 +830,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Type: "string",
 						},
 					},
-					Required: []string{"name"},
+					Required: []string{"shell"},
 				},
 				"v1.ExecResult": &registry.Model{
 					Type: "object",

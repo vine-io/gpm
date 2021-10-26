@@ -20,12 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//go:build darwin
 // +build darwin
 
 package biz
 
 import (
 	"bytes"
+	"context"
 	"os"
 	"os/exec"
 	"os/user"
@@ -139,8 +141,39 @@ func adminCmd(cmd *exec.Cmd) {
 	cmd.SysProcAttr = sysAttr
 }
 
-func startTerminal(in *gpmv1.TerminalIn) *exec.Cmd {
-	cmd := exec.Command("/bin/bash")
+func startExec(ctx context.Context, in *gpmv1.ExecIn) *exec.Cmd {
+	cmd := exec.CommandContext(ctx, "/bin/bash", "-c", in.Shell)
+
+	sysAttr := &syscall.SysProcAttr{
+		Setpgid: true,
+	}
+
+	u, _ := user.Lookup(in.User)
+	group, _ := user.LookupGroup(in.Group)
+	if u != nil && group != nil {
+		uid, _ := strconv.ParseInt(u.Uid, 10, 64)
+		gid, _ := strconv.ParseInt(group.Gid, 10, 64)
+		sysAttr.Credential = &syscall.Credential{
+			Uid: uint32(uid),
+			Gid: uint32(gid),
+		}
+	}
+
+	cmd.SysProcAttr = sysAttr
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	for k, v := range in.Env {
+		cmd.Env = append(cmd.Env, k+"="+v)
+	}
+	home, err := os.UserHomeDir()
+	if err == nil {
+		cmd.Dir = home
+	}
+
+	return cmd
+}
+
+func startTerminal(ctx context.Context, in *gpmv1.TerminalIn) *exec.Cmd {
+	cmd := exec.CommandContext(ctx, "/bin/bash")
 
 	sysAttr := &syscall.SysProcAttr{
 		Setpgid: true,

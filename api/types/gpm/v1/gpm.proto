@@ -217,12 +217,11 @@ message UpdateResult {
 
 message ExecIn {
   // +gen:required
-  string name = 1;
-  repeated string args = 2;
-  string dir = 3;
-  map<string, string> env = 4;
-  string user = 5;
-  string group = 6;
+  string shell = 1;
+  string dir = 2;
+  map<string, string> env = 3;
+  string user = 4;
+  string group = 5;
 }
 
 message ExecResult {

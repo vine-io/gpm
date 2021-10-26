@@ -42,8 +42,7 @@ func execBash(c *cli.Context) error {
 	outE := os.Stdout
 
 	in := &gpmv1.ExecIn{}
-	in.Name = c.String("cmd")
-	in.Args = c.StringSlice("args")
+	in.Shell = c.String("shell")
 	in.Dir = c.String("dir")
 	env := c.StringSlice("env")
 	in.User = c.String("user")
@@ -80,14 +79,9 @@ func ExecBashCmd() *cli.Command {
 		Action:   execBash,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "cmd",
-				Aliases: []string{"C"},
+				Name:    "shell",
+				Aliases: []string{"S"},
 				Usage:   "specify the command for exec",
-			},
-			&cli.StringSliceFlag{
-				Name:    "args",
-				Aliases: []string{"A"},
-				Usage:   "specify the args for exec",
 			},
 			&cli.StringFlag{
 				Name:  "dir",

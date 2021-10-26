@@ -236,8 +236,8 @@ func (m *ExecIn) Validate() error {
 
 func (m *ExecIn) ValidateE(prefix string) error {
 	errs := make([]error, 0)
-	if len(m.Name) == 0 {
-		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	if len(m.Shell) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sshell' is required", prefix))
 	}
 	return is.MargeErr(errs...)
 }
