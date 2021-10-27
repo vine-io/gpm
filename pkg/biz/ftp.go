@@ -217,7 +217,7 @@ func (s *sftp) Push(ctx context.Context, stream IOReader) error {
 			}
 
 			log.Infof("save file: %s -> %s", b.Name, dst)
-			file, err = os.Create(dst)
+			file, err = createFile(dst)
 			if err != nil {
 				return err
 			}
