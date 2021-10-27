@@ -11,9 +11,6 @@ ifeq "$(TAG)" ""
 	exit 1
 endif
 	git tag $(TAG)
-	sed -i "" "s/GitTag     = ".*"/GitTag     = \"$(shell git describe --abbrev=0 --tags --always --match "v*")\"/g" pkg/runtime/doc.go
-	sed -i "" "s/GitCommit  = ".*"/GitCommit  = \"$(shell git rev-parse --short HEAD)\"/g" pkg/runtime/doc.go
-	sed -i "" "s/BuildDate  = ".*"/BuildDate  = \"$(shell date +%s)\"/g" pkg/runtime/doc.go
 	git add .
 	git commit -m "$(TAG)"
 	git tag -d $(TAG)
