@@ -11,15 +11,16 @@ ifeq "$(TAG)" ""
 	exit 1
 endif
 	git tag $(TAG)
+	make build-tag
 	git add .
 	git commit -m "$(TAG)"
 	git tag -d $(TAG)
 	git tag $(TAG)
 
 build-tag:
-	sed -i "" "s/GitTag     = ".*"/GitTag     = \"$(shell git describe --abbrev=0 --tags --always --match "v*")\"/g" pkg/runtime/doc.go
-	sed -i "" "s/GitCommit  = ".*"/GitCommit  = \"$(shell git rev-parse --short HEAD)\"/g" pkg/runtime/doc.go
-	sed -i "" "s/BuildDate  = ".*"/BuildDate  = \"$(shell date +%s)\"/g" pkg/runtime/doc.go
+	sed -i "" "s/GitTag     = ".*"/GitTag     = \"$(GIT_TAG)\"/g" pkg/runtime/doc.go
+	sed -i "" "s/GitCommit  = ".*"/GitCommit  = \"$(GIT_COMMIT)\"/g" pkg/runtime/doc.go
+	sed -i "" "s/BuildDate  = ".*"/BuildDate  = \"$(BUILD_DATE)\"/g" pkg/runtime/doc.go
 
 install:
 	go install github.com/vine-io/vine/cmd/vine
