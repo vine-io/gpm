@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package interfaces
+package service
 
 import (
 	"context"
@@ -34,11 +34,11 @@ func (s *GpmAPI) Healthz(ctx context.Context, _ *pb.Empty, rsp *pb.Empty) error 
 }
 
 func (s *GpmAPI) UpdateSelf(ctx context.Context, stream pb.GpmService_UpdateSelfStream) error {
-	return s.H.UpdateSelf(ctx, &simpleUpdateSelfStream{stream: stream})
+	return s.G.Update(ctx, &simpleUpdateSelfStream{stream: stream})
 }
 
 func (s *GpmAPI) Info(ctx context.Context, _ *pb.InfoReq, rsp *pb.InfoRsp) (err error) {
-	rsp.Gpm, err = s.H.Info(ctx)
+	rsp.Gpm, err = s.G.Info(ctx)
 	return
 }
 
@@ -46,7 +46,7 @@ func (s *GpmAPI) ListService(ctx context.Context, req *pb.ListServiceReq, rsp *p
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Services, rsp.Total, err = s.H.ListService(ctx)
+	rsp.Services, rsp.Total, err = s.G.List(ctx)
 	return
 }
 
@@ -54,7 +54,7 @@ func (s *GpmAPI) GetService(ctx context.Context, req *pb.GetServiceReq, rsp *pb.
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.GetService(ctx, req.Name)
+	rsp.Service, err = s.G.Get(ctx, req.Name)
 	return
 }
 
@@ -62,7 +62,7 @@ func (s *GpmAPI) CreateService(ctx context.Context, req *pb.CreateServiceReq, rs
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.CreateService(ctx, req.Spec)
+	rsp.Service, err = s.G.Create(ctx, req.Spec)
 	return
 }
 
@@ -70,7 +70,7 @@ func (s *GpmAPI) EditService(ctx context.Context, req *pb.EditServiceReq, rsp *p
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.EditService(ctx, req.Name, req.Spec)
+	rsp.Service, err = s.G.Edit(ctx, req.Name, req.Spec)
 	return
 }
 
@@ -78,7 +78,7 @@ func (s *GpmAPI) StartService(ctx context.Context, req *pb.StartServiceReq, rsp 
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.StartService(ctx, req.Name)
+	rsp.Service, err = s.G.Start(ctx, req.Name)
 	return
 }
 
@@ -86,7 +86,7 @@ func (s *GpmAPI) StopService(ctx context.Context, req *pb.StopServiceReq, rsp *p
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.StopService(ctx, req.Name)
+	rsp.Service, err = s.G.Stop(ctx, req.Name)
 	return
 }
 
@@ -94,7 +94,7 @@ func (s *GpmAPI) RebootService(ctx context.Context, req *pb.RebootServiceReq, rs
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.RebootService(ctx, req.Name)
+	rsp.Service, err = s.G.Reboot(ctx, req.Name)
 	return
 }
 
@@ -102,7 +102,7 @@ func (s *GpmAPI) DeleteService(ctx context.Context, req *pb.DeleteServiceReq, rs
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.H.DeleteService(ctx, req.Name)
+	rsp.Service, err = s.G.Delete(ctx, req.Name)
 	return
 }
 
@@ -110,30 +110,30 @@ func (s *GpmAPI) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	return s.H.WatchServiceLog(ctx, req.Name, req.Number, req.Follow, &simpleWatchLogSender{stream: stream})
+	return s.G.TailLog(ctx, req.Name, req.Number, req.Follow, &simpleWatchLogSender{stream: stream})
 }
 
 func (s *GpmAPI) InstallService(ctx context.Context, stream pb.GpmService_InstallServiceStream) error {
-	return s.H.InstallService(ctx, &simpleInstallStream{stream: stream})
+	return s.G.Install(ctx, &simpleInstallStream{stream: stream})
 }
 
 func (s *GpmAPI) ListServiceVersions(ctx context.Context, req *pb.ListServiceVersionsReq, rsp *pb.ListServiceVersionsRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Versions, err = s.H.ListServiceVersions(ctx, req.Name)
+	rsp.Versions, err = s.G.ListVersions(ctx, req.Name)
 	return
 }
 
 func (s *GpmAPI) UpgradeService(ctx context.Context, stream pb.GpmService_UpgradeServiceStream) error {
-	return s.H.UpgradeService(ctx, &simpleUpgradeStream{stream: stream})
+	return s.G.Upgrade(ctx, &simpleUpgradeStream{stream: stream})
 }
 
 func (s *GpmAPI) RollBackService(ctx context.Context, req *pb.RollbackServiceReq, rsp *pb.RollbackServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	err = s.H.RollbackService(ctx, req.Name, req.Revision)
+	err = s.G.Rollback(ctx, req.Name, req.Revision)
 	return
 }
 
@@ -142,7 +142,7 @@ func (s *GpmAPI) Ls(ctx context.Context, req *pb.LsReq, rsp *pb.LsRsp) (err erro
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
 
-	rsp.Files, err = s.H.Ls(ctx, req.Path)
+	rsp.Files, err = s.T.List(ctx, req.Path)
 	return
 }
 
@@ -150,21 +150,21 @@ func (s *GpmAPI) Pull(ctx context.Context, req *pb.PullReq, stream pb.GpmService
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	return s.H.Pull(ctx, req.Name, req.Dir, &simplePullSender{stream: stream})
+	return s.T.Pull(ctx, req.Name, req.Dir, &simplePullSender{stream: stream})
 }
 
 func (s *GpmAPI) Push(ctx context.Context, stream pb.GpmService_PushStream) (err error) {
-	return s.H.Push(ctx, &simplePushReader{stream: stream})
+	return s.T.Push(ctx, &simplePushReader{stream: stream})
 }
 
 func (s *GpmAPI) Exec(ctx context.Context, req *pb.ExecReq, rsp *pb.ExecRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Result, err = s.H.Exec(ctx, req.In)
+	rsp.Result, err = s.T.Exec(ctx, req.In)
 	return
 }
 
 func (s *GpmAPI) Terminal(ctx context.Context, stream pb.GpmService_TerminalStream) error {
-	return s.H.Terminal(ctx, &simpleTerminalStream{stream: stream})
+	return s.T.Terminal(ctx, &simpleTerminalStream{stream: stream})
 }

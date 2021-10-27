@@ -23,12 +23,12 @@
 package pkg
 
 import (
-	"github.com/vine-io/gpm/pkg/interfaces"
+	"github.com/vine-io/gpm/pkg/service"
 	log "github.com/vine-io/vine/lib/logger"
 )
 
 func Run() {
-	app := interfaces.New()
+	app := service.New()
 
 	if err := app.Init(); err != nil {
 		log.Fatal(err)

@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package interfaces
+package service
 
 import (
 	"bytes"
@@ -32,14 +32,14 @@ import (
 	"time"
 
 	pb "github.com/vine-io/gpm/api/service/gpm/v1"
-	"github.com/vine-io/gpm/pkg/app"
+	"github.com/vine-io/gpm/pkg/biz"
 	"github.com/vine-io/gpm/pkg/infra/repo"
 	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	"github.com/vine-io/gpm/pkg/runtime/ssl"
-	"github.com/vine-io/plugins/logger/zap"
 
 	"github.com/vine-io/cli"
+	"github.com/vine-io/plugins/logger/zap"
 	"github.com/vine-io/vine"
 	grpcClient "github.com/vine-io/vine/core/client/grpc"
 	"github.com/vine-io/vine/core/registry/memory"
@@ -103,7 +103,8 @@ type GpmAPI struct {
 
 	API *RestAPI
 
-	H app.GpmApp `inject:""`
+	G biz.Manager `inject:""`
+	T biz.FTP     `inject:""`
 }
 
 func (s *GpmAPI) Init() error {
@@ -205,7 +206,7 @@ func (s *GpmAPI) Init() error {
 		return err
 	}
 
-	if err = s.H.Init(); err != nil {
+	if err = s.G.Init(); err != nil {
 		return err
 	}
 
