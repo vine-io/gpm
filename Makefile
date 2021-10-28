@@ -88,4 +88,4 @@ tar: tar-amd tar-arm
 clean:
 	rm -fr vendor
 
-.PHONY: build-tag vendor install build-darwin build-windows build-linux build tar clean
+.PHONY: release build-tag vendor install build-darwin build-windows build-linux build tar clean
