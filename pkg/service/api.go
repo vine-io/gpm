@@ -28,7 +28,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 	pbr "github.com/schollz/progressbar/v3"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/runtime"
@@ -60,20 +60,21 @@ const (
 type RestAPI struct {
 	apihttp.Server
 
-	app *fiber.App
+	app *gin.Engine
 }
 
 func (r *RestAPI) Init(opts ...apihttp.Option) error {
 	// create the router
-	app := fiber.New(fiber.Config{DisableStartupMessage: true})
+	gin.SetMode(gin.ReleaseMode)
+	app := gin.New()
 
 	if config.Get("enable", "openapi").Bool(false) {
 		openapi.RegisterOpenAPI(app)
 	}
 
 	// TODO: more api
-	app.Get("/api/v1/endpoints", r.getEndpointsHandler())
-	app.Post("/api/v1/push", r.pushHandler())
+	app.GET("/api/v1/endpoints", r.getEndpointsHandler())
+	app.POST("/api/v1/push", r.pushHandler())
 
 	// create the namespace resolver
 	nsResolver := namespace.NewResolver(Type, runtime.Namespace)
@@ -113,8 +114,8 @@ func (r *RestAPI) Init(opts ...apihttp.Option) error {
 	return nil
 }
 
-func (r *RestAPI) getEndpointsHandler() fiber.Handler {
-	return func(c *fiber.Ctx) error {
+func (r *RestAPI) getEndpointsHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
 
 		endpoints := make([]map[string]string, 0)
 		keys := make(map[string]struct{}, 0)
@@ -141,34 +142,38 @@ func (r *RestAPI) getEndpointsHandler() fiber.Handler {
 			}
 		}
 
-		return c.JSON(fiber.Map{
+		c.JSON(200, gin.H{
 			"data": endpoints,
 		})
 	}
 }
 
-func (r *RestAPI) pushHandler() fiber.Handler {
+func (r *RestAPI) pushHandler() gin.HandlerFunc {
 
-	return func(c *fiber.Ctx) error {
+	return func(c *gin.Context) {
 		mf, err := c.MultipartForm()
 		if err != nil {
-			return fiber.NewError(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, err)
+			return
 		}
 
 		fs, ok := mf.File["file"]
 		if !ok {
-			return fiber.NewError(http.StatusBadRequest, "missing file")
+			c.JSON(http.StatusBadRequest, "missing file")
+			return
 		}
 		vv := mf.Value["dst"]
 		if !ok {
-			return fiber.NewError(http.StatusBadRequest, "missing dst")
+			c.JSON(http.StatusBadRequest, "missing dst")
+			return
 		}
 		file := fs[0]
 		dst := vv[0]
 
 		fd, err := file.Open()
 		if err != nil {
-			return fiber.NewError(http.StatusInternalServerError, "open file: "+err.Error())
+			c.JSON(http.StatusInternalServerError, "open file: "+err.Error())
+			return
 		}
 		defer fd.Close()
 
@@ -178,16 +183,16 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 			Total: file.Size,
 		}
 
-		ctx := c.Context()
 		cc := client.New()
 		opts := []vclient.CallOption{
 			vclient.WithDialTimeout(time.Hour * 2),
 			vclient.WithStreamTimeout(time.Hour * 2),
 		}
 
-		stream, err := cc.Push(ctx, opts...)
+		stream, err := cc.Push(c, opts...)
 		if err != nil {
-			return fiber.NewError(http.StatusBadGateway, "connect to gpm server: "+err.Error())
+			c.JSON(http.StatusBadGateway, "connect to gpm server: "+err.Error())
+			return
 		}
 
 		outE := log.DefaultLogger.Options().Out
@@ -204,7 +209,8 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 		for {
 			n, e := fd.Read(buf)
 			if e != nil && e != io.EOF {
-				return fiber.NewError(http.StatusInternalServerError, e.Error())
+				c.JSON(http.StatusInternalServerError, e.Error())
+				return
 			}
 
 			if n > 0 {
@@ -213,7 +219,8 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 				in.Chunk = buf[0:n]
 				err = stream.Send(in)
 				if err != nil {
-					return fiber.NewError(http.StatusInternalServerError, err.Error())
+					c.JSON(http.StatusInternalServerError, err.Error())
+					return
 				}
 			}
 
@@ -223,10 +230,11 @@ func (r *RestAPI) pushHandler() fiber.Handler {
 		}
 
 		if err = stream.Wait(); err != nil {
-			return fiber.NewError(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusInternalServerError, err.Error())
+			return
 		}
 
-		return c.JSON(fiber.Map{
+		c.JSON(http.StatusOK, gin.H{
 			"result": "OK",
 		})
 	}
