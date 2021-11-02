@@ -97,7 +97,7 @@ func (r *RestAPI) Init(opts ...apihttp.Option) error {
 		ahandler.WithClient(vclient.DefaultClient),
 	)
 
-	app.Group(APIPath, rp.Handle)
+	app.Use(rp.Handle)
 	api := httpapi.NewServer(config.Get("api", "address").String(""))
 	if err := api.Init(opts...); err != nil {
 		return err
