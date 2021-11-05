@@ -67,6 +67,7 @@ func (r *RestAPI) Init(opts ...apihttp.Option) error {
 	// create the router
 	gin.SetMode(gin.ReleaseMode)
 	app := gin.New()
+	app.Use(gin.Recovery())
 
 	if config.Get("enable", "openapi").Bool(false) {
 		openapi.RegisterOpenAPI(app)
