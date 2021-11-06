@@ -20,7 +20,7 @@ require (
 	github.com/vine-io/pkg/inject v0.1.0
 	github.com/vine-io/pkg/unit v0.1.0
 	github.com/vine-io/plugins/logger/zap v1.3.4
-	github.com/vine-io/vine v1.3.5-beta
+	github.com/vine-io/vine v1.3.6
 	golang.org/x/text v0.3.5
 	google.golang.org/grpc v1.39.0
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
