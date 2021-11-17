@@ -245,6 +245,8 @@ github.com/vine-io/gscheduler v0.3.0 h1:eAd+1Uzdh99WsnApWYwVR8MmUSFLNn3mSVXS2vhF
 github.com/vine-io/gscheduler v0.3.0/go.mod h1:Aaq3G56fS4yPLRQRienH3F1yGfStEPrAVLr1os60ZI8=
 github.com/vine-io/pkg/inject v0.1.0 h1:m6j63ILzdxi+uTmpYi0xzo2EtQocvC+4DtKuPx41B7Y=
 github.com/vine-io/pkg/inject v0.1.0/go.mod h1:p4DMHbFeMWJtPQCRvLI6A4xEjA0BLbuum1gAORZp9oI=
+github.com/vine-io/pkg/release v0.1.0 h1:QzWJJpbSan/6C9Bdbmvxoksp2A6LwJNVmQ4pp+mO8gI=
+github.com/vine-io/pkg/release v0.1.0/go.mod h1:bhsoo8+rj4X2cEuwP78FdYTxmVQ/NS8KwG35o7NMikM=
 github.com/vine-io/pkg/unit v0.1.0 h1:SlvVbSnDovLTsVzb4ikJEJf8oaxLX3Bjyq+QACLUlV0=
 github.com/vine-io/pkg/unit v0.1.0/go.mod h1:nyfkjNg2pEYlP7CxfexM1dpUuqGhDxBidLu6gJCkHPE=
 github.com/vine-io/plugins/logger/zap v1.1.0 h1:sl7SrDjUbMALOIKwQMpT2ETaMS+iUwS64befKVvxd/c=

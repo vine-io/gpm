@@ -18,6 +18,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.7 // indirect
 	github.com/vine-io/cli v1.3.0
 	github.com/vine-io/pkg/inject v0.1.0
+	github.com/vine-io/pkg/release v0.1.0
 	github.com/vine-io/pkg/unit v0.1.0
 	github.com/vine-io/plugins/logger/zap v1.4.0
 	github.com/vine-io/vine v1.4.0

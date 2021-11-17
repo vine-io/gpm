@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//go:build linux
 // +build linux
 
 package pkg
@@ -37,16 +38,16 @@ import (
 
 	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/pkg/runtime"
+	"github.com/vine-io/pkg/release"
 )
 
 //go:embed testdata/gpmd
 var f embed.FS
 
 const (
-	gpm           = "/usr/local/sbin/gpm"
-	gpmd          = "/usr/local/sbin/gpmd"
-	autoStartFile = "/etc/rc.d/init.d/gpmd"
-	gpmdConf      = "/etc/gpm/gpmd.conf"
+	gpm      = "/usr/local/sbin/gpm"
+	gpmd     = "/usr/local/sbin/gpmd"
+	gpmdConf = "/etc/gpm/gpmd.conf"
 )
 
 var gpmdTmp = `#!/bin/bash
@@ -191,7 +192,15 @@ func deploy(c *cli.Context) error {
 	_ = os.MkdirAll("/etc/gpm", 0o755)
 	text := `--args "--server-address=0.0.0.0:7700" --args "--enable-log"`
 	ioutil.WriteFile(gpmdConf, []byte(text), 0o755)
+
+	autoStartFile := "/etc/rc.d/init.d/gpmd"
 	_ = ioutil.WriteFile(autoStartFile, []byte(gpmdTmp), 0o777)
+	or, e := release.Get()
+	if e == nil {
+		if (or.Name == "centos" || or.Name == "rhel") && or.Version == "6" {
+			exec.Command("chkconfig", "gpmd", "on").CombinedOutput()
+		}
+	}
 
 	fmt.Fprintf(outE, "install gpm successfully!\n")
 	return nil
@@ -223,11 +232,13 @@ func run(c *cli.Context) error {
 	if len(args) == 0 {
 		args = append(args, "--server-address=0.0.0.0:7700", "--enable-log")
 	}
-	cmd := exec.Command("gpmd", args...)
+	cmd := exec.Command(gpmd, args...)
+	cmd.Env = os.Environ()
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("gpmd start: %v", err)
 	}
 
+	autoStartFile := "/etc/rc.d/init.d/gpmd"
 	stat, _ := os.Stat(autoStartFile)
 	if stat != nil {
 		text := ""
