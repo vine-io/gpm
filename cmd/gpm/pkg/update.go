@@ -138,7 +138,7 @@ func update(c *cli.Context) error {
 
 	time.Sleep(time.Second * 2)
 
-	timeout := time.After(time.Second * 30)
+	timeout := time.After(time.Minute)
 	var n int
 	for {
 		select {

@@ -37,6 +37,7 @@ import (
 	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
 	"github.com/vine-io/gpm/pkg/runtime/ssl"
+	"github.com/vine-io/pkg/release"
 
 	"github.com/vine-io/cli"
 	"github.com/vine-io/plugins/logger/zap"
@@ -192,6 +193,9 @@ func (s *GpmAPI) Init() error {
 	s.Service.Init(opts...)
 
 	aopts = append(aopts, apihttp.EnableCORS(true))
+
+	or, _ := release.Get()
+	log.Infof("system information: %s", or)
 
 	if err = config.Load(clisrc); err != nil {
 		log.Fatal(err)
