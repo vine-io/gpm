@@ -26,18 +26,19 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"time"
 
-	"github.com/olekukonko/tablewriter"
 	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/pkg/runtime/client"
 )
 
-func versionService(c *cli.Context) error {
-
+func forgetService(c *cli.Context) error {
 	name := c.String("name")
+	revision := c.String("revision")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
+	}
+	if len(revision) == 0 {
+		return fmt.Errorf("missing revision")
 	}
 
 	opts := getCallOptions(c)
@@ -45,40 +46,40 @@ func versionService(c *cli.Context) error {
 	ctx := context.Background()
 	outE := os.Stdout
 
-	list, err := cc.ListServiceVersions(ctx, name, opts...)
+	s, err := cc.GetService(ctx, name, opts...)
 	if err != nil {
 		return err
 	}
 
-	if len(list) > 0 {
-		tw := tablewriter.NewWriter(outE)
-		tw.SetHeader([]string{"Name", "Version", "Time"})
-
-		for _, item := range list {
-			row := make([]string, 0)
-			row = append(row, item.Name)
-			row = append(row, item.Version)
-			row = append(row, time.Unix(item.Timestamp, 0).String())
-			tw.Append(row)
-		}
-
-		tw.Render()
+	if s.Version == revision {
+		return fmt.Errorf("version: %s being used", revision)
 	}
 
+	err = cc.ForgetService(ctx, name, revision, opts...)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(outE, "forget %s %s\n", s.Name, revision)
 	return nil
 }
 
-func VersionServiceCmd() *cli.Command {
+func ForgetServiceCmd() *cli.Command {
 	return &cli.Command{
-		Name:     "version",
-		Usage:    "list service history versions",
+		Name:     "forget",
+		Usage:    "forget a service version",
 		Category: "service",
-		Action:   versionService,
+		Action:   forgetService,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "name",
 				Aliases: []string{"N"},
-				Usage:   "the specify the name for version",
+				Usage:   "specify the name of service",
+			},
+			&cli.StringFlag{
+				Name:    "revision",
+				Aliases: []string{"R"},
+				Usage:   "specify the revision of service",
 			},
 		},
 	}

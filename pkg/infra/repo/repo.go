@@ -189,7 +189,13 @@ func (db *DB) ListServiceVersion(ctx context.Context, name string) ([]*gpmv1.Ser
 
 			parts := strings.Split(d.Name(), "@")
 			if len(parts) > 1 {
-				t, _ := time.Parse("20060102150405", parts[1])
+				loc, _ := time.LoadLocation("Local")
+				var t time.Time
+				if loc != nil {
+					t, _ = time.ParseInLocation("20060102150405", parts[1], loc)
+				} else {
+					t, _ = time.Parse("20060102150405", parts[1])
+				}
 				sv := &gpmv1.ServiceVersion{
 					Name:      name,
 					Version:   parts[0],

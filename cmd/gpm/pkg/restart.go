@@ -31,7 +31,7 @@ import (
 	"github.com/vine-io/gpm/pkg/runtime/client"
 )
 
-func rebootService(c *cli.Context) error {
+func restartService(c *cli.Context) error {
 
 	name := c.String("name")
 	if len(name) == 0 {
@@ -43,7 +43,7 @@ func rebootService(c *cli.Context) error {
 	ctx := context.Background()
 	outE := os.Stdout
 
-	s, err := cc.RebootService(ctx, name, opts...)
+	s, err := cc.RestartService(ctx, name, opts...)
 	if err != nil {
 		return err
 	}
@@ -52,12 +52,12 @@ func rebootService(c *cli.Context) error {
 	return nil
 }
 
-func RebootServiceCmd() *cli.Command {
+func RestartServiceCmd() *cli.Command {
 	return &cli.Command{
-		Name:     "reboot",
-		Usage:    "reboot a service",
+		Name:     "restart",
+		Usage:    "restart a service",
 		Category: "service",
-		Action:   rebootService,
+		Action:   restartService,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "name",

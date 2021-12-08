@@ -16,7 +16,7 @@ type Manager interface {
 	Edit(context.Context, string, *gpmv1.EditServiceSpec) (*gpmv1.Service, error)
 	Start(context.Context, string) (*gpmv1.Service, error)
 	Stop(context.Context, string) (*gpmv1.Service, error)
-	Reboot(context.Context, string) (*gpmv1.Service, error)
+	Restart(context.Context, string) (*gpmv1.Service, error)
 	Delete(context.Context, string) (*gpmv1.Service, error)
 	TailLog(context.Context, string, int64, bool, IOWriter) error
 
@@ -24,6 +24,7 @@ type Manager interface {
 	ListVersions(context.Context, string) ([]*gpmv1.ServiceVersion, error)
 	Upgrade(context.Context, IOStream) error
 	Rollback(context.Context, string, string) error
+	Forget(context.Context, string, string) error
 }
 
 type FTP interface {

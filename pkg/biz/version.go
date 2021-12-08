@@ -379,6 +379,49 @@ func (g *manager) Rollback(ctx context.Context, name string, version string) err
 	return nil
 }
 
+func (g *manager) Forget(ctx context.Context, name string, version string) error {
+	s, err := g.getService(ctx, name)
+	if err != nil {
+		return err
+	}
+
+	vv, err := g.ListVersions(ctx, name)
+	if err != nil {
+		return err
+	}
+
+	var v *gpmv1.ServiceVersion
+	for _, item := range vv {
+		if item.Version == version {
+			v = item
+		}
+	}
+	if v == nil {
+		return verrs.NotFound(g.Name(), "invalid version '%s' of service:%s", version, name)
+	}
+
+	vf := version + "@" + time.Unix(v.Timestamp, 0).Format("20060102150405")
+	vstore := filepath.Join(config.Get("root").String(""), "services", name, "versions", vf)
+	log.Infof("remove %s@%s version file %s", name, version, vstore)
+	if err = os.Remove(vstore); err != nil {
+		log.Errorf("remove %s@%s version file: %v", name, version, err)
+	}
+
+	pkg := filepath.Join(config.Get("root").String(""), "packages", name, name+"-"+version+".tar.gz")
+	log.Infof("remove %s@%s version package %s", name, version, pkg)
+	if err = os.Remove(pkg); err != nil {
+		log.Errorf("remove %s:%s version directory: %v", name, version, err)
+	}
+
+	sp := s.Dir + "_" + version
+	log.Infof("remove %s@%s version directory %s", name, version, sp)
+	if err = os.RemoveAll(sp); err != nil {
+		log.Errorf("remove %s@%s version package: %v", name, version, err)
+	}
+
+	return nil
+}
+
 func createFile(name string) (*os.File, error) {
 	lIndex := 0
 	switch runtime.GOOS {

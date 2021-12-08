@@ -117,8 +117,8 @@ func (s *SimpleClient) StopService(ctx context.Context, name string, opts ...cli
 	return rsp.Service, nil
 }
 
-func (s *SimpleClient) RebootService(ctx context.Context, name string, opts ...client.CallOption) (*gpmv1.Service, error) {
-	rsp, err := s.cc.RebootService(ctx, &pb.RebootServiceReq{Name: name}, opts...)
+func (s *SimpleClient) RestartService(ctx context.Context, name string, opts ...client.CallOption) (*gpmv1.Service, error) {
+	rsp, err := s.cc.RestartService(ctx, &pb.RestartServiceReq{Name: name}, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -171,6 +171,14 @@ func (s *SimpleClient) UpgradeService(ctx context.Context, spec *gpmv1.UpgradeSp
 
 func (s *SimpleClient) RollBackService(ctx context.Context, name, revision string, opts ...client.CallOption) error {
 	_, err := s.cc.RollBackService(ctx, &pb.RollbackServiceReq{Name: name, Revision: revision}, opts...)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *SimpleClient) ForgetService(ctx context.Context, name, revision string, opts ...client.CallOption) error {
+	_, err := s.cc.ForgetService(ctx, &pb.ForgetServiceReq{Name: name, Revision: revision}, opts...)
 	if err != nil {
 		return err
 	}

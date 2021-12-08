@@ -90,11 +90,11 @@ func (s *GpmAPI) StopService(ctx context.Context, req *pb.StopServiceReq, rsp *p
 	return
 }
 
-func (s *GpmAPI) RebootService(ctx context.Context, req *pb.RebootServiceReq, rsp *pb.RebootServiceRsp) (err error) {
+func (s *GpmAPI) RestartService(ctx context.Context, req *pb.RestartServiceReq, rsp *pb.RestartServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.G.Reboot(ctx, req.Name)
+	rsp.Service, err = s.G.Restart(ctx, req.Name)
 	return
 }
 
@@ -134,6 +134,14 @@ func (s *GpmAPI) RollBackService(ctx context.Context, req *pb.RollbackServiceReq
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
 	err = s.G.Rollback(ctx, req.Name, req.Revision)
+	return
+}
+
+func (s *GpmAPI) ForgetService(ctx context.Context, req *pb.ForgetServiceReq, rsp *pb.ForgetServiceRsp) (err error) {
+	if err = req.Validate(); err != nil {
+		return verrs.BadRequest(s.Name(), err.Error())
+	}
+	err = s.G.Forget(ctx, req.Name, req.Revision)
 	return
 }
 

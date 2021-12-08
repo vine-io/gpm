@@ -333,7 +333,7 @@ func (g *manager) stopService(ctx context.Context, p *Process) (*gpmv1.Service, 
 	return s, nil
 }
 
-func (g *manager) Reboot(ctx context.Context, name string) (*gpmv1.Service, error) {
+func (g *manager) Restart(ctx context.Context, name string) (*gpmv1.Service, error) {
 	s, err := g.getService(ctx, name)
 	if err != nil {
 		return nil, err

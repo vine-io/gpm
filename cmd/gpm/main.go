@@ -56,12 +56,13 @@ func main() {
 			pkg.StartServiceCmd(),
 			pkg.StopServiceCmd(),
 			pkg.DeleteServiceCmd(),
-			pkg.RebootServiceCmd(),
+			pkg.RestartServiceCmd(),
 			pkg.TailServiceCmd(),
 
 			pkg.InstallServiceCmd(),
 			pkg.UpgradeServiceCmd(),
 			pkg.RollbackServiceCmd(),
+			pkg.ForgetServiceCmd(),
 			pkg.VersionServiceCmd(),
 
 			pkg.LsBashCmd(),

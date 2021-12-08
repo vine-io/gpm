@@ -662,23 +662,23 @@ func (m *StopServiceRsp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_StopServiceRsp proto.InternalMessageInfo
 
-type RebootServiceReq struct {
+type RestartServiceReq struct {
 	// +gen:required
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 }
 
-func (m *RebootServiceReq) Reset()         { *m = RebootServiceReq{} }
-func (m *RebootServiceReq) String() string { return proto.CompactTextString(m) }
-func (*RebootServiceReq) ProtoMessage()    {}
-func (*RebootServiceReq) Descriptor() ([]byte, []int) {
+func (m *RestartServiceReq) Reset()         { *m = RestartServiceReq{} }
+func (m *RestartServiceReq) String() string { return proto.CompactTextString(m) }
+func (*RestartServiceReq) ProtoMessage()    {}
+func (*RestartServiceReq) Descriptor() ([]byte, []int) {
 	return fileDescriptor_a737174c368a3c5b, []int{17}
 }
-func (m *RebootServiceReq) XXX_Unmarshal(b []byte) error {
+func (m *RestartServiceReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *RebootServiceReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RestartServiceReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_RebootServiceReq.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RestartServiceReq.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -688,34 +688,34 @@ func (m *RebootServiceReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *RebootServiceReq) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RebootServiceReq.Merge(m, src)
+func (m *RestartServiceReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RestartServiceReq.Merge(m, src)
 }
-func (m *RebootServiceReq) XXX_Size() int {
+func (m *RestartServiceReq) XXX_Size() int {
 	return m.XSize()
 }
-func (m *RebootServiceReq) XXX_DiscardUnknown() {
-	xxx_messageInfo_RebootServiceReq.DiscardUnknown(m)
+func (m *RestartServiceReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_RestartServiceReq.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_RebootServiceReq proto.InternalMessageInfo
+var xxx_messageInfo_RestartServiceReq proto.InternalMessageInfo
 
-type RebootServiceRsp struct {
+type RestartServiceRsp struct {
 	Service *v1.Service `protobuf:"bytes,1,opt,name=service,proto3" json:"service,omitempty"`
 }
 
-func (m *RebootServiceRsp) Reset()         { *m = RebootServiceRsp{} }
-func (m *RebootServiceRsp) String() string { return proto.CompactTextString(m) }
-func (*RebootServiceRsp) ProtoMessage()    {}
-func (*RebootServiceRsp) Descriptor() ([]byte, []int) {
+func (m *RestartServiceRsp) Reset()         { *m = RestartServiceRsp{} }
+func (m *RestartServiceRsp) String() string { return proto.CompactTextString(m) }
+func (*RestartServiceRsp) ProtoMessage()    {}
+func (*RestartServiceRsp) Descriptor() ([]byte, []int) {
 	return fileDescriptor_a737174c368a3c5b, []int{18}
 }
-func (m *RebootServiceRsp) XXX_Unmarshal(b []byte) error {
+func (m *RestartServiceRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *RebootServiceRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *RestartServiceRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_RebootServiceRsp.Marshal(b, m, deterministic)
+		return xxx_messageInfo_RestartServiceRsp.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -725,17 +725,17 @@ func (m *RebootServiceRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, er
 		return b[:n], nil
 	}
 }
-func (m *RebootServiceRsp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_RebootServiceRsp.Merge(m, src)
+func (m *RestartServiceRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RestartServiceRsp.Merge(m, src)
 }
-func (m *RebootServiceRsp) XXX_Size() int {
+func (m *RestartServiceRsp) XXX_Size() int {
 	return m.XSize()
 }
-func (m *RebootServiceRsp) XXX_DiscardUnknown() {
-	xxx_messageInfo_RebootServiceRsp.DiscardUnknown(m)
+func (m *RestartServiceRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_RestartServiceRsp.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_RebootServiceRsp proto.InternalMessageInfo
+var xxx_messageInfo_RestartServiceRsp proto.InternalMessageInfo
 
 type DeleteServiceReq struct {
 	// +gen:required
@@ -1187,6 +1187,81 @@ func (m *RollbackServiceRsp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RollbackServiceRsp proto.InternalMessageInfo
 
+type ForgetServiceReq struct {
+	// +gen:required
+	Name     string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Revision string `protobuf:"bytes,2,opt,name=revision,proto3" json:"revision,omitempty"`
+}
+
+func (m *ForgetServiceReq) Reset()         { *m = ForgetServiceReq{} }
+func (m *ForgetServiceReq) String() string { return proto.CompactTextString(m) }
+func (*ForgetServiceReq) ProtoMessage()    {}
+func (*ForgetServiceReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a737174c368a3c5b, []int{31}
+}
+func (m *ForgetServiceReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ForgetServiceReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ForgetServiceReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ForgetServiceReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ForgetServiceReq.Merge(m, src)
+}
+func (m *ForgetServiceReq) XXX_Size() int {
+	return m.XSize()
+}
+func (m *ForgetServiceReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_ForgetServiceReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ForgetServiceReq proto.InternalMessageInfo
+
+type ForgetServiceRsp struct {
+}
+
+func (m *ForgetServiceRsp) Reset()         { *m = ForgetServiceRsp{} }
+func (m *ForgetServiceRsp) String() string { return proto.CompactTextString(m) }
+func (*ForgetServiceRsp) ProtoMessage()    {}
+func (*ForgetServiceRsp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_a737174c368a3c5b, []int{32}
+}
+func (m *ForgetServiceRsp) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ForgetServiceRsp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ForgetServiceRsp.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ForgetServiceRsp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ForgetServiceRsp.Merge(m, src)
+}
+func (m *ForgetServiceRsp) XXX_Size() int {
+	return m.XSize()
+}
+func (m *ForgetServiceRsp) XXX_DiscardUnknown() {
+	xxx_messageInfo_ForgetServiceRsp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ForgetServiceRsp proto.InternalMessageInfo
+
 type LsReq struct {
 	// +gen:required
 	Path string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
@@ -1196,7 +1271,7 @@ func (m *LsReq) Reset()         { *m = LsReq{} }
 func (m *LsReq) String() string { return proto.CompactTextString(m) }
 func (*LsReq) ProtoMessage()    {}
 func (*LsReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a737174c368a3c5b, []int{31}
+	return fileDescriptor_a737174c368a3c5b, []int{33}
 }
 func (m *LsReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1233,7 +1308,7 @@ func (m *LsRsp) Reset()         { *m = LsRsp{} }
 func (m *LsRsp) String() string { return proto.CompactTextString(m) }
 func (*LsRsp) ProtoMessage()    {}
 func (*LsRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a737174c368a3c5b, []int{32}
+	return fileDescriptor_a737174c368a3c5b, []int{34}
 }
 func (m *LsRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1271,7 +1346,7 @@ func (m *PullReq) Reset()         { *m = PullReq{} }
 func (m *PullReq) String() string { return proto.CompactTextString(m) }
 func (*PullReq) ProtoMessage()    {}
 func (*PullReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a737174c368a3c5b, []int{33}
+	return fileDescriptor_a737174c368a3c5b, []int{35}
 }
 func (m *PullReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1308,7 +1383,7 @@ func (m *PullRsp) Reset()         { *m = PullRsp{} }
 func (m *PullRsp) String() string { return proto.CompactTextString(m) }
 func (*PullRsp) ProtoMessage()    {}
 func (*PullRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a737174c368a3c5b, []int{34}
+	return fileDescriptor_a737174c368a3c5b, []int{36}
 }
 func (m *PullRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1345,7 +1420,7 @@ func (m *PushReq) Reset()         { *m = PushReq{} }
 func (m *PushReq) String() string { return proto.CompactTextString(m) }
 func (*PushReq) ProtoMessage()    {}
 func (*PushReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a737174c368a3c5b, []int{35}
+	return fileDescriptor_a737174c368a3c5b, []int{37}
 }
 func (m *PushReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1381,7 +1456,7 @@ func (m *PushRsp) Reset()         { *m = PushRsp{} }
 func (m *PushRsp) String() string { return proto.CompactTextString(m) }
 func (*PushRsp) ProtoMessage()    {}
 func (*PushRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a737174c368a3c5b, []int{36}
+	return fileDescriptor_a737174c368a3c5b, []int{38}
 }
 func (m *PushRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1419,7 +1494,7 @@ func (m *ExecReq) Reset()         { *m = ExecReq{} }
 func (m *ExecReq) String() string { return proto.CompactTextString(m) }
 func (*ExecReq) ProtoMessage()    {}
 func (*ExecReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a737174c368a3c5b, []int{37}
+	return fileDescriptor_a737174c368a3c5b, []int{39}
 }
 func (m *ExecReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1456,7 +1531,7 @@ func (m *ExecRsp) Reset()         { *m = ExecRsp{} }
 func (m *ExecRsp) String() string { return proto.CompactTextString(m) }
 func (*ExecRsp) ProtoMessage()    {}
 func (*ExecRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a737174c368a3c5b, []int{38}
+	return fileDescriptor_a737174c368a3c5b, []int{40}
 }
 func (m *ExecRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1494,7 +1569,7 @@ func (m *TerminalReq) Reset()         { *m = TerminalReq{} }
 func (m *TerminalReq) String() string { return proto.CompactTextString(m) }
 func (*TerminalReq) ProtoMessage()    {}
 func (*TerminalReq) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a737174c368a3c5b, []int{39}
+	return fileDescriptor_a737174c368a3c5b, []int{41}
 }
 func (m *TerminalReq) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1531,7 +1606,7 @@ func (m *TerminalRsp) Reset()         { *m = TerminalRsp{} }
 func (m *TerminalRsp) String() string { return proto.CompactTextString(m) }
 func (*TerminalRsp) ProtoMessage()    {}
 func (*TerminalRsp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_a737174c368a3c5b, []int{40}
+	return fileDescriptor_a737174c368a3c5b, []int{42}
 }
 func (m *TerminalRsp) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -1578,8 +1653,8 @@ func init() {
 	proto.RegisterType((*StartServiceRsp)(nil), "gpmv1.StartServiceRsp")
 	proto.RegisterType((*StopServiceReq)(nil), "gpmv1.StopServiceReq")
 	proto.RegisterType((*StopServiceRsp)(nil), "gpmv1.StopServiceRsp")
-	proto.RegisterType((*RebootServiceReq)(nil), "gpmv1.RebootServiceReq")
-	proto.RegisterType((*RebootServiceRsp)(nil), "gpmv1.RebootServiceRsp")
+	proto.RegisterType((*RestartServiceReq)(nil), "gpmv1.RestartServiceReq")
+	proto.RegisterType((*RestartServiceRsp)(nil), "gpmv1.RestartServiceRsp")
 	proto.RegisterType((*DeleteServiceReq)(nil), "gpmv1.DeleteServiceReq")
 	proto.RegisterType((*DeleteServiceRsp)(nil), "gpmv1.DeleteServiceRsp")
 	proto.RegisterType((*WatchServiceLogReq)(nil), "gpmv1.WatchServiceLogReq")
@@ -1592,6 +1667,8 @@ func init() {
 	proto.RegisterType((*UpgradeServiceRsp)(nil), "gpmv1.UpgradeServiceRsp")
 	proto.RegisterType((*RollbackServiceReq)(nil), "gpmv1.RollbackServiceReq")
 	proto.RegisterType((*RollbackServiceRsp)(nil), "gpmv1.RollbackServiceRsp")
+	proto.RegisterType((*ForgetServiceReq)(nil), "gpmv1.ForgetServiceReq")
+	proto.RegisterType((*ForgetServiceRsp)(nil), "gpmv1.ForgetServiceRsp")
 	proto.RegisterType((*LsReq)(nil), "gpmv1.LsReq")
 	proto.RegisterType((*LsRsp)(nil), "gpmv1.LsRsp")
 	proto.RegisterType((*PullReq)(nil), "gpmv1.PullReq")
@@ -1609,76 +1686,78 @@ func init() {
 }
 
 var fileDescriptor_a737174c368a3c5b = []byte{
-	// 1095 bytes of a gzipped FileDescriptorProto
+	// 1129 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x57, 0x5f, 0x53, 0xdb, 0x46,
-	0x10, 0x47, 0x98, 0x3f, 0x66, 0x09, 0x86, 0x6c, 0x08, 0xa5, 0x97, 0x89, 0x4b, 0x95, 0x92, 0x52,
-	0xd2, 0x60, 0x08, 0x99, 0x4e, 0x03, 0x9e, 0xce, 0x34, 0x0d, 0x05, 0xa6, 0x74, 0x26, 0x23, 0x37,
-	0x6d, 0xa7, 0x6f, 0xb2, 0x39, 0x6c, 0x4d, 0xf5, 0xe7, 0xd0, 0x09, 0xb7, 0xe9, 0xa7, 0xe8, 0xc7,
-	0xca, 0x63, 0x1e, 0xfb, 0xd8, 0xc2, 0x4b, 0x3f, 0x46, 0xe7, 0x4e, 0x27, 0x59, 0xa7, 0x3f, 0xb8,
-	0x7e, 0xb2, 0xf6, 0x76, 0x7f, 0xbb, 0x7b, 0xab, 0xd3, 0xef, 0x77, 0x86, 0xfd, 0xbe, 0x13, 0x0d,
-	0xae, 0xba, 0x3b, 0xbd, 0xc0, 0x6b, 0x0d, 0x1d, 0x9f, 0x3e, 0x75, 0x82, 0x56, 0x9f, 0x79, 0x2d,
-	0x9b, 0x39, 0x2d, 0x4e, 0xc3, 0xa1, 0xd3, 0xa3, 0xd2, 0x1e, 0xee, 0x89, 0x9f, 0x1d, 0x16, 0x06,
-	0x51, 0x80, 0xb3, 0x7d, 0xe6, 0x0d, 0xf7, 0xc8, 0xde, 0x2d, 0xd8, 0xe8, 0x2d, 0xa3, 0xbc, 0x80,
-	0x34, 0xe7, 0x61, 0xf6, 0xc8, 0x63, 0xd1, 0x5b, 0x73, 0x17, 0x96, 0xde, 0xb0, 0x73, 0x3b, 0xa2,
-	0x1d, 0xea, 0x5e, 0x58, 0xf4, 0x12, 0x3f, 0x82, 0x69, 0xc7, 0x5f, 0x37, 0x36, 0x8c, 0xad, 0xc5,
-	0x67, 0xcb, 0x3b, 0xb2, 0xc0, 0x4e, 0x1c, 0x71, 0xea, 0x5b, 0xd3, 0x8e, 0x6f, 0xb6, 0x35, 0x04,
-	0x67, 0xf8, 0x04, 0xe6, 0x42, 0xca, 0xaf, 0xdc, 0x68, 0x7d, 0x5a, 0xa2, 0xee, 0x69, 0x28, 0x4b,
-	0xba, 0x2c, 0x15, 0x62, 0x2e, 0xc0, 0xfc, 0xa9, 0x7f, 0x11, 0x58, 0xf4, 0xd2, 0x7c, 0xa2, 0x1e,
-	0x39, 0xc3, 0x0d, 0xa8, 0xf5, 0x99, 0xa7, 0xaa, 0x36, 0x14, 0xfe, 0x98, 0x79, 0xd2, 0x2f, 0x5c,
-	0xe6, 0x0a, 0x34, 0xce, 0x1c, 0x1e, 0x75, 0xe2, 0x51, 0x08, 0xb8, 0xa5, 0xaf, 0x70, 0x86, 0xdb,
-	0x50, 0x57, 0xa3, 0xe2, 0xeb, 0xc6, 0x46, 0x2d, 0x93, 0x2a, 0x09, 0x4a, 0xfd, 0xb8, 0x0a, 0xb3,
-	0x51, 0x10, 0xd9, 0xae, 0xec, 0xb9, 0x66, 0xc5, 0x86, 0xf9, 0x08, 0x96, 0x8e, 0x69, 0xa6, 0x08,
-	0x22, 0xcc, 0xf8, 0xb6, 0x47, 0x65, 0x67, 0x0b, 0x96, 0x7c, 0x36, 0x5f, 0x68, 0x41, 0x9c, 0xe1,
-	0x16, 0xcc, 0xab, 0xbc, 0xb9, 0x1d, 0x24, 0x31, 0x89, 0xdb, 0x3c, 0x80, 0x95, 0x6f, 0x42, 0x2a,
-	0x67, 0x97, 0x96, 0x78, 0x0c, 0x33, 0x9c, 0xd1, 0x9e, 0x82, 0xa2, 0x0e, 0xed, 0x30, 0xda, 0xb3,
-	0xa4, 0xdf, 0x6c, 0xe7, 0xb1, 0x13, 0x55, 0x7e, 0x0d, 0x8d, 0xa3, 0x73, 0x67, 0xcc, 0xd6, 0x70,
-	0x5b, 0xf5, 0x12, 0xbf, 0xc8, 0x35, 0x95, 0x2c, 0x03, 0xcc, 0xf4, 0x73, 0xa0, 0x67, 0x9c, 0xa8,
-	0x9b, 0x4d, 0x58, 0xee, 0x44, 0x76, 0x38, 0x6e, 0xd2, 0x87, 0xb9, 0xb0, 0x89, 0x6a, 0x7c, 0x02,
-	0x8d, 0x4e, 0x14, 0xb0, 0x31, 0x25, 0x0e, 0xf4, 0xa8, 0x89, 0x2a, 0x3c, 0x86, 0x15, 0x8b, 0x76,
-	0x83, 0x60, 0xdc, 0x36, 0xda, 0xf9, 0xb8, 0x49, 0xab, 0xbc, 0xa2, 0x2e, 0xd5, 0xce, 0x4c, 0x45,
-	0x15, 0x3d, 0x6e, 0xa2, 0x2a, 0x3f, 0x03, 0xfe, 0x64, 0x47, 0xbd, 0x81, 0x72, 0x9c, 0x05, 0xfd,
-	0xaa, 0x33, 0xb2, 0x06, 0x73, 0xfe, 0x95, 0xd7, 0xa5, 0xa1, 0xfa, 0x74, 0x94, 0x25, 0xd6, 0x2f,
-	0x02, 0xd7, 0x0d, 0x7e, 0x5b, 0xaf, 0x6d, 0x18, 0x5b, 0x75, 0x4b, 0x59, 0xe6, 0x8b, 0x62, 0x66,
-	0xce, 0xf0, 0x11, 0xd4, 0xdc, 0xa0, 0xaf, 0xba, 0xba, 0xab, 0x77, 0x25, 0x42, 0x84, 0xd7, 0x6c,
-	0xc3, 0xdd, 0x53, 0x9f, 0x47, 0xb6, 0xeb, 0x66, 0xf6, 0xfe, 0x69, 0x86, 0xa0, 0x3e, 0x50, 0x40,
-	0x3d, 0x4a, 0x11, 0xd5, 0x49, 0x01, 0xcd, 0x19, 0xee, 0xa7, 0x64, 0x15, 0x67, 0x78, 0x50, 0x9a,
-	0x21, 0x47, 0x5a, 0x9f, 0xc3, 0x5a, 0x86, 0x6a, 0x7e, 0xa4, 0x21, 0x77, 0x02, 0x9f, 0x57, 0xbd,
-	0x88, 0xef, 0xca, 0xa3, 0x39, 0xc3, 0x3d, 0xa8, 0x0f, 0x95, 0xa9, 0x08, 0xea, 0xbe, 0xbe, 0x73,
-	0x15, 0x6c, 0xa5, 0x61, 0x62, 0x04, 0x6f, 0x58, 0x3f, 0xb4, 0xcf, 0xe9, 0x98, 0x11, 0xe8, 0x51,
-	0xa3, 0x11, 0xe4, 0xd0, 0xb7, 0x8c, 0x20, 0x5f, 0x47, 0x1b, 0xc1, 0x2b, 0x40, 0x2b, 0x70, 0xdd,
-	0xae, 0xdd, 0xfb, 0x75, 0x0c, 0x87, 0x10, 0xa8, 0x87, 0x74, 0xe8, 0x88, 0xf6, 0xe5, 0x09, 0x59,
-	0xb0, 0x52, 0xdb, 0x5c, 0x2d, 0x66, 0xe1, 0xcc, 0x7c, 0x00, 0xb3, 0x67, 0xc9, 0x34, 0x99, 0x1d,
-	0x0d, 0x92, 0x74, 0xe2, 0xd9, 0xdc, 0x91, 0x4e, 0xce, 0x70, 0x13, 0x66, 0x2f, 0x1c, 0x37, 0xa5,
-	0xf6, 0x44, 0x9b, 0xbe, 0x75, 0x5c, 0x2a, 0x65, 0x22, 0xf6, 0x9a, 0x2d, 0x98, 0x7f, 0x7d, 0xe5,
-	0xba, 0x55, 0xdd, 0xad, 0x40, 0xed, 0xdc, 0x89, 0x8f, 0x6e, 0xdd, 0x12, 0x8f, 0xe6, 0x73, 0x05,
-	0xe0, 0x0c, 0x3f, 0xcb, 0x4d, 0x26, 0x39, 0x97, 0x71, 0x42, 0x6d, 0x1e, 0x5b, 0x02, 0xc5, 0x07,
-	0xa2, 0xcc, 0xc3, 0xcc, 0xdb, 0x58, 0x4a, 0x11, 0x7c, 0xa0, 0xde, 0xc1, 0x82, 0x8a, 0xe4, 0x4c,
-	0x80, 0x8e, 0x7e, 0xa7, 0xbd, 0x2a, 0x90, 0xf0, 0x29, 0xd0, 0x73, 0x15, 0x79, 0x4b, 0x53, 0x71,
-	0x26, 0xad, 0xa9, 0x5d, 0x58, 0xfc, 0x81, 0x86, 0x9e, 0xe3, 0xdb, 0x72, 0xff, 0x1f, 0x67, 0x6a,
-	0x24, 0xa8, 0xc4, 0x9f, 0x8a, 0xf9, 0x08, 0xc1, 0x19, 0x3e, 0xcd, 0x49, 0xf9, 0xfd, 0x1c, 0x4a,
-	0xaf, 0xf7, 0xec, 0xdf, 0x05, 0x80, 0x63, 0xe6, 0xa9, 0x57, 0x89, 0x9b, 0x30, 0x7f, 0x42, 0x6d,
-	0x37, 0x1a, 0xfc, 0x81, 0x77, 0x92, 0x26, 0xc5, 0x25, 0x83, 0x68, 0x16, 0xb6, 0x01, 0x46, 0x17,
-	0x08, 0x5c, 0xd5, 0x6e, 0x0b, 0xea, 0x16, 0x42, 0x4a, 0x56, 0x39, 0xdb, 0x32, 0x76, 0x0d, 0x21,
-	0x97, 0xe2, 0x75, 0x63, 0x23, 0xfd, 0x70, 0xe5, 0x6d, 0x82, 0x68, 0x36, 0x67, 0x78, 0x08, 0x8b,
-	0x99, 0xaf, 0x10, 0x93, 0x9d, 0xe8, 0x97, 0x08, 0x52, 0xb6, 0xcc, 0x19, 0x7e, 0x09, 0x30, 0x92,
-	0xf8, 0xb4, 0x45, 0xed, 0x6a, 0x40, 0x4a, 0x56, 0x39, 0xc3, 0xaf, 0x61, 0x49, 0x53, 0x69, 0x4c,
-	0xbe, 0xcf, 0xbc, 0xee, 0x93, 0x72, 0x47, 0xdc, 0x79, 0x46, 0x58, 0xd3, 0xce, 0x75, 0xf9, 0x26,
-	0x65, 0xcb, 0x9c, 0xe1, 0x57, 0x70, 0x27, 0x2b, 0x99, 0x98, 0x68, 0x78, 0x4e, 0x6e, 0x49, 0xe9,
-	0x7a, 0x5c, 0x3c, 0xa3, 0x87, 0x69, 0x71, 0x5d, 0x49, 0x49, 0xd9, 0x72, 0xbc, 0x79, 0x4d, 0xe8,
-	0xd2, 0xcd, 0xe7, 0x65, 0x92, 0x94, 0x3b, 0xe2, 0x14, 0x9a, 0x8a, 0xa5, 0x29, 0xf2, 0x1a, 0x48,
-	0xca, 0x1d, 0x9c, 0xe1, 0x29, 0x2c, 0xe7, 0x04, 0x07, 0x3f, 0x54, 0xb1, 0x45, 0x89, 0x23, 0x55,
-	0x2e, 0xce, 0x76, 0x0d, 0x3c, 0x81, 0x86, 0x2e, 0x0c, 0xb8, 0x5e, 0xa1, 0x17, 0x97, 0xa4, 0xc2,
-	0xa3, 0x8e, 0x6d, 0x07, 0xee, 0x95, 0x88, 0x02, 0x3e, 0x2c, 0x9e, 0xbf, 0x8c, 0xbc, 0x90, 0xdb,
-	0xdc, 0x9c, 0x89, 0xf6, 0x74, 0xd2, 0x4e, 0xdb, 0x2b, 0x68, 0x06, 0xa9, 0xf0, 0xa8, 0xf6, 0x8e,
-	0x61, 0x59, 0x10, 0xf3, 0xcb, 0x11, 0x31, 0xa7, 0x33, 0x2b, 0xd2, 0x3e, 0xa9, 0x72, 0xc9, 0x9b,
-	0xfc, 0xf4, 0x19, 0x4f, 0x3f, 0x7f, 0x49, 0xeb, 0x24, 0x63, 0xc9, 0x3b, 0xc9, 0x8c, 0xe0, 0xd3,
-	0xf4, 0x03, 0x56, 0x6c, 0x4d, 0x34, 0x5b, 0x4e, 0x7f, 0x5b, 0x44, 0xf2, 0x41, 0x26, 0x52, 0x12,
-	0x2e, 0xd1, 0xec, 0x11, 0x2d, 0x08, 0x42, 0x4c, 0x63, 0x15, 0xcf, 0x12, 0xcd, 0xe6, 0x0c, 0xbf,
-	0x80, 0x7a, 0x42, 0x66, 0x88, 0x05, 0x76, 0xbb, 0x24, 0x85, 0xb5, 0x38, 0xff, 0xcb, 0xef, 0xdf,
-	0xfd, 0xd3, 0x9c, 0x7a, 0x77, 0xdd, 0x34, 0xde, 0x5f, 0x37, 0x8d, 0xbf, 0xaf, 0x9b, 0xc6, 0x9f,
-	0x37, 0xcd, 0xa9, 0xf7, 0x37, 0xcd, 0xa9, 0xbf, 0x6e, 0x9a, 0x53, 0xbf, 0xb4, 0xfe, 0xf7, 0xbf,
-	0xb7, 0x43, 0x99, 0xbe, 0x3b, 0x27, 0xff, 0x86, 0xed, 0xff, 0x17, 0x00, 0x00, 0xff, 0xff, 0x30,
-	0xd8, 0x61, 0x33, 0xf7, 0x0d, 0x00, 0x00,
+	0x10, 0xc7, 0x38, 0x80, 0x59, 0x82, 0x81, 0x0d, 0xa1, 0xf4, 0x32, 0x71, 0xa9, 0x52, 0x12, 0x4a,
+	0x1a, 0x0c, 0x21, 0xd3, 0x69, 0x80, 0x76, 0xa6, 0x14, 0x02, 0x4c, 0xe9, 0x4c, 0x46, 0x6e, 0xda,
+	0x4e, 0xdf, 0x84, 0x39, 0x6c, 0x4d, 0xf5, 0xe7, 0xd0, 0x09, 0xb7, 0xe9, 0xa7, 0xe8, 0x27, 0xe9,
+	0xe7, 0xc8, 0x63, 0x1e, 0xfb, 0xd8, 0xc2, 0x17, 0xe9, 0xdc, 0xe9, 0x74, 0xd6, 0x49, 0x32, 0x8e,
+	0x9f, 0xac, 0xbb, 0xdd, 0xdf, 0xee, 0xde, 0x9e, 0xf4, 0xfb, 0xad, 0x61, 0xbb, 0xe3, 0xc6, 0xdd,
+	0xab, 0xb3, 0x8d, 0x76, 0xe8, 0x37, 0x7b, 0x6e, 0x40, 0x9f, 0xb9, 0x61, 0xb3, 0xc3, 0xfc, 0xa6,
+	0xc3, 0xdc, 0x26, 0xa7, 0x51, 0xcf, 0x6d, 0x53, 0xb9, 0xee, 0x6d, 0x89, 0x9f, 0x0d, 0x16, 0x85,
+	0x71, 0x88, 0x13, 0x1d, 0xe6, 0xf7, 0xb6, 0xc8, 0xd6, 0x2d, 0xd8, 0xf8, 0x2d, 0xa3, 0xbc, 0x80,
+	0xb4, 0xa6, 0x60, 0xe2, 0xd0, 0x67, 0xf1, 0x5b, 0x6b, 0x13, 0x66, 0xdf, 0xb0, 0x73, 0x27, 0xa6,
+	0x2d, 0xea, 0x5d, 0xd8, 0xf4, 0x12, 0x3f, 0x81, 0x71, 0x37, 0x58, 0xae, 0xac, 0x54, 0xd6, 0x66,
+	0x9e, 0xcf, 0x6d, 0xc8, 0x04, 0x1b, 0x89, 0xc7, 0x49, 0x60, 0x8f, 0xbb, 0x81, 0xb5, 0x67, 0x20,
+	0x38, 0xc3, 0xa7, 0x30, 0x19, 0x51, 0x7e, 0xe5, 0xc5, 0xcb, 0xe3, 0x12, 0x75, 0xcf, 0x40, 0xd9,
+	0xd2, 0x64, 0x2b, 0x17, 0x6b, 0x1a, 0xa6, 0x4e, 0x82, 0x8b, 0xd0, 0xa6, 0x97, 0xd6, 0x53, 0xf5,
+	0xc8, 0x19, 0xae, 0x40, 0xb5, 0xc3, 0x7c, 0x95, 0xb5, 0xae, 0xf0, 0x47, 0xcc, 0x97, 0x76, 0x61,
+	0xb2, 0xe6, 0xa1, 0x7e, 0xea, 0xf2, 0xb8, 0x95, 0xb4, 0x42, 0xc0, 0x6d, 0x73, 0x87, 0x33, 0x5c,
+	0x87, 0x9a, 0x6a, 0x15, 0x5f, 0xae, 0xac, 0x54, 0x33, 0xa1, 0x52, 0x27, 0x6d, 0xc7, 0x45, 0x98,
+	0x88, 0xc3, 0xd8, 0xf1, 0x64, 0xcd, 0x55, 0x3b, 0x59, 0x58, 0x8f, 0x60, 0xf6, 0x88, 0x66, 0x92,
+	0x20, 0xc2, 0x9d, 0xc0, 0xf1, 0xa9, 0xac, 0x6c, 0xda, 0x96, 0xcf, 0xd6, 0x4b, 0xc3, 0x89, 0x33,
+	0x5c, 0x83, 0x29, 0x15, 0x37, 0x77, 0x82, 0xd4, 0x27, 0x35, 0x5b, 0x3b, 0x30, 0xff, 0x5d, 0x44,
+	0x65, 0xef, 0x74, 0x8a, 0xc7, 0x70, 0x87, 0x33, 0xda, 0x56, 0x50, 0x34, 0xa1, 0x2d, 0x46, 0xdb,
+	0xb6, 0xb4, 0x5b, 0x7b, 0x79, 0xec, 0x48, 0x99, 0x5f, 0x43, 0xfd, 0xf0, 0xdc, 0x1d, 0x72, 0x34,
+	0x5c, 0x57, 0xb5, 0x24, 0x17, 0xb9, 0xa4, 0x82, 0x65, 0x80, 0x99, 0x7a, 0x76, 0xcc, 0x88, 0x23,
+	0x55, 0xb3, 0x0a, 0x73, 0xad, 0xd8, 0x89, 0x86, 0x75, 0x7a, 0x37, 0xe7, 0x36, 0x52, 0x8e, 0xcf,
+	0xa0, 0xde, 0x8a, 0x43, 0x36, 0x24, 0xc5, 0x8e, 0xe9, 0x35, 0x52, 0x86, 0x27, 0xb0, 0x60, 0x53,
+	0xfe, 0x01, 0xe7, 0xf8, 0xba, 0xe0, 0x38, 0x52, 0x9e, 0xc7, 0x30, 0x7f, 0x40, 0x3d, 0x6a, 0xbc,
+	0x35, 0x65, 0x69, 0xf6, 0xf2, 0x7e, 0x23, 0x65, 0xf9, 0x05, 0xf0, 0x67, 0x27, 0x6e, 0x77, 0x95,
+	0xe1, 0x34, 0xec, 0x0c, 0x7a, 0x4b, 0x96, 0x60, 0x32, 0xb8, 0xf2, 0xcf, 0x68, 0xa4, 0x3e, 0x1e,
+	0xb5, 0x12, 0xfb, 0x17, 0xa1, 0xe7, 0x85, 0xbf, 0x2f, 0x57, 0x57, 0x2a, 0x6b, 0x35, 0x5b, 0xad,
+	0xac, 0x97, 0xc5, 0xc8, 0x9c, 0xe1, 0x23, 0xa8, 0x7a, 0x61, 0x47, 0x55, 0xb5, 0x60, 0x56, 0x25,
+	0x5c, 0x84, 0xd5, 0xda, 0x83, 0x85, 0x93, 0x80, 0xc7, 0x8e, 0xe7, 0x65, 0xce, 0xfe, 0x24, 0x43,
+	0x51, 0x1f, 0x29, 0xa0, 0xe9, 0xa5, 0xa8, 0xea, 0xb8, 0x80, 0xe6, 0x0c, 0xb7, 0x35, 0x5d, 0x25,
+	0x11, 0x1e, 0x94, 0x46, 0xc8, 0xd1, 0xd6, 0x17, 0xb0, 0x94, 0x21, 0x9b, 0x9f, 0x68, 0xc4, 0xdd,
+	0x30, 0xe0, 0x83, 0x2e, 0xe2, 0xfb, 0x72, 0x6f, 0xce, 0x70, 0x0b, 0x6a, 0x3d, 0xb5, 0x54, 0x14,
+	0x75, 0xdf, 0x3c, 0xb9, 0x72, 0xb6, 0xb5, 0x9b, 0x68, 0xc1, 0x1b, 0xd6, 0x89, 0x9c, 0x73, 0x3a,
+	0xa4, 0x05, 0xa6, 0x57, 0xbf, 0x05, 0x39, 0xf4, 0x2d, 0x2d, 0xc8, 0xe7, 0x31, 0x5a, 0x70, 0x00,
+	0x68, 0x87, 0x9e, 0x77, 0xe6, 0xb4, 0x7f, 0x1b, 0xc2, 0x22, 0x04, 0x6a, 0x11, 0xed, 0xb9, 0xa2,
+	0x7c, 0xf9, 0x86, 0x4c, 0xdb, 0x7a, 0x6d, 0x2d, 0x16, 0xa3, 0x70, 0x66, 0xed, 0xc3, 0xfc, 0xab,
+	0x30, 0xea, 0x0c, 0xa3, 0xde, 0x5b, 0x23, 0x63, 0x3e, 0x06, 0x67, 0xd6, 0x03, 0x98, 0x38, 0x4d,
+	0x6f, 0x89, 0x39, 0x71, 0x37, 0x0d, 0x26, 0x9e, 0xad, 0x0d, 0x69, 0xe4, 0x0c, 0x57, 0x61, 0xe2,
+	0xc2, 0xf5, 0xb4, 0x68, 0xa4, 0xaa, 0xf7, 0xca, 0xf5, 0xa8, 0x14, 0xa0, 0xc4, 0x6a, 0x35, 0x61,
+	0xea, 0xf5, 0x95, 0xe7, 0x0d, 0xaa, 0x6d, 0x1e, 0xaa, 0xe7, 0x6e, 0xf2, 0x49, 0xd4, 0x6c, 0xf1,
+	0x68, 0xbd, 0x50, 0x00, 0xce, 0xf0, 0xf3, 0x5c, 0xc7, 0xd3, 0xf7, 0x3d, 0x09, 0x68, 0xf4, 0x79,
+	0x4d, 0xa0, 0x78, 0x57, 0xa4, 0x79, 0x98, 0xb9, 0xe5, 0x59, 0x8d, 0xe0, 0x5d, 0x75, 0xb7, 0xd3,
+	0xca, 0x93, 0x33, 0x01, 0x3a, 0xfc, 0x83, 0xb6, 0x07, 0x81, 0x84, 0x4d, 0x81, 0x5e, 0x28, 0xcf,
+	0x5b, 0x8a, 0x4a, 0x22, 0x19, 0x45, 0x6d, 0xc2, 0xcc, 0x8f, 0x34, 0xf2, 0xdd, 0xc0, 0x91, 0xe7,
+	0xff, 0x34, 0x93, 0x23, 0x45, 0xa5, 0x76, 0x3d, 0x26, 0xf4, 0x11, 0x9c, 0xe1, 0xb3, 0xdc, 0x90,
+	0x70, 0x3f, 0x87, 0x32, 0xf3, 0x3d, 0xff, 0x1b, 0x00, 0x8e, 0x98, 0xaf, 0xae, 0x12, 0x57, 0x61,
+	0xea, 0x98, 0x3a, 0x5e, 0xdc, 0xfd, 0x13, 0xef, 0xa6, 0x45, 0x8a, 0xf1, 0x85, 0x18, 0x2b, 0xdc,
+	0x03, 0xe8, 0x8f, 0x26, 0xb8, 0x68, 0xcc, 0x21, 0x6a, 0xbe, 0x21, 0x25, 0xbb, 0x9c, 0xad, 0x55,
+	0x36, 0x2b, 0x42, 0x88, 0xc5, 0x75, 0x63, 0x5d, 0x13, 0x82, 0x9c, 0x53, 0x88, 0xb1, 0xe6, 0x0c,
+	0x77, 0x61, 0x26, 0xf3, 0x75, 0x63, 0x7a, 0x12, 0x73, 0x3c, 0x21, 0x65, 0xdb, 0x9c, 0xe1, 0x57,
+	0x00, 0xfd, 0xe1, 0x41, 0x97, 0x68, 0x0c, 0x1d, 0xa4, 0x64, 0x97, 0x33, 0xfc, 0x16, 0x66, 0x0d,
+	0xfd, 0xc7, 0xf4, 0xbb, 0xcf, 0x4f, 0x14, 0xa4, 0xdc, 0x90, 0x54, 0x9e, 0x91, 0x6c, 0x5d, 0xb9,
+	0x39, 0x18, 0x90, 0xb2, 0x6d, 0xce, 0xf0, 0x1b, 0xb8, 0x9b, 0x15, 0x63, 0x4c, 0xa7, 0x83, 0x9c,
+	0x90, 0x93, 0xd2, 0xfd, 0x24, 0x79, 0x46, 0x69, 0x75, 0x72, 0x53, 0xa3, 0x49, 0xd9, 0x36, 0x67,
+	0x78, 0x00, 0x75, 0x53, 0x41, 0x71, 0x59, 0x39, 0x16, 0x14, 0x98, 0x0c, 0xb0, 0x24, 0x2d, 0x34,
+	0x04, 0x52, 0xb7, 0x30, 0x2f, 0xaf, 0xa4, 0xdc, 0xc0, 0x19, 0x9e, 0xc0, 0x5c, 0x4e, 0xcb, 0xf0,
+	0x63, 0xe5, 0x5b, 0x54, 0x4f, 0x32, 0xc8, 0xc4, 0xd9, 0x66, 0x05, 0x8f, 0xa1, 0x6e, 0x6a, 0x8e,
+	0x3e, 0x53, 0x41, 0xf2, 0xc8, 0x00, 0x8b, 0x7a, 0x73, 0x5b, 0x70, 0xaf, 0x44, 0x6f, 0xf0, 0x61,
+	0xf1, 0x15, 0xcc, 0x28, 0x17, 0xb9, 0xcd, 0xcc, 0x99, 0x28, 0xcf, 0xd4, 0x03, 0x5d, 0x5e, 0x41,
+	0x8e, 0xc8, 0x00, 0x8b, 0x2a, 0xef, 0x08, 0xe6, 0x04, 0xe7, 0xef, 0xf7, 0x39, 0x5f, 0xf7, 0xac,
+	0xa8, 0x28, 0x64, 0x90, 0x29, 0xb9, 0x3f, 0x83, 0xe2, 0xf5, 0xfd, 0xe5, 0xc5, 0x83, 0x94, 0x1b,
+	0xe4, 0x3f, 0x8d, 0xf1, 0x53, 0xae, 0x49, 0x44, 0x8a, 0x03, 0xc9, 0xac, 0xe4, 0xc4, 0x74, 0x47,
+	0xb0, 0xb2, 0xa6, 0x01, 0xc5, 0xf9, 0xc4, 0x58, 0xcb, 0x0b, 0x5c, 0x17, 0x9e, 0xbc, 0x9b, 0xf1,
+	0x94, 0xb4, 0x4d, 0x8c, 0x75, 0x9f, 0x5c, 0x04, 0xad, 0x6a, 0x5f, 0xc5, 0xd6, 0xc4, 0x58, 0x73,
+	0x86, 0x5f, 0x42, 0x2d, 0xa5, 0x44, 0xc4, 0x02, 0x47, 0x5e, 0x92, 0xc2, 0x5e, 0x12, 0x7f, 0xff,
+	0x87, 0x77, 0xff, 0x35, 0xc6, 0xde, 0x5d, 0x37, 0x2a, 0xef, 0xaf, 0x1b, 0x95, 0x7f, 0xaf, 0x1b,
+	0x95, 0xbf, 0x6e, 0x1a, 0x63, 0xef, 0x6f, 0x1a, 0x63, 0xff, 0xdc, 0x34, 0xc6, 0x7e, 0x6d, 0x7e,
+	0xf0, 0xbf, 0xcb, 0x5d, 0x19, 0xfe, 0x6c, 0x52, 0xfe, 0x4d, 0xdc, 0xfe, 0x3f, 0x00, 0x00, 0xff,
+	0xff, 0xb5, 0x9c, 0xba, 0x6f, 0x97, 0x0e, 0x00, 0x00,
 }
 
 func (m *Empty) XSize() (n int) {
@@ -1899,7 +1978,7 @@ func (m *StopServiceRsp) XSize() (n int) {
 	return n
 }
 
-func (m *RebootServiceReq) XSize() (n int) {
+func (m *RestartServiceReq) XSize() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1912,7 +1991,7 @@ func (m *RebootServiceReq) XSize() (n int) {
 	return n
 }
 
-func (m *RebootServiceRsp) XSize() (n int) {
+func (m *RestartServiceRsp) XSize() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2081,6 +2160,32 @@ func (m *RollbackServiceReq) XSize() (n int) {
 }
 
 func (m *RollbackServiceRsp) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *ForgetServiceReq) XSize() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	l = len(m.Revision)
+	if l > 0 {
+		n += 1 + l + sovGpm(uint64(l))
+	}
+	return n
+}
+
+func (m *ForgetServiceRsp) XSize() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -2784,7 +2889,7 @@ func (m *StopServiceRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *RebootServiceReq) Marshal() (dAtA []byte, err error) {
+func (m *RestartServiceReq) Marshal() (dAtA []byte, err error) {
 	size := m.XSize()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2794,12 +2899,12 @@ func (m *RebootServiceReq) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *RebootServiceReq) MarshalTo(dAtA []byte) (int, error) {
+func (m *RestartServiceReq) MarshalTo(dAtA []byte) (int, error) {
 	size := m.XSize()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *RebootServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RestartServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -2814,7 +2919,7 @@ func (m *RebootServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *RebootServiceRsp) Marshal() (dAtA []byte, err error) {
+func (m *RestartServiceRsp) Marshal() (dAtA []byte, err error) {
 	size := m.XSize()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -2824,12 +2929,12 @@ func (m *RebootServiceRsp) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *RebootServiceRsp) MarshalTo(dAtA []byte) (int, error) {
+func (m *RestartServiceRsp) MarshalTo(dAtA []byte) (int, error) {
 	size := m.XSize()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *RebootServiceRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *RestartServiceRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -3254,6 +3359,66 @@ func (m *RollbackServiceRsp) MarshalTo(dAtA []byte) (int, error) {
 }
 
 func (m *RollbackServiceRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *ForgetServiceReq) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ForgetServiceReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ForgetServiceReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Revision) > 0 {
+		i -= len(m.Revision)
+		copy(dAtA[i:], m.Revision)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Revision)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintGpm(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ForgetServiceRsp) Marshal() (dAtA []byte, err error) {
+	size := m.XSize()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ForgetServiceRsp) MarshalTo(dAtA []byte) (int, error) {
+	size := m.XSize()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ForgetServiceRsp) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -5003,7 +5168,7 @@ func (m *StopServiceRsp) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *RebootServiceReq) Unmarshal(dAtA []byte) error {
+func (m *RestartServiceReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -5026,10 +5191,10 @@ func (m *RebootServiceReq) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: RebootServiceReq: wiretype end group for non-group")
+			return fmt.Errorf("proto: RestartServiceReq: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RebootServiceReq: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RestartServiceReq: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -5085,7 +5250,7 @@ func (m *RebootServiceReq) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *RebootServiceRsp) Unmarshal(dAtA []byte) error {
+func (m *RestartServiceRsp) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -5108,10 +5273,10 @@ func (m *RebootServiceRsp) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: RebootServiceRsp: wiretype end group for non-group")
+			return fmt.Errorf("proto: RestartServiceRsp: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: RebootServiceRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: RestartServiceRsp: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -6220,6 +6385,170 @@ func (m *RollbackServiceRsp) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *ForgetServiceReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ForgetServiceReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ForgetServiceReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Revision", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGpm
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGpm
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Revision = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ForgetServiceRsp) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGpm
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ForgetServiceRsp: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ForgetServiceRsp: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGpm(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGpm
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func (m *LsReq) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -7169,8 +7498,8 @@ type GpmServiceClient interface {
 	// +gen:patch=/api/v1/Service/{name}/action/stop
 	StopService(ctx context.Context, in *StopServiceReq, opts ...grpc.CallOption) (*StopServiceRsp, error)
 	// +gen:summary=重启服务
-	// +gen:patch=/api/v1/Service/{name}/action/reboot
-	RebootService(ctx context.Context, in *RebootServiceReq, opts ...grpc.CallOption) (*RebootServiceRsp, error)
+	// +gen:patch=/api/v1/Service/{name}/action/restart
+	RestartService(ctx context.Context, in *RestartServiceReq, opts ...grpc.CallOption) (*RestartServiceRsp, error)
 	// +gen:summary=删除服务
 	// +gen:delete=/api/v1/Service/{name}
 	DeleteService(ctx context.Context, in *DeleteServiceReq, opts ...grpc.CallOption) (*DeleteServiceRsp, error)
@@ -7186,6 +7515,9 @@ type GpmServiceClient interface {
 	// +gen:summary=回滚服务
 	// +gen:post=/api/v1/Service/{name}/rollback
 	RollBackService(ctx context.Context, in *RollbackServiceReq, opts ...grpc.CallOption) (*RollbackServiceRsp, error)
+	// +gen:summary=删除历史版本
+	// +gen:delete=/api/v1/Service/{name}/forget
+	ForgetService(ctx context.Context, in *ForgetServiceReq, opts ...grpc.CallOption) (*ForgetServiceRsp, error)
 	// +gen:summary=获取目录信息下文件列表
 	// +gen:get=/api/v1/Action/ls
 	Ls(ctx context.Context, in *LsReq, opts ...grpc.CallOption) (*LsRsp, error)
@@ -7311,9 +7643,9 @@ func (c *gpmServiceClient) StopService(ctx context.Context, in *StopServiceReq, 
 	return out, nil
 }
 
-func (c *gpmServiceClient) RebootService(ctx context.Context, in *RebootServiceReq, opts ...grpc.CallOption) (*RebootServiceRsp, error) {
-	out := new(RebootServiceRsp)
-	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/RebootService", in, out, opts...)
+func (c *gpmServiceClient) RestartService(ctx context.Context, in *RestartServiceReq, opts ...grpc.CallOption) (*RestartServiceRsp, error) {
+	out := new(RestartServiceRsp)
+	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/RestartService", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -7435,6 +7767,15 @@ func (x *gpmServiceUpgradeServiceClient) Recv() (*UpgradeServiceRsp, error) {
 func (c *gpmServiceClient) RollBackService(ctx context.Context, in *RollbackServiceReq, opts ...grpc.CallOption) (*RollbackServiceRsp, error) {
 	out := new(RollbackServiceRsp)
 	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/RollBackService", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gpmServiceClient) ForgetService(ctx context.Context, in *ForgetServiceReq, opts ...grpc.CallOption) (*ForgetServiceRsp, error) {
+	out := new(ForgetServiceRsp)
+	err := c.cc.Invoke(ctx, "/gpmv1.GpmService/ForgetService", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -7581,8 +7922,8 @@ type GpmServiceServer interface {
 	// +gen:patch=/api/v1/Service/{name}/action/stop
 	StopService(context.Context, *StopServiceReq) (*StopServiceRsp, error)
 	// +gen:summary=重启服务
-	// +gen:patch=/api/v1/Service/{name}/action/reboot
-	RebootService(context.Context, *RebootServiceReq) (*RebootServiceRsp, error)
+	// +gen:patch=/api/v1/Service/{name}/action/restart
+	RestartService(context.Context, *RestartServiceReq) (*RestartServiceRsp, error)
 	// +gen:summary=删除服务
 	// +gen:delete=/api/v1/Service/{name}
 	DeleteService(context.Context, *DeleteServiceReq) (*DeleteServiceRsp, error)
@@ -7598,6 +7939,9 @@ type GpmServiceServer interface {
 	// +gen:summary=回滚服务
 	// +gen:post=/api/v1/Service/{name}/rollback
 	RollBackService(context.Context, *RollbackServiceReq) (*RollbackServiceRsp, error)
+	// +gen:summary=删除历史版本
+	// +gen:delete=/api/v1/Service/{name}/forget
+	ForgetService(context.Context, *ForgetServiceReq) (*ForgetServiceRsp, error)
 	// +gen:summary=获取目录信息下文件列表
 	// +gen:get=/api/v1/Action/ls
 	Ls(context.Context, *LsReq) (*LsRsp, error)
@@ -7643,8 +7987,8 @@ func (*UnimplementedGpmServiceServer) StartService(ctx context.Context, req *Sta
 func (*UnimplementedGpmServiceServer) StopService(ctx context.Context, req *StopServiceReq) (*StopServiceRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StopService not implemented")
 }
-func (*UnimplementedGpmServiceServer) RebootService(ctx context.Context, req *RebootServiceReq) (*RebootServiceRsp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RebootService not implemented")
+func (*UnimplementedGpmServiceServer) RestartService(ctx context.Context, req *RestartServiceReq) (*RestartServiceRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RestartService not implemented")
 }
 func (*UnimplementedGpmServiceServer) DeleteService(ctx context.Context, req *DeleteServiceReq) (*DeleteServiceRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteService not implemented")
@@ -7663,6 +8007,9 @@ func (*UnimplementedGpmServiceServer) UpgradeService(srv GpmService_UpgradeServi
 }
 func (*UnimplementedGpmServiceServer) RollBackService(ctx context.Context, req *RollbackServiceReq) (*RollbackServiceRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RollBackService not implemented")
+}
+func (*UnimplementedGpmServiceServer) ForgetService(ctx context.Context, req *ForgetServiceReq) (*ForgetServiceRsp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ForgetService not implemented")
 }
 func (*UnimplementedGpmServiceServer) Ls(ctx context.Context, req *LsReq) (*LsRsp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ls not implemented")
@@ -7854,20 +8201,20 @@ func _GpmService_StopService_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _GpmService_RebootService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RebootServiceReq)
+func _GpmService_RestartService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RestartServiceReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GpmServiceServer).RebootService(ctx, in)
+		return srv.(GpmServiceServer).RestartService(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/gpmv1.GpmService/RebootService",
+		FullMethod: "/gpmv1.GpmService/RestartService",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GpmServiceServer).RebootService(ctx, req.(*RebootServiceReq))
+		return srv.(GpmServiceServer).RestartService(ctx, req.(*RestartServiceReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -7995,6 +8342,24 @@ func _GpmService_RollBackService_Handler(srv interface{}, ctx context.Context, d
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(GpmServiceServer).RollBackService(ctx, req.(*RollbackServiceReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GpmService_ForgetService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ForgetServiceReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GpmServiceServer).ForgetService(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/gpmv1.GpmService/ForgetService",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GpmServiceServer).ForgetService(ctx, req.(*ForgetServiceReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -8145,8 +8510,8 @@ var _GpmService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _GpmService_StopService_Handler,
 		},
 		{
-			MethodName: "RebootService",
-			Handler:    _GpmService_RebootService_Handler,
+			MethodName: "RestartService",
+			Handler:    _GpmService_RestartService_Handler,
 		},
 		{
 			MethodName: "DeleteService",
@@ -8159,6 +8524,10 @@ var _GpmService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RollBackService",
 			Handler:    _GpmService_RollBackService_Handler,
+		},
+		{
+			MethodName: "ForgetService",
+			Handler:    _GpmService_ForgetService_Handler,
 		},
 		{
 			MethodName: "Ls",

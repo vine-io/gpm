@@ -181,11 +181,11 @@ func (m *StopServiceRsp) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
-func (m *RebootServiceReq) Validate() error {
+func (m *RestartServiceReq) Validate() error {
 	return m.ValidateE("")
 }
 
-func (m *RebootServiceReq) ValidateE(prefix string) error {
+func (m *RestartServiceReq) ValidateE(prefix string) error {
 	errs := make([]error, 0)
 	if len(m.Name) == 0 {
 		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
@@ -193,11 +193,11 @@ func (m *RebootServiceReq) ValidateE(prefix string) error {
 	return is.MargeErr(errs...)
 }
 
-func (m *RebootServiceRsp) Validate() error {
+func (m *RestartServiceRsp) Validate() error {
 	return m.ValidateE("")
 }
 
-func (m *RebootServiceRsp) ValidateE(prefix string) error {
+func (m *RestartServiceRsp) ValidateE(prefix string) error {
 	errs := make([]error, 0)
 	return is.MargeErr(errs...)
 }
@@ -318,6 +318,27 @@ func (m *RollbackServiceRsp) Validate() error {
 }
 
 func (m *RollbackServiceRsp) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	return is.MargeErr(errs...)
+}
+
+func (m *ForgetServiceReq) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ForgetServiceReq) ValidateE(prefix string) error {
+	errs := make([]error, 0)
+	if len(m.Name) == 0 {
+		errs = append(errs, fmt.Errorf("field '%sname' is required", prefix))
+	}
+	return is.MargeErr(errs...)
+}
+
+func (m *ForgetServiceRsp) Validate() error {
+	return m.ValidateE("")
+}
+
+func (m *ForgetServiceRsp) ValidateE(prefix string) error {
 	errs := make([]error, 0)
 	return is.MargeErr(errs...)
 }

@@ -177,7 +177,7 @@ func (p *Process) watching() {
 			pr, err := proc.NewProcess(int32(p.Pid))
 			if err != nil {
 				pid, _ := p.run()
-				log.Infof("reboot service(dead) %s at pid: %d", p.Name, pid)
+				log.Infof("restart service(dead) %s at pid: %d", p.Name, pid)
 				p.db.UpdateService(context.TODO(), p.Service)
 			} else {
 				status, _ := pr.Status()
@@ -186,7 +186,7 @@ func (p *Process) watching() {
 					_ = p.kill()
 					pid, _ := p.run()
 					p.db.UpdateService(context.TODO(), p.Service)
-					log.Infof("reboot service(Z) %s at pid: %d", p.Name, pid)
+					log.Infof("restart service(Z) %s at pid: %d", p.Name, pid)
 				}
 			}
 		}

@@ -86,9 +86,9 @@ func NewGpmServiceEndpoints() []*api.Endpoint {
 			Handler:     "rpc",
 		},
 		&api.Endpoint{
-			Name:        "GpmService.RebootService",
-			Description: "GpmService.RebootService",
-			Path:        []string{"/api/v1/Service/{name}/action/reboot"},
+			Name:        "GpmService.RestartService",
+			Description: "GpmService.RestartService",
+			Path:        []string{"/api/v1/Service/{name}/action/restart"},
 			Method:      []string{"PATCH"},
 			Body:        "*",
 			Handler:     "rpc",
@@ -114,6 +114,14 @@ func NewGpmServiceEndpoints() []*api.Endpoint {
 			Description: "GpmService.RollBackService",
 			Path:        []string{"/api/v1/Service/{name}/rollback"},
 			Method:      []string{"POST"},
+			Body:        "*",
+			Handler:     "rpc",
+		},
+		&api.Endpoint{
+			Name:        "GpmService.ForgetService",
+			Description: "GpmService.ForgetService",
+			Path:        []string{"/api/v1/Service/{name}/forget"},
+			Method:      []string{"DELETE"},
 			Body:        "*",
 			Handler:     "rpc",
 		},
@@ -164,7 +172,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						Content: &registry.PathRequestBodyContent{
 							ApplicationJson: &registry.ApplicationContent{
 								Schema: &registry.Schema{
-									Ref: "#/components/schemas/v1.ExecReq",
+									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ExecReq",
 								},
 							},
 						},
@@ -174,7 +182,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.ExecRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ExecRsp"},
 								},
 							},
 						},
@@ -206,7 +214,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.LsRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.LsRsp"},
 								},
 							},
 						},
@@ -226,7 +234,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.ListServiceRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ListServiceRsp"},
 								},
 							},
 						},
@@ -243,7 +251,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						Content: &registry.PathRequestBodyContent{
 							ApplicationJson: &registry.ApplicationContent{
 								Schema: &registry.Schema{
-									Ref: "#/components/schemas/v1.CreateServiceReq",
+									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceReq",
 								},
 							},
 						},
@@ -253,7 +261,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.CreateServiceRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceRsp"},
 								},
 							},
 						},
@@ -284,7 +292,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.DeleteServiceRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.DeleteServiceRsp"},
 								},
 							},
 						},
@@ -313,7 +321,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.GetServiceRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.GetServiceRsp"},
 								},
 							},
 						},
@@ -342,7 +350,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						Content: &registry.PathRequestBodyContent{
 							ApplicationJson: &registry.ApplicationContent{
 								Schema: &registry.Schema{
-									Ref: "#/components/schemas/v1.EditServiceReq",
+									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.EditServiceReq",
 								},
 							},
 						},
@@ -352,7 +360,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.EditServiceRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.EditServiceRsp"},
 								},
 							},
 						},
@@ -360,17 +368,17 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					Security: []*registry.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{name}/action/reboot": &registry.OpenAPIPath{
+			"/api/v1/Service/{name}/action/restart": &registry.OpenAPIPath{
 				Patch: &registry.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "重启服务",
-					Description: "GpmService RebootService",
-					OperationId: "GpmServiceRebootService",
+					Description: "GpmService RestartService",
+					OperationId: "GpmServiceRestartService",
 					Parameters: []*registry.PathParameters{
 						&registry.PathParameters{
 							Name:        "name",
 							In:          "path",
-							Description: "RebootServiceReq field name",
+							Description: "RestartServiceReq field name",
 							Required:    true,
 							Explode:     true,
 							Schema: &registry.Schema{
@@ -379,11 +387,11 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 					},
 					RequestBody: &registry.PathRequestBody{
-						Description: "RebootService RebootServiceReq",
+						Description: "RestartService RestartServiceReq",
 						Content: &registry.PathRequestBodyContent{
 							ApplicationJson: &registry.ApplicationContent{
 								Schema: &registry.Schema{
-									Ref: "#/components/schemas/v1.RebootServiceReq",
+									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceReq",
 								},
 							},
 						},
@@ -393,7 +401,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.RebootServiceRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceRsp"},
 								},
 							},
 						},
@@ -424,7 +432,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						Content: &registry.PathRequestBodyContent{
 							ApplicationJson: &registry.ApplicationContent{
 								Schema: &registry.Schema{
-									Ref: "#/components/schemas/v1.StartServiceReq",
+									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.StartServiceReq",
 								},
 							},
 						},
@@ -434,7 +442,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.StartServiceRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.StartServiceRsp"},
 								},
 							},
 						},
@@ -465,7 +473,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						Content: &registry.PathRequestBodyContent{
 							ApplicationJson: &registry.ApplicationContent{
 								Schema: &registry.Schema{
-									Ref: "#/components/schemas/v1.StopServiceReq",
+									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.StopServiceReq",
 								},
 							},
 						},
@@ -475,7 +483,38 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.StopServiceRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.StopServiceRsp"},
+								},
+							},
+						},
+					},
+					Security: []*registry.PathSecurity{},
+				},
+			},
+			"/api/v1/Service/{name}/forget": &registry.OpenAPIPath{
+				Delete: &registry.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "删除历史版本",
+					Description: "GpmService ForgetService",
+					OperationId: "GpmServiceForgetService",
+					Parameters: []*registry.PathParameters{
+						&registry.PathParameters{
+							Name:        "name",
+							In:          "path",
+							Description: "ForgetServiceReq field name",
+							Required:    true,
+							Explode:     true,
+							Schema: &registry.Schema{
+								Type: "string",
+							},
+						},
+					},
+					Responses: map[string]*registry.PathResponse{
+						"200": &registry.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &registry.PathRequestBodyContent{
+								ApplicationJson: &registry.ApplicationContent{
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ForgetServiceRsp"},
 								},
 							},
 						},
@@ -506,7 +545,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						Content: &registry.PathRequestBodyContent{
 							ApplicationJson: &registry.ApplicationContent{
 								Schema: &registry.Schema{
-									Ref: "#/components/schemas/v1.RollbackServiceReq",
+									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceReq",
 								},
 							},
 						},
@@ -516,7 +555,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.RollbackServiceRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceRsp"},
 								},
 							},
 						},
@@ -547,7 +586,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.ListServiceVersionsRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ListServiceVersionsRsp"},
 								},
 							},
 						},
@@ -567,7 +606,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 							Description: "successful response (stream response)",
 							Content: &registry.PathRequestBodyContent{
 								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/v1.InfoRsp"},
+									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.InfoRsp"},
 								},
 							},
 						},
@@ -579,26 +618,26 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 		Components: &registry.OpenAPIComponents{
 			SecuritySchemes: &registry.SecuritySchemes{},
 			Schemas: map[string]*registry.Model{
-				"v1.ExecReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ExecReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"in": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.ExecIn",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ExecIn",
 						},
 					},
 					Required: []string{"in"},
 				},
-				"v1.ExecRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ExecRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"result": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.ExecResult",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ExecResult",
 						},
 					},
 				},
-				"v1.LsReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.LsReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"path": &registry.Schema{
@@ -607,25 +646,25 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					},
 					Required: []string{"path"},
 				},
-				"v1.LsRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.LsRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"files": &registry.Schema{
 							Type:  "array",
-							Items: &registry.Schema{Ref: "#/components/schemas/v1.FileInfo"},
+							Items: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.FileInfo"},
 						},
 					},
 				},
-				"v1.ListServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceReq": &registry.Model{
 					Type:       "object",
 					Properties: map[string]*registry.Schema{},
 				},
-				"v1.ListServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"services": &registry.Schema{
 							Type:  "array",
-							Items: &registry.Schema{Ref: "#/components/schemas/v1.Service"},
+							Items: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service"},
 						},
 						"total": &registry.Schema{
 							Type:   "integer",
@@ -633,26 +672,26 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 					},
 				},
-				"v1.CreateServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"spec": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.ServiceSpec",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ServiceSpec",
 						},
 					},
 					Required: []string{"spec"},
 				},
-				"v1.CreateServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"service": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.Service",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"v1.DeleteServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.DeleteServiceReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -661,16 +700,16 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					},
 					Required: []string{"name"},
 				},
-				"v1.DeleteServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.DeleteServiceRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"service": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.Service",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"v1.GetServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.GetServiceReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -679,16 +718,16 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					},
 					Required: []string{"name"},
 				},
-				"v1.GetServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.GetServiceRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"service": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.Service",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"v1.EditServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.EditServiceReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -696,21 +735,21 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 						"spec": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.EditServiceSpec",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.EditServiceSpec",
 						},
 					},
 					Required: []string{"spec"},
 				},
-				"v1.EditServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.EditServiceRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"service": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.Service",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"v1.RebootServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -719,16 +758,16 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					},
 					Required: []string{"name"},
 				},
-				"v1.RebootServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"service": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.Service",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"v1.StartServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.StartServiceReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -737,16 +776,16 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					},
 					Required: []string{"name"},
 				},
-				"v1.StartServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.StartServiceRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"service": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.Service",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"v1.StopServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.StopServiceReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -755,16 +794,16 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					},
 					Required: []string{"name"},
 				},
-				"v1.StopServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.StopServiceRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"service": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.Service",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"v1.RollbackServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ForgetServiceReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -776,11 +815,27 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					},
 					Required: []string{"name"},
 				},
-				"v1.RollbackServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ForgetServiceRsp": &registry.Model{
 					Type:       "object",
 					Properties: map[string]*registry.Schema{},
 				},
-				"v1.ListServiceVersionsReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceReq": &registry.Model{
+					Type: "object",
+					Properties: map[string]*registry.Schema{
+						"name": &registry.Schema{
+							Type: "string",
+						},
+						"revision": &registry.Schema{
+							Type: "string",
+						},
+					},
+					Required: []string{"name"},
+				},
+				"github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceRsp": &registry.Model{
+					Type:       "object",
+					Properties: map[string]*registry.Schema{},
+				},
+				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceVersionsReq": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -789,29 +844,29 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					},
 					Required: []string{"name"},
 				},
-				"v1.ListServiceVersionsRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceVersionsRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"versions": &registry.Schema{
 							Type:  "array",
-							Items: &registry.Schema{Ref: "#/components/schemas/v1.ServiceVersion"},
+							Items: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ServiceVersion"},
 						},
 					},
 				},
-				"v1.InfoReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.InfoReq": &registry.Model{
 					Type:       "object",
 					Properties: map[string]*registry.Schema{},
 				},
-				"v1.InfoRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.InfoRsp": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"gpm": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.GpmInfo",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.GpmInfo",
 						},
 					},
 				},
-				"v1.ExecIn": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.ExecIn": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"shell": &registry.Schema{
@@ -832,13 +887,13 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					},
 					Required: []string{"shell"},
 				},
-				"v1.ExecResult": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.ExecResult": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"result": &registry.Schema{},
 					},
 				},
-				"v1.FileInfo": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.FileInfo": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -860,7 +915,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 					},
 				},
-				"v1.Service": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.Service": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -885,11 +940,11 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 						"sysProcAttr": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.SysProcAttr",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr",
 						},
 						"log": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.ProcLog",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ProcLog",
 						},
 						"version": &registry.Schema{
 							Type: "string",
@@ -923,12 +978,12 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 						"stat": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.Stat",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Stat",
 						},
 					},
 					Required: []string{"name", "bin"},
 				},
-				"v1.ServiceSpec": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.ServiceSpec": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -949,11 +1004,11 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 						"sysProcAttr": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.SysProcAttr",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr",
 						},
 						"log": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.ProcLog",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ProcLog",
 						},
 						"version": &registry.Schema{
 							Type: "string",
@@ -972,7 +1027,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 					},
 					Required: []string{"name", "bin", "version"},
 				},
-				"v1.EditServiceSpec": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.EditServiceSpec": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"bin": &registry.Schema{
@@ -990,11 +1045,11 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 						"sysProcAttr": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.SysProcAttr",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr",
 						},
 						"log": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.ProcLog",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ProcLog",
 						},
 						"autoRestart": &registry.Schema{
 							Type:   "integer",
@@ -1002,7 +1057,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 					},
 				},
-				"v1.ServiceVersion": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.ServiceVersion": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"name": &registry.Schema{
@@ -1017,7 +1072,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 					},
 				},
-				"v1.GpmInfo": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.GpmInfo": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"version": &registry.Schema{
@@ -1038,7 +1093,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 						"stat": &registry.Schema{
 							Type: "object",
-							Ref:  "#/components/schemas/v1.Stat",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Stat",
 						},
 						"upTime": &registry.Schema{
 							Type:   "integer",
@@ -1046,7 +1101,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 					},
 				},
-				"v1.SysProcAttr": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"chroot": &registry.Schema{
@@ -1068,7 +1123,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 					},
 				},
-				"v1.ProcLog": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.ProcLog": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"expire": &registry.Schema{
@@ -1082,7 +1137,7 @@ func NewGpmServiceOpenAPI() *registry.OpenAPI {
 						},
 					},
 				},
-				"v1.Stat": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.Stat": &registry.Model{
 					Type: "object",
 					Properties: map[string]*registry.Schema{
 						"cpuPercent": &registry.Schema{
@@ -1130,8 +1185,8 @@ type GpmService interface {
 	// +gen:patch=/api/v1/Service/{name}/action/stop
 	StopService(ctx context.Context, in *StopServiceReq, opts ...client.CallOption) (*StopServiceRsp, error)
 	// +gen:summary=重启服务
-	// +gen:patch=/api/v1/Service/{name}/action/reboot
-	RebootService(ctx context.Context, in *RebootServiceReq, opts ...client.CallOption) (*RebootServiceRsp, error)
+	// +gen:patch=/api/v1/Service/{name}/action/restart
+	RestartService(ctx context.Context, in *RestartServiceReq, opts ...client.CallOption) (*RestartServiceRsp, error)
 	// +gen:summary=删除服务
 	// +gen:delete=/api/v1/Service/{name}
 	DeleteService(ctx context.Context, in *DeleteServiceReq, opts ...client.CallOption) (*DeleteServiceRsp, error)
@@ -1147,6 +1202,9 @@ type GpmService interface {
 	// +gen:summary=回滚服务
 	// +gen:post=/api/v1/Service/{name}/rollback
 	RollBackService(ctx context.Context, in *RollbackServiceReq, opts ...client.CallOption) (*RollbackServiceRsp, error)
+	// +gen:summary=删除历史版本
+	// +gen:delete=/api/v1/Service/{name}/forget
+	ForgetService(ctx context.Context, in *ForgetServiceReq, opts ...client.CallOption) (*ForgetServiceRsp, error)
 	// +gen:summary=获取目录信息下文件列表
 	// +gen:get=/api/v1/Action/ls
 	Ls(ctx context.Context, in *LsReq, opts ...client.CallOption) (*LsRsp, error)
@@ -1304,9 +1362,9 @@ func (c *gpmService) StopService(ctx context.Context, in *StopServiceReq, opts .
 	return out, nil
 }
 
-func (c *gpmService) RebootService(ctx context.Context, in *RebootServiceReq, opts ...client.CallOption) (*RebootServiceRsp, error) {
-	req := c.c.NewRequest(c.name, "GpmService.RebootService", in)
-	out := new(RebootServiceRsp)
+func (c *gpmService) RestartService(ctx context.Context, in *RestartServiceReq, opts ...client.CallOption) (*RestartServiceRsp, error) {
+	req := c.c.NewRequest(c.name, "GpmService.RestartService", in)
+	out := new(RestartServiceRsp)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1488,6 +1546,16 @@ func (x *gpmServiceUpgradeService) Recv() (*UpgradeServiceRsp, error) {
 func (c *gpmService) RollBackService(ctx context.Context, in *RollbackServiceReq, opts ...client.CallOption) (*RollbackServiceRsp, error) {
 	req := c.c.NewRequest(c.name, "GpmService.RollBackService", in)
 	out := new(RollbackServiceRsp)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *gpmService) ForgetService(ctx context.Context, in *ForgetServiceReq, opts ...client.CallOption) (*ForgetServiceRsp, error) {
+	req := c.c.NewRequest(c.name, "GpmService.ForgetService", in)
+	out := new(ForgetServiceRsp)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -1695,8 +1763,8 @@ type GpmServiceHandler interface {
 	// +gen:patch=/api/v1/Service/{name}/action/stop
 	StopService(context.Context, *StopServiceReq, *StopServiceRsp) error
 	// +gen:summary=重启服务
-	// +gen:patch=/api/v1/Service/{name}/action/reboot
-	RebootService(context.Context, *RebootServiceReq, *RebootServiceRsp) error
+	// +gen:patch=/api/v1/Service/{name}/action/restart
+	RestartService(context.Context, *RestartServiceReq, *RestartServiceRsp) error
 	// +gen:summary=删除服务
 	// +gen:delete=/api/v1/Service/{name}
 	DeleteService(context.Context, *DeleteServiceReq, *DeleteServiceRsp) error
@@ -1712,6 +1780,9 @@ type GpmServiceHandler interface {
 	// +gen:summary=回滚服务
 	// +gen:post=/api/v1/Service/{name}/rollback
 	RollBackService(context.Context, *RollbackServiceReq, *RollbackServiceRsp) error
+	// +gen:summary=删除历史版本
+	// +gen:delete=/api/v1/Service/{name}/forget
+	ForgetService(context.Context, *ForgetServiceReq, *ForgetServiceRsp) error
 	// +gen:summary=获取目录信息下文件列表
 	// +gen:get=/api/v1/Action/ls
 	Ls(context.Context, *LsReq, *LsRsp) error
@@ -1737,13 +1808,14 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		EditService(ctx context.Context, in *EditServiceReq, out *EditServiceRsp) error
 		StartService(ctx context.Context, in *StartServiceReq, out *StartServiceRsp) error
 		StopService(ctx context.Context, in *StopServiceReq, out *StopServiceRsp) error
-		RebootService(ctx context.Context, in *RebootServiceReq, out *RebootServiceRsp) error
+		RestartService(ctx context.Context, in *RestartServiceReq, out *RestartServiceRsp) error
 		DeleteService(ctx context.Context, in *DeleteServiceReq, out *DeleteServiceRsp) error
 		WatchServiceLog(ctx context.Context, stream server.Stream) error
 		InstallService(ctx context.Context, stream server.Stream) error
 		ListServiceVersions(ctx context.Context, in *ListServiceVersionsReq, out *ListServiceVersionsRsp) error
 		UpgradeService(ctx context.Context, stream server.Stream) error
 		RollBackService(ctx context.Context, in *RollbackServiceReq, out *RollbackServiceRsp) error
+		ForgetService(ctx context.Context, in *ForgetServiceReq, out *ForgetServiceRsp) error
 		Ls(ctx context.Context, in *LsReq, out *LsRsp) error
 		Pull(ctx context.Context, stream server.Stream) error
 		Push(ctx context.Context, stream server.Stream) error
@@ -1811,9 +1883,9 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		Handler:     "rpc",
 	}))
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
-		Name:        "GpmService.RebootService",
-		Description: "GpmService.RebootService",
-		Path:        []string{"/api/v1/Service/{name}/action/reboot"},
+		Name:        "GpmService.RestartService",
+		Description: "GpmService.RestartService",
+		Path:        []string{"/api/v1/Service/{name}/action/restart"},
 		Method:      []string{"PATCH"},
 		Body:        "*",
 		Handler:     "rpc",
@@ -1839,6 +1911,14 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		Description: "GpmService.RollBackService",
 		Path:        []string{"/api/v1/Service/{name}/rollback"},
 		Method:      []string{"POST"},
+		Body:        "*",
+		Handler:     "rpc",
+	}))
+	opts = append(opts, api.WithEndpoint(&api.Endpoint{
+		Name:        "GpmService.ForgetService",
+		Description: "GpmService.ForgetService",
+		Path:        []string{"/api/v1/Service/{name}/forget"},
+		Method:      []string{"DELETE"},
 		Body:        "*",
 		Handler:     "rpc",
 	}))
@@ -1943,8 +2023,8 @@ func (h *gpmServiceHandler) StopService(ctx context.Context, in *StopServiceReq,
 	return h.GpmServiceHandler.StopService(ctx, in, out)
 }
 
-func (h *gpmServiceHandler) RebootService(ctx context.Context, in *RebootServiceReq, out *RebootServiceRsp) error {
-	return h.GpmServiceHandler.RebootService(ctx, in, out)
+func (h *gpmServiceHandler) RestartService(ctx context.Context, in *RestartServiceReq, out *RestartServiceRsp) error {
+	return h.GpmServiceHandler.RestartService(ctx, in, out)
 }
 
 func (h *gpmServiceHandler) DeleteService(ctx context.Context, in *DeleteServiceReq, out *DeleteServiceRsp) error {
@@ -2087,6 +2167,10 @@ func (x *gpmServiceUpgradeServiceStream) Recv() (*UpgradeServiceReq, error) {
 
 func (h *gpmServiceHandler) RollBackService(ctx context.Context, in *RollbackServiceReq, out *RollbackServiceRsp) error {
 	return h.GpmServiceHandler.RollBackService(ctx, in, out)
+}
+
+func (h *gpmServiceHandler) ForgetService(ctx context.Context, in *ForgetServiceReq, out *ForgetServiceRsp) error {
+	return h.GpmServiceHandler.ForgetService(ctx, in, out)
 }
 
 func (h *gpmServiceHandler) Ls(ctx context.Context, in *LsReq, out *LsRsp) error {

@@ -34,8 +34,8 @@ service GpmService {
   // +gen:patch=/api/v1/Service/{name}/action/stop
   rpc StopService(StopServiceReq) returns (StopServiceRsp);
   // +gen:summary=重启服务
-  // +gen:patch=/api/v1/Service/{name}/action/reboot
-  rpc RebootService(RebootServiceReq) returns (RebootServiceRsp);
+  // +gen:patch=/api/v1/Service/{name}/action/restart
+  rpc RestartService(RestartServiceReq) returns (RestartServiceRsp);
   // +gen:summary=删除服务
   // +gen:delete=/api/v1/Service/{name}
   rpc DeleteService(DeleteServiceReq) returns (DeleteServiceRsp);
@@ -53,6 +53,9 @@ service GpmService {
   // +gen:summary=回滚服务
   // +gen:post=/api/v1/Service/{name}/rollback
   rpc RollBackService(RollbackServiceReq) returns (RollbackServiceRsp);
+  // +gen:summary=删除历史版本
+  // +gen:delete=/api/v1/Service/{name}/forget
+  rpc ForgetService(ForgetServiceReq) returns (ForgetServiceRsp);
 
   // +gen:summary=获取目录信息下文件列表
   // +gen:get=/api/v1/Action/ls
@@ -138,12 +141,12 @@ message StopServiceRsp {
   gpmv1.Service service = 1;
 }
 
-message RebootServiceReq {
+message RestartServiceReq {
   // +gen:required
   string name = 1;
 }
 
-message RebootServiceRsp {
+message RestartServiceRsp {
   gpmv1.Service service = 1;
 }
 
@@ -199,6 +202,14 @@ message RollbackServiceReq {
 }
 
 message RollbackServiceRsp {}
+
+message ForgetServiceReq {
+  // +gen:required
+  string name = 1;
+  string revision = 2;
+}
+
+message ForgetServiceRsp {}
 
 message LsReq {
   // +gen:required

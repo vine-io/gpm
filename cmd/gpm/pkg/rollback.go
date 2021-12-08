@@ -63,7 +63,7 @@ func rollbackService(c *cli.Context) error {
 func RollbackServiceCmd() *cli.Command {
 	return &cli.Command{
 		Name:     "rollback",
-		Usage:    "reboot a service",
+		Usage:    "rollback a service",
 		Category: "service",
 		Action:   rollbackService,
 		Flags: []cli.Flag{
