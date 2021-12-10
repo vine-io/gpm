@@ -338,6 +338,7 @@ func (p *Process) stop() error {
 	select {
 	case <-after:
 		_ = pr.Kill()
+		_, _ = pr.Wait()
 	case <-done:
 	}
 
