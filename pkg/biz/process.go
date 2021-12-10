@@ -326,7 +326,21 @@ func (p *Process) stop() error {
 	if err != nil {
 		return err
 	}
-	_, _ = pr.Wait()
+
+	after := time.After(time.Second * 5)
+	done := make(chan struct{}, 1)
+
+	go func(pp *os.Process) {
+		_, _ = pp.Wait()
+		done <- struct{}{}
+	}(pr)
+
+	select {
+	case <-after:
+		_ = pr.Kill()
+	case <-done:
+	}
+
 	_ = pr.Release()
 	p.Pid = 0
 	p.pr = nil
