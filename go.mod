@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/StackExchange/wmi v1.2.0 // indirect
-	github.com/gin-gonic/gin v1.7.4
+	github.com/gin-gonic/gin v1.7.7
 	github.com/go-git/go-git/v5 v5.2.0 // indirect
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/gogo/protobuf v1.3.2
@@ -20,8 +20,8 @@ require (
 	github.com/vine-io/pkg/inject v0.1.0
 	github.com/vine-io/pkg/release v0.1.0
 	github.com/vine-io/pkg/unit v0.1.0
-	github.com/vine-io/plugins/logger/zap v1.4.0
-	github.com/vine-io/vine v1.4.0
+	github.com/vine-io/plugins/logger/zap v1.4.2
+	github.com/vine-io/vine v1.4.2
 	golang.org/x/text v0.3.5
 	google.golang.org/grpc v1.39.0
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect

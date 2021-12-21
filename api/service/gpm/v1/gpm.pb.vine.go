@@ -8,6 +8,7 @@ import (
 	fmt "fmt"
 	proto "github.com/gogo/protobuf/proto"
 	_ "github.com/vine-io/gpm/api/types/gpm/v1"
+	vine "github.com/vine-io/vine"
 	client "github.com/vine-io/vine/core/client"
 	registry "github.com/vine-io/vine/core/registry"
 	server "github.com/vine-io/vine/core/server"
@@ -1738,63 +1739,63 @@ func (x *gpmServiceTerminal) Recv() (*TerminalRsp, error) {
 // +gen:openapi
 type GpmServiceHandler interface {
 	// gpm 检测 gpm 服务状态
-	Healthz(context.Context, *Empty, *Empty) error
+	Healthz(*vine.Context, *Empty, *Empty) error
 	// gpm 升级
-	UpdateSelf(context.Context, GpmService_UpdateSelfStream) error
+	UpdateSelf(*vine.Context, GpmService_UpdateSelfStream) error
 	// +gen:summary=gpm 信息
 	// +gen:get=/api/v1/info
-	Info(context.Context, *InfoReq, *InfoRsp) error
+	Info(*vine.Context, *InfoReq, *InfoRsp) error
 	// +gen:summary=查询所有服务
 	// +gen:get=/api/v1/Service
-	ListService(context.Context, *ListServiceReq, *ListServiceRsp) error
+	ListService(*vine.Context, *ListServiceReq, *ListServiceRsp) error
 	// +gen:summary=查询单个服务
 	// +gen:get=/api/v1/Service/{name}
-	GetService(context.Context, *GetServiceReq, *GetServiceRsp) error
+	GetService(*vine.Context, *GetServiceReq, *GetServiceRsp) error
 	// +gen:summary=新建服务
 	// +gen:post=/api/v1/Service
-	CreateService(context.Context, *CreateServiceReq, *CreateServiceRsp) error
+	CreateService(*vine.Context, *CreateServiceReq, *CreateServiceRsp) error
 	// +gen:summary=修改服务信息
 	// +gen:patch=/api/v1/Service/{name}
-	EditService(context.Context, *EditServiceReq, *EditServiceRsp) error
+	EditService(*vine.Context, *EditServiceReq, *EditServiceRsp) error
 	// +gen:summary=启动服务
 	// +gen:patch=/api/v1/Service/{name}/action/start
-	StartService(context.Context, *StartServiceReq, *StartServiceRsp) error
+	StartService(*vine.Context, *StartServiceReq, *StartServiceRsp) error
 	// +gen:summary=停止服务
 	// +gen:patch=/api/v1/Service/{name}/action/stop
-	StopService(context.Context, *StopServiceReq, *StopServiceRsp) error
+	StopService(*vine.Context, *StopServiceReq, *StopServiceRsp) error
 	// +gen:summary=重启服务
 	// +gen:patch=/api/v1/Service/{name}/action/restart
-	RestartService(context.Context, *RestartServiceReq, *RestartServiceRsp) error
+	RestartService(*vine.Context, *RestartServiceReq, *RestartServiceRsp) error
 	// +gen:summary=删除服务
 	// +gen:delete=/api/v1/Service/{name}
-	DeleteService(context.Context, *DeleteServiceReq, *DeleteServiceRsp) error
+	DeleteService(*vine.Context, *DeleteServiceReq, *DeleteServiceRsp) error
 	// 动态监听服务日志
-	WatchServiceLog(context.Context, *WatchServiceLogReq, GpmService_WatchServiceLogStream) error
+	WatchServiceLog(*vine.Context, *WatchServiceLogReq, GpmService_WatchServiceLogStream) error
 	// 远程安装服务
-	InstallService(context.Context, GpmService_InstallServiceStream) error
+	InstallService(*vine.Context, GpmService_InstallServiceStream) error
 	// +gen:summary=查看服务历史版本
 	// +gen:get=/api/v1/Service/{name}/versions
-	ListServiceVersions(context.Context, *ListServiceVersionsReq, *ListServiceVersionsRsp) error
+	ListServiceVersions(*vine.Context, *ListServiceVersionsReq, *ListServiceVersionsRsp) error
 	// 升级服务
-	UpgradeService(context.Context, GpmService_UpgradeServiceStream) error
+	UpgradeService(*vine.Context, GpmService_UpgradeServiceStream) error
 	// +gen:summary=回滚服务
 	// +gen:post=/api/v1/Service/{name}/rollback
-	RollBackService(context.Context, *RollbackServiceReq, *RollbackServiceRsp) error
+	RollBackService(*vine.Context, *RollbackServiceReq, *RollbackServiceRsp) error
 	// +gen:summary=删除历史版本
 	// +gen:delete=/api/v1/Service/{name}/forget
-	ForgetService(context.Context, *ForgetServiceReq, *ForgetServiceRsp) error
+	ForgetService(*vine.Context, *ForgetServiceReq, *ForgetServiceRsp) error
 	// +gen:summary=获取目录信息下文件列表
 	// +gen:get=/api/v1/Action/ls
-	Ls(context.Context, *LsReq, *LsRsp) error
+	Ls(*vine.Context, *LsReq, *LsRsp) error
 	// 拉取文件
-	Pull(context.Context, *PullReq, GpmService_PullStream) error
+	Pull(*vine.Context, *PullReq, GpmService_PullStream) error
 	// 推送文件
-	Push(context.Context, GpmService_PushStream) error
+	Push(*vine.Context, GpmService_PushStream) error
 	// +gen:summary=远程执行命令
 	// +gen:post=/api/v1/Action/exec
-	Exec(context.Context, *ExecReq, *ExecRsp) error
+	Exec(*vine.Context, *ExecReq, *ExecRsp) error
 	// 远程命令行交互
-	Terminal(context.Context, GpmService_TerminalStream) error
+	Terminal(*vine.Context, GpmService_TerminalStream) error
 }
 
 func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...server.HandlerOption) error {
@@ -1947,11 +1948,11 @@ type gpmServiceHandler struct {
 }
 
 func (h *gpmServiceHandler) Healthz(ctx context.Context, in *Empty, out *Empty) error {
-	return h.GpmServiceHandler.Healthz(ctx, in, out)
+	return h.GpmServiceHandler.Healthz(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) UpdateSelf(ctx context.Context, stream server.Stream) error {
-	return h.GpmServiceHandler.UpdateSelf(ctx, &gpmServiceUpdateSelfStream{stream})
+	return h.GpmServiceHandler.UpdateSelf(vine.InitContext(ctx), &gpmServiceUpdateSelfStream{stream})
 }
 
 type GpmService_UpdateSelfStream interface {
@@ -1996,39 +1997,39 @@ func (x *gpmServiceUpdateSelfStream) Recv() (*UpdateSelfReq, error) {
 }
 
 func (h *gpmServiceHandler) Info(ctx context.Context, in *InfoReq, out *InfoRsp) error {
-	return h.GpmServiceHandler.Info(ctx, in, out)
+	return h.GpmServiceHandler.Info(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) ListService(ctx context.Context, in *ListServiceReq, out *ListServiceRsp) error {
-	return h.GpmServiceHandler.ListService(ctx, in, out)
+	return h.GpmServiceHandler.ListService(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) GetService(ctx context.Context, in *GetServiceReq, out *GetServiceRsp) error {
-	return h.GpmServiceHandler.GetService(ctx, in, out)
+	return h.GpmServiceHandler.GetService(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) CreateService(ctx context.Context, in *CreateServiceReq, out *CreateServiceRsp) error {
-	return h.GpmServiceHandler.CreateService(ctx, in, out)
+	return h.GpmServiceHandler.CreateService(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) EditService(ctx context.Context, in *EditServiceReq, out *EditServiceRsp) error {
-	return h.GpmServiceHandler.EditService(ctx, in, out)
+	return h.GpmServiceHandler.EditService(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) StartService(ctx context.Context, in *StartServiceReq, out *StartServiceRsp) error {
-	return h.GpmServiceHandler.StartService(ctx, in, out)
+	return h.GpmServiceHandler.StartService(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) StopService(ctx context.Context, in *StopServiceReq, out *StopServiceRsp) error {
-	return h.GpmServiceHandler.StopService(ctx, in, out)
+	return h.GpmServiceHandler.StopService(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) RestartService(ctx context.Context, in *RestartServiceReq, out *RestartServiceRsp) error {
-	return h.GpmServiceHandler.RestartService(ctx, in, out)
+	return h.GpmServiceHandler.RestartService(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) DeleteService(ctx context.Context, in *DeleteServiceReq, out *DeleteServiceRsp) error {
-	return h.GpmServiceHandler.DeleteService(ctx, in, out)
+	return h.GpmServiceHandler.DeleteService(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) WatchServiceLog(ctx context.Context, stream server.Stream) error {
@@ -2036,7 +2037,7 @@ func (h *gpmServiceHandler) WatchServiceLog(ctx context.Context, stream server.S
 	if err := stream.Recv(m); err != nil {
 		return err
 	}
-	return h.GpmServiceHandler.WatchServiceLog(ctx, m, &gpmServiceWatchServiceLogStream{stream})
+	return h.GpmServiceHandler.WatchServiceLog(vine.InitContext(ctx), m, &gpmServiceWatchServiceLogStream{stream})
 }
 
 type GpmService_WatchServiceLogStream interface {
@@ -2072,7 +2073,7 @@ func (x *gpmServiceWatchServiceLogStream) Send(m *WatchServiceLogRsp) error {
 }
 
 func (h *gpmServiceHandler) InstallService(ctx context.Context, stream server.Stream) error {
-	return h.GpmServiceHandler.InstallService(ctx, &gpmServiceInstallServiceStream{stream})
+	return h.GpmServiceHandler.InstallService(vine.InitContext(ctx), &gpmServiceInstallServiceStream{stream})
 }
 
 type GpmService_InstallServiceStream interface {
@@ -2117,11 +2118,11 @@ func (x *gpmServiceInstallServiceStream) Recv() (*InstallServiceReq, error) {
 }
 
 func (h *gpmServiceHandler) ListServiceVersions(ctx context.Context, in *ListServiceVersionsReq, out *ListServiceVersionsRsp) error {
-	return h.GpmServiceHandler.ListServiceVersions(ctx, in, out)
+	return h.GpmServiceHandler.ListServiceVersions(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) UpgradeService(ctx context.Context, stream server.Stream) error {
-	return h.GpmServiceHandler.UpgradeService(ctx, &gpmServiceUpgradeServiceStream{stream})
+	return h.GpmServiceHandler.UpgradeService(vine.InitContext(ctx), &gpmServiceUpgradeServiceStream{stream})
 }
 
 type GpmService_UpgradeServiceStream interface {
@@ -2166,15 +2167,15 @@ func (x *gpmServiceUpgradeServiceStream) Recv() (*UpgradeServiceReq, error) {
 }
 
 func (h *gpmServiceHandler) RollBackService(ctx context.Context, in *RollbackServiceReq, out *RollbackServiceRsp) error {
-	return h.GpmServiceHandler.RollBackService(ctx, in, out)
+	return h.GpmServiceHandler.RollBackService(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) ForgetService(ctx context.Context, in *ForgetServiceReq, out *ForgetServiceRsp) error {
-	return h.GpmServiceHandler.ForgetService(ctx, in, out)
+	return h.GpmServiceHandler.ForgetService(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) Ls(ctx context.Context, in *LsReq, out *LsRsp) error {
-	return h.GpmServiceHandler.Ls(ctx, in, out)
+	return h.GpmServiceHandler.Ls(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) Pull(ctx context.Context, stream server.Stream) error {
@@ -2182,7 +2183,7 @@ func (h *gpmServiceHandler) Pull(ctx context.Context, stream server.Stream) erro
 	if err := stream.Recv(m); err != nil {
 		return err
 	}
-	return h.GpmServiceHandler.Pull(ctx, m, &gpmServicePullStream{stream})
+	return h.GpmServiceHandler.Pull(vine.InitContext(ctx), m, &gpmServicePullStream{stream})
 }
 
 type GpmService_PullStream interface {
@@ -2218,7 +2219,7 @@ func (x *gpmServicePullStream) Send(m *PullRsp) error {
 }
 
 func (h *gpmServiceHandler) Push(ctx context.Context, stream server.Stream) error {
-	return h.GpmServiceHandler.Push(ctx, &gpmServicePushStream{stream})
+	return h.GpmServiceHandler.Push(vine.InitContext(ctx), &gpmServicePushStream{stream})
 }
 
 type GpmService_PushStream interface {
@@ -2263,11 +2264,11 @@ func (x *gpmServicePushStream) Recv() (*PushReq, error) {
 }
 
 func (h *gpmServiceHandler) Exec(ctx context.Context, in *ExecReq, out *ExecRsp) error {
-	return h.GpmServiceHandler.Exec(ctx, in, out)
+	return h.GpmServiceHandler.Exec(vine.InitContext(ctx), in, out)
 }
 
 func (h *gpmServiceHandler) Terminal(ctx context.Context, stream server.Stream) error {
-	return h.GpmServiceHandler.Terminal(ctx, &gpmServiceTerminalStream{stream})
+	return h.GpmServiceHandler.Terminal(vine.InitContext(ctx), &gpmServiceTerminalStream{stream})
 }
 
 type GpmService_TerminalStream interface {

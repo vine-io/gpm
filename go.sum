@@ -54,6 +54,8 @@ github.com/gin-contrib/sse v0.1.0 h1:Y/yl/+YNO8GZSjAhjMsSuLt29uWRFHdHYUb5lYOV9qE
 github.com/gin-contrib/sse v0.1.0/go.mod h1:RHrZQHXnP2xjPF+u1gW/2HnVO7nvIa9PG3Gm+fLHvGI=
 github.com/gin-gonic/gin v1.7.4 h1:QmUZXrvJ9qZ3GfWvQ+2wnW/1ePrTEJqPKMYEU3lD/DM=
 github.com/gin-gonic/gin v1.7.4/go.mod h1:jD2toBW3GZUr5UMcdrwQA10I7RuaFOl/SGeDjXkfUtY=
+github.com/gin-gonic/gin v1.7.7 h1:3DoBmSbJbZAWqXJC3SLjAPfutPJJRN1U5pALB7EeTTs=
+github.com/gin-gonic/gin v1.7.7/go.mod h1:axIBovoeJpVj8S3BwE0uPMTeReE4+AfFtqpqaZ1qq1U=
 github.com/gliderlabs/ssh v0.2.2/go.mod h1:U7qILu1NlMHj9FlMhZLlkCdDnU1DBEAqr0aevW3Awn0=
 github.com/go-git/gcfg v1.5.0/go.mod h1:5m20vg6GwYabIxaOonVkTdrILxQMpEShl1xiMF4ua+E=
 github.com/go-git/go-billy/v5 v5.0.0/go.mod h1:pmpqyWchKfYfrkb/UVH4otLvyi/5gJlGI4Hb3ZqZ3W0=
@@ -255,6 +257,8 @@ github.com/vine-io/plugins/logger/zap v1.3.4 h1:hxjIkPsxLiMi9Y2Tf+iXDFVBlItN71CP
 github.com/vine-io/plugins/logger/zap v1.3.4/go.mod h1:orQnJwihYmB0XJ1BJZNgz+SgSva3cNLdtpK33CuxFak=
 github.com/vine-io/plugins/logger/zap v1.4.0 h1:DLhU7MNDCjvAldlsKCQjwB0O/62LxvbctfYQbEqxgp4=
 github.com/vine-io/plugins/logger/zap v1.4.0/go.mod h1:bACUuQqqASdli9btTqGNpshplxyXOO5JtmVGQk2FGkU=
+github.com/vine-io/plugins/logger/zap v1.4.2 h1:cG60wX0pgcfHwTQcUK1iBewcdagJAkFXIi91RprzkdM=
+github.com/vine-io/plugins/logger/zap v1.4.2/go.mod h1:27PIaeB7QdjN2BbOM9g3nqv2+LCoDT4Xg1Oozsiko3I=
 github.com/vine-io/vine v1.1.0/go.mod h1:4yV4+moqkETpFuzwzFtd9TlJ6xWj0tKLmZMYLs8LsP4=
 github.com/vine-io/vine v1.3.4 h1:9B1dxixJD9nSlcHm9+VvwHwUhTYT1nB5LqGnviAdGMQ=
 github.com/vine-io/vine v1.3.4/go.mod h1:CmEAsMZzEzaufm3Z5lbjvaQbkBUJDNai9QYEQnGKpNc=
@@ -266,6 +270,8 @@ github.com/vine-io/vine v1.3.6 h1:fpi5kG4jwHwDEFOAcQ9DyCkp6Wsn+gbJigcK6rmbzF8=
 github.com/vine-io/vine v1.3.6/go.mod h1:CmEAsMZzEzaufm3Z5lbjvaQbkBUJDNai9QYEQnGKpNc=
 github.com/vine-io/vine v1.4.0 h1:qIFPs/BVeRniabuUcKQiRTYV6NyIoqnRddo074uklTM=
 github.com/vine-io/vine v1.4.0/go.mod h1:CmEAsMZzEzaufm3Z5lbjvaQbkBUJDNai9QYEQnGKpNc=
+github.com/vine-io/vine v1.4.2 h1:hwupcX4dGFdMM/Di0VK8PdjATxXmSBKBaEW+Br8L09U=
+github.com/vine-io/vine v1.4.2/go.mod h1:CmEAsMZzEzaufm3Z5lbjvaQbkBUJDNai9QYEQnGKpNc=
 github.com/xanzy/ssh-agent v0.2.1/go.mod h1:mLlQY/MoOhWBj+gOGMQkOeiEvkx+8pJSI+0Bx9h2kr4=
 github.com/xlab/treeprint v1.0.0/go.mod h1:IoImgRak9i3zJyuxOKUP1v4UZd1tMoKkq/Cimt1uhCg=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
