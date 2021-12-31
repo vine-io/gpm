@@ -259,6 +259,8 @@ github.com/vine-io/plugins/logger/zap v1.4.0 h1:DLhU7MNDCjvAldlsKCQjwB0O/62Lxvbc
 github.com/vine-io/plugins/logger/zap v1.4.0/go.mod h1:bACUuQqqASdli9btTqGNpshplxyXOO5JtmVGQk2FGkU=
 github.com/vine-io/plugins/logger/zap v1.4.2 h1:cG60wX0pgcfHwTQcUK1iBewcdagJAkFXIi91RprzkdM=
 github.com/vine-io/plugins/logger/zap v1.4.2/go.mod h1:27PIaeB7QdjN2BbOM9g3nqv2+LCoDT4Xg1Oozsiko3I=
+github.com/vine-io/plugins/logger/zap v1.4.4 h1:QinhY0UlroEq4hUwMcE8/QgdjzYAwHKwE8bK968MMaY=
+github.com/vine-io/plugins/logger/zap v1.4.4/go.mod h1:nESBPj0ZoUg1MpF0dTFkYAEiGTyiHNR/ecJpCP1eJwo=
 github.com/vine-io/vine v1.1.0/go.mod h1:4yV4+moqkETpFuzwzFtd9TlJ6xWj0tKLmZMYLs8LsP4=
 github.com/vine-io/vine v1.3.4 h1:9B1dxixJD9nSlcHm9+VvwHwUhTYT1nB5LqGnviAdGMQ=
 github.com/vine-io/vine v1.3.4/go.mod h1:CmEAsMZzEzaufm3Z5lbjvaQbkBUJDNai9QYEQnGKpNc=
@@ -272,6 +274,8 @@ github.com/vine-io/vine v1.4.0 h1:qIFPs/BVeRniabuUcKQiRTYV6NyIoqnRddo074uklTM=
 github.com/vine-io/vine v1.4.0/go.mod h1:CmEAsMZzEzaufm3Z5lbjvaQbkBUJDNai9QYEQnGKpNc=
 github.com/vine-io/vine v1.4.2 h1:hwupcX4dGFdMM/Di0VK8PdjATxXmSBKBaEW+Br8L09U=
 github.com/vine-io/vine v1.4.2/go.mod h1:CmEAsMZzEzaufm3Z5lbjvaQbkBUJDNai9QYEQnGKpNc=
+github.com/vine-io/vine v1.4.4 h1:AFAtufLwMPa8xnyxEHVfyVuGNYJW1M9SpqNb+SSGctI=
+github.com/vine-io/vine v1.4.4/go.mod h1:d4KXNwH+HpkwBKuR5owQxuRSGhCd5eUj2lnAGDACUtg=
 github.com/xanzy/ssh-agent v0.2.1/go.mod h1:mLlQY/MoOhWBj+gOGMQkOeiEvkx+8pJSI+0Bx9h2kr4=
 github.com/xlab/treeprint v1.0.0/go.mod h1:IoImgRak9i3zJyuxOKUP1v4UZd1tMoKkq/Cimt1uhCg=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

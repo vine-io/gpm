@@ -3,6 +3,8 @@
 
 package gpmv1
 
+import ()
+
 // DeepCopyInto is an auto-generated deepcopy function, coping the receiver, writing into out. in must be no-nil.
 func (in *Service) DeepCopyInto(out *Service) {
 	*out = *in
