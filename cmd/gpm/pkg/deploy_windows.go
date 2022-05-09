@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+//go:build windows
 // +build windows
 
 package pkg
@@ -149,7 +150,7 @@ func deploy(c *cli.Context) error {
 	path := os.Getenv("Path")
 	if path != "" {
 		if !strings.Contains(path, root+"\\bin") {
-			bb.WriteString(fmt.Sprintf(`setx "Path" "%s;%s" /m`, root+"\\bin", path))
+			bb.WriteString(fmt.Sprintf(`setx "Path" "%s\bin;%s" /m`, root, path))
 		}
 	}
 
