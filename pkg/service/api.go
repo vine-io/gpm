@@ -120,7 +120,7 @@ func (r *RestAPI) getEndpointsHandler() gin.HandlerFunc {
 
 		endpoints := make([]map[string]string, 0)
 		keys := make(map[string]struct{}, 0)
-		list, _ := registry.GetService(runtime.GpmName)
+		list, _ := registry.GetService(c, runtime.GpmName)
 		for _, item := range list {
 			for _, e := range item.Endpoints {
 				if _, ok := keys[e.Name]; ok {

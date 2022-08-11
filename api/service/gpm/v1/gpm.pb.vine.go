@@ -10,9 +10,10 @@ import (
 	_ "github.com/vine-io/gpm/api/types/gpm/v1"
 	vine "github.com/vine-io/vine"
 	client "github.com/vine-io/vine/core/client"
-	registry "github.com/vine-io/vine/core/registry"
 	server "github.com/vine-io/vine/core/server"
 	api "github.com/vine-io/vine/lib/api"
+	openapi "github.com/vine-io/vine/lib/api/handler/openapi"
+	openapipb "github.com/vine-io/vine/lib/api/handler/openapi/proto"
 	math "math"
 )
 
@@ -146,1007 +147,1007 @@ func NewGpmServiceEndpoints() []*api.Endpoint {
 }
 
 // Swagger OpenAPI 3.0 for GpmService service
-func NewGpmServiceOpenAPI() *registry.OpenAPI {
-	return &registry.OpenAPI{
+func NewGpmServiceOpenAPI() *openapipb.OpenAPI {
+	return &openapipb.OpenAPI{
 		Openapi: "3.0.1",
-		Info: &registry.OpenAPIInfo{
+		Info: &openapipb.OpenAPIInfo{
 			Title:       "GpmServiceService",
 			Description: "OpenAPI3.0 for GpmService",
 			Version:     "v1.0.0",
 		},
-		Servers: []*registry.OpenAPIServer{},
-		Tags: []*registry.OpenAPITag{
-			&registry.OpenAPITag{
+		Servers: []*openapipb.OpenAPIServer{},
+		Tags: []*openapipb.OpenAPITag{
+			&openapipb.OpenAPITag{
 				Name:        "GpmService",
 				Description: "OpenAPI3.0 for GpmService",
 			},
 		},
-		Paths: map[string]*registry.OpenAPIPath{
-			"/api/v1/Action/exec": &registry.OpenAPIPath{
-				Post: &registry.OpenAPIPathDocs{
+		Paths: map[string]*openapipb.OpenAPIPath{
+			"/api/v1/Action/exec": &openapipb.OpenAPIPath{
+				Post: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "远程执行命令",
 					Description: "GpmService Exec",
 					OperationId: "GpmServiceExec",
-					RequestBody: &registry.PathRequestBody{
+					RequestBody: &openapipb.PathRequestBody{
 						Description: "Exec ExecReq",
-						Content: &registry.PathRequestBodyContent{
-							ApplicationJson: &registry.ApplicationContent{
-								Schema: &registry.Schema{
+						Content: &openapipb.PathRequestBodyContent{
+							ApplicationJson: &openapipb.ApplicationContent{
+								Schema: &openapipb.Schema{
 									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ExecReq",
 								},
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ExecRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ExecRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
-			"/api/v1/Action/ls": &registry.OpenAPIPath{
-				Get: &registry.OpenAPIPathDocs{
+			"/api/v1/Action/ls": &openapipb.OpenAPIPath{
+				Get: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "获取目录信息下文件列表",
 					Description: "GpmService Ls",
 					OperationId: "GpmServiceLs",
-					Parameters: []*registry.PathParameters{
-						&registry.PathParameters{
+					Parameters: []*openapipb.PathParameters{
+						&openapipb.PathParameters{
 							Name:        "path",
 							In:          "query",
 							Description: "LsReq field path",
 							Required:    true,
 							Style:       "form",
 							Explode:     true,
-							Schema: &registry.Schema{
+							Schema: &openapipb.Schema{
 								Type: "string",
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.LsRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.LsRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
-			"/api/v1/Service": &registry.OpenAPIPath{
-				Get: &registry.OpenAPIPathDocs{
+			"/api/v1/Service": &openapipb.OpenAPIPath{
+				Get: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "查询所有服务",
 					Description: "GpmService ListService",
 					OperationId: "GpmServiceListService",
-					Parameters:  []*registry.PathParameters{},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Parameters:  []*openapipb.PathParameters{},
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ListServiceRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ListServiceRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
-				Post: &registry.OpenAPIPathDocs{
+				Post: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "新建服务",
 					Description: "GpmService CreateService",
 					OperationId: "GpmServiceCreateService",
-					RequestBody: &registry.PathRequestBody{
+					RequestBody: &openapipb.PathRequestBody{
 						Description: "CreateService CreateServiceReq",
-						Content: &registry.PathRequestBodyContent{
-							ApplicationJson: &registry.ApplicationContent{
-								Schema: &registry.Schema{
+						Content: &openapipb.PathRequestBodyContent{
+							ApplicationJson: &openapipb.ApplicationContent{
+								Schema: &openapipb.Schema{
 									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceReq",
 								},
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{name}": &registry.OpenAPIPath{
-				Delete: &registry.OpenAPIPathDocs{
+			"/api/v1/Service/{name}": &openapipb.OpenAPIPath{
+				Delete: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "删除服务",
 					Description: "GpmService DeleteService",
 					OperationId: "GpmServiceDeleteService",
-					Parameters: []*registry.PathParameters{
-						&registry.PathParameters{
+					Parameters: []*openapipb.PathParameters{
+						&openapipb.PathParameters{
 							Name:        "name",
 							In:          "path",
 							Description: "DeleteServiceReq field name",
 							Required:    true,
 							Explode:     true,
-							Schema: &registry.Schema{
+							Schema: &openapipb.Schema{
 								Type: "string",
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.DeleteServiceRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.DeleteServiceRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
-				Get: &registry.OpenAPIPathDocs{
+				Get: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "查询单个服务",
 					Description: "GpmService GetService",
 					OperationId: "GpmServiceGetService",
-					Parameters: []*registry.PathParameters{
-						&registry.PathParameters{
+					Parameters: []*openapipb.PathParameters{
+						&openapipb.PathParameters{
 							Name:        "name",
 							In:          "path",
 							Description: "服务名称",
 							Required:    true,
 							Explode:     true,
-							Schema: &registry.Schema{
+							Schema: &openapipb.Schema{
 								Type: "string",
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.GetServiceRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.GetServiceRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
-				Patch: &registry.OpenAPIPathDocs{
+				Patch: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "修改服务信息",
 					Description: "GpmService EditService",
 					OperationId: "GpmServiceEditService",
-					Parameters: []*registry.PathParameters{
-						&registry.PathParameters{
+					Parameters: []*openapipb.PathParameters{
+						&openapipb.PathParameters{
 							Name:        "name",
 							In:          "path",
 							Description: "EditServiceReq field name",
 							Required:    true,
 							Explode:     true,
-							Schema: &registry.Schema{
+							Schema: &openapipb.Schema{
 								Type: "string",
 							},
 						},
 					},
-					RequestBody: &registry.PathRequestBody{
+					RequestBody: &openapipb.PathRequestBody{
 						Description: "EditService EditServiceReq",
-						Content: &registry.PathRequestBodyContent{
-							ApplicationJson: &registry.ApplicationContent{
-								Schema: &registry.Schema{
+						Content: &openapipb.PathRequestBodyContent{
+							ApplicationJson: &openapipb.ApplicationContent{
+								Schema: &openapipb.Schema{
 									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.EditServiceReq",
 								},
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.EditServiceRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.EditServiceRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{name}/action/restart": &registry.OpenAPIPath{
-				Patch: &registry.OpenAPIPathDocs{
+			"/api/v1/Service/{name}/action/restart": &openapipb.OpenAPIPath{
+				Patch: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "重启服务",
 					Description: "GpmService RestartService",
 					OperationId: "GpmServiceRestartService",
-					Parameters: []*registry.PathParameters{
-						&registry.PathParameters{
+					Parameters: []*openapipb.PathParameters{
+						&openapipb.PathParameters{
 							Name:        "name",
 							In:          "path",
 							Description: "RestartServiceReq field name",
 							Required:    true,
 							Explode:     true,
-							Schema: &registry.Schema{
+							Schema: &openapipb.Schema{
 								Type: "string",
 							},
 						},
 					},
-					RequestBody: &registry.PathRequestBody{
+					RequestBody: &openapipb.PathRequestBody{
 						Description: "RestartService RestartServiceReq",
-						Content: &registry.PathRequestBodyContent{
-							ApplicationJson: &registry.ApplicationContent{
-								Schema: &registry.Schema{
+						Content: &openapipb.PathRequestBodyContent{
+							ApplicationJson: &openapipb.ApplicationContent{
+								Schema: &openapipb.Schema{
 									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceReq",
 								},
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{name}/action/start": &registry.OpenAPIPath{
-				Patch: &registry.OpenAPIPathDocs{
+			"/api/v1/Service/{name}/action/start": &openapipb.OpenAPIPath{
+				Patch: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "启动服务",
 					Description: "GpmService StartService",
 					OperationId: "GpmServiceStartService",
-					Parameters: []*registry.PathParameters{
-						&registry.PathParameters{
+					Parameters: []*openapipb.PathParameters{
+						&openapipb.PathParameters{
 							Name:        "name",
 							In:          "path",
 							Description: "StartServiceReq field name",
 							Required:    true,
 							Explode:     true,
-							Schema: &registry.Schema{
+							Schema: &openapipb.Schema{
 								Type: "string",
 							},
 						},
 					},
-					RequestBody: &registry.PathRequestBody{
+					RequestBody: &openapipb.PathRequestBody{
 						Description: "StartService StartServiceReq",
-						Content: &registry.PathRequestBodyContent{
-							ApplicationJson: &registry.ApplicationContent{
-								Schema: &registry.Schema{
+						Content: &openapipb.PathRequestBodyContent{
+							ApplicationJson: &openapipb.ApplicationContent{
+								Schema: &openapipb.Schema{
 									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.StartServiceReq",
 								},
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.StartServiceRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.StartServiceRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{name}/action/stop": &registry.OpenAPIPath{
-				Patch: &registry.OpenAPIPathDocs{
+			"/api/v1/Service/{name}/action/stop": &openapipb.OpenAPIPath{
+				Patch: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "停止服务",
 					Description: "GpmService StopService",
 					OperationId: "GpmServiceStopService",
-					Parameters: []*registry.PathParameters{
-						&registry.PathParameters{
+					Parameters: []*openapipb.PathParameters{
+						&openapipb.PathParameters{
 							Name:        "name",
 							In:          "path",
 							Description: "StopServiceReq field name",
 							Required:    true,
 							Explode:     true,
-							Schema: &registry.Schema{
+							Schema: &openapipb.Schema{
 								Type: "string",
 							},
 						},
 					},
-					RequestBody: &registry.PathRequestBody{
+					RequestBody: &openapipb.PathRequestBody{
 						Description: "StopService StopServiceReq",
-						Content: &registry.PathRequestBodyContent{
-							ApplicationJson: &registry.ApplicationContent{
-								Schema: &registry.Schema{
+						Content: &openapipb.PathRequestBodyContent{
+							ApplicationJson: &openapipb.ApplicationContent{
+								Schema: &openapipb.Schema{
 									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.StopServiceReq",
 								},
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.StopServiceRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.StopServiceRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{name}/forget": &registry.OpenAPIPath{
-				Delete: &registry.OpenAPIPathDocs{
+			"/api/v1/Service/{name}/forget": &openapipb.OpenAPIPath{
+				Delete: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "删除历史版本",
 					Description: "GpmService ForgetService",
 					OperationId: "GpmServiceForgetService",
-					Parameters: []*registry.PathParameters{
-						&registry.PathParameters{
+					Parameters: []*openapipb.PathParameters{
+						&openapipb.PathParameters{
 							Name:        "name",
 							In:          "path",
 							Description: "ForgetServiceReq field name",
 							Required:    true,
 							Explode:     true,
-							Schema: &registry.Schema{
+							Schema: &openapipb.Schema{
 								Type: "string",
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ForgetServiceRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ForgetServiceRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{name}/rollback": &registry.OpenAPIPath{
-				Post: &registry.OpenAPIPathDocs{
+			"/api/v1/Service/{name}/rollback": &openapipb.OpenAPIPath{
+				Post: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "回滚服务",
 					Description: "GpmService RollBackService",
 					OperationId: "GpmServiceRollBackService",
-					Parameters: []*registry.PathParameters{
-						&registry.PathParameters{
+					Parameters: []*openapipb.PathParameters{
+						&openapipb.PathParameters{
 							Name:        "name",
 							In:          "path",
 							Description: "RollbackServiceReq field name",
 							Required:    true,
 							Explode:     true,
-							Schema: &registry.Schema{
+							Schema: &openapipb.Schema{
 								Type: "string",
 							},
 						},
 					},
-					RequestBody: &registry.PathRequestBody{
+					RequestBody: &openapipb.PathRequestBody{
 						Description: "RollBackService RollbackServiceReq",
-						Content: &registry.PathRequestBodyContent{
-							ApplicationJson: &registry.ApplicationContent{
-								Schema: &registry.Schema{
+						Content: &openapipb.PathRequestBodyContent{
+							ApplicationJson: &openapipb.ApplicationContent{
+								Schema: &openapipb.Schema{
 									Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceReq",
 								},
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
-			"/api/v1/Service/{name}/versions": &registry.OpenAPIPath{
-				Get: &registry.OpenAPIPathDocs{
+			"/api/v1/Service/{name}/versions": &openapipb.OpenAPIPath{
+				Get: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "查看服务历史版本",
 					Description: "GpmService ListServiceVersions",
 					OperationId: "GpmServiceListServiceVersions",
-					Parameters: []*registry.PathParameters{
-						&registry.PathParameters{
+					Parameters: []*openapipb.PathParameters{
+						&openapipb.PathParameters{
 							Name:        "name",
 							In:          "path",
 							Description: "ListServiceVersionsReq field name",
 							Required:    true,
 							Explode:     true,
-							Schema: &registry.Schema{
+							Schema: &openapipb.Schema{
 								Type: "string",
 							},
 						},
 					},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ListServiceVersionsRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ListServiceVersionsRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
-			"/api/v1/info": &registry.OpenAPIPath{
-				Get: &registry.OpenAPIPathDocs{
+			"/api/v1/info": &openapipb.OpenAPIPath{
+				Get: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "gpm 信息",
 					Description: "GpmService Info",
 					OperationId: "GpmServiceInfo",
-					Parameters:  []*registry.PathParameters{},
-					Responses: map[string]*registry.PathResponse{
-						"200": &registry.PathResponse{
+					Parameters:  []*openapipb.PathParameters{},
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
 							Description: "successful response (stream response)",
-							Content: &registry.PathRequestBodyContent{
-								ApplicationJson: &registry.ApplicationContent{
-									Schema: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.InfoRsp"},
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.InfoRsp"},
 								},
 							},
 						},
 					},
-					Security: []*registry.PathSecurity{},
+					Security: []*openapipb.PathSecurity{},
 				},
 			},
 		},
-		Components: &registry.OpenAPIComponents{
-			SecuritySchemes: &registry.SecuritySchemes{},
-			Schemas: map[string]*registry.Model{
-				"github.com.vine-io.gpm.api.service.gpm.v1.ExecReq": &registry.Model{
+		Components: &openapipb.OpenAPIComponents{
+			SecuritySchemes: &openapipb.SecuritySchemes{},
+			Schemas: map[string]*openapipb.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ExecReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"in": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"in": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ExecIn",
 						},
 					},
 					Required: []string{"in"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.ExecRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ExecRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"result": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"result": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ExecResult",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.LsReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.LsReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"path": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"path": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 					Required: []string{"path"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.LsRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.LsRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"files": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"files": &openapipb.Schema{
 							Type:  "array",
-							Items: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.FileInfo"},
+							Items: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.FileInfo"},
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceReq": &openapipb.Model{
 					Type:       "object",
-					Properties: map[string]*registry.Schema{},
+					Properties: map[string]*openapipb.Schema{},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"services": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"services": &openapipb.Schema{
 							Type:  "array",
-							Items: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service"},
+							Items: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service"},
 						},
-						"total": &registry.Schema{
+						"total": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int64",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"spec": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"spec": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ServiceSpec",
 						},
 					},
 					Required: []string{"spec"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.CreateServiceRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"service": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"service": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.DeleteServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.DeleteServiceReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 					Required: []string{"name"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.DeleteServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.DeleteServiceRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"service": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"service": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.GetServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.GetServiceReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 					Required: []string{"name"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.GetServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.GetServiceRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"service": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"service": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.EditServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.EditServiceReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
-						"spec": &registry.Schema{
+						"spec": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.EditServiceSpec",
 						},
 					},
 					Required: []string{"spec"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.EditServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.EditServiceRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"service": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"service": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 					Required: []string{"name"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.RestartServiceRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"service": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"service": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.StartServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.StartServiceReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 					Required: []string{"name"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.StartServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.StartServiceRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"service": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"service": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.StopServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.StopServiceReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 					Required: []string{"name"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.StopServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.StopServiceRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"service": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"service": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.ForgetServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ForgetServiceReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
-						"revision": &registry.Schema{
+						"revision": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 					Required: []string{"name"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.ForgetServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ForgetServiceRsp": &openapipb.Model{
 					Type:       "object",
-					Properties: map[string]*registry.Schema{},
+					Properties: map[string]*openapipb.Schema{},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
-						"revision": &registry.Schema{
+						"revision": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 					Required: []string{"name"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.RollbackServiceRsp": &openapipb.Model{
 					Type:       "object",
-					Properties: map[string]*registry.Schema{},
+					Properties: map[string]*openapipb.Schema{},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceVersionsReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceVersionsReq": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 					Required: []string{"name"},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceVersionsRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceVersionsRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"versions": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"versions": &openapipb.Schema{
 							Type:  "array",
-							Items: &registry.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ServiceVersion"},
+							Items: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ServiceVersion"},
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.InfoReq": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.InfoReq": &openapipb.Model{
 					Type:       "object",
-					Properties: map[string]*registry.Schema{},
+					Properties: map[string]*openapipb.Schema{},
 				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.InfoRsp": &registry.Model{
+				"github.com.vine-io.gpm.api.service.gpm.v1.InfoRsp": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"gpm": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"gpm": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.GpmInfo",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.ExecIn": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.ExecIn": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"shell": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"shell": &openapipb.Schema{
 							Type: "string",
 						},
-						"dir": &registry.Schema{
+						"dir": &openapipb.Schema{
 							Type: "string",
 						},
-						"env": &registry.Schema{
-							AdditionalProperties: &registry.Schema{},
+						"env": &openapipb.Schema{
+							AdditionalProperties: &openapipb.Schema{},
 						},
-						"user": &registry.Schema{
+						"user": &openapipb.Schema{
 							Type: "string",
 						},
-						"group": &registry.Schema{
+						"group": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 					Required: []string{"shell"},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.ExecResult": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.ExecResult": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"result": &registry.Schema{},
+					Properties: map[string]*openapipb.Schema{
+						"result": &openapipb.Schema{},
 					},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.FileInfo": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.FileInfo": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
-						"size": &registry.Schema{
+						"size": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int64",
 						},
-						"mode": &registry.Schema{
+						"mode": &openapipb.Schema{
 							Type: "string",
 						},
-						"modTime": &registry.Schema{
+						"modTime": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int64",
 						},
-						"IsDir": &registry.Schema{
+						"IsDir": &openapipb.Schema{
 							Type: "boolean",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.Service": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.Service": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
-						"bin": &registry.Schema{
+						"bin": &openapipb.Schema{
 							Type: "string",
 						},
-						"args": &registry.Schema{
+						"args": &openapipb.Schema{
 							Type:  "array",
-							Items: &registry.Schema{Type: "string"},
+							Items: &openapipb.Schema{Type: "string"},
 						},
-						"pid": &registry.Schema{
+						"pid": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int64",
 						},
-						"dir": &registry.Schema{
+						"dir": &openapipb.Schema{
 							Type: "string",
 						},
-						"env": &registry.Schema{
-							AdditionalProperties: &registry.Schema{},
+						"env": &openapipb.Schema{
+							AdditionalProperties: &openapipb.Schema{},
 						},
-						"sysProcAttr": &registry.Schema{
+						"sysProcAttr": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr",
 						},
-						"log": &registry.Schema{
+						"log": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ProcLog",
 						},
-						"version": &registry.Schema{
+						"version": &openapipb.Schema{
 							Type: "string",
 						},
-						"autoRestart": &registry.Schema{
+						"autoRestart": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int32",
 						},
-						"installFlag": &registry.Schema{
+						"installFlag": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int32",
 						},
-						"creationTimestamp": &registry.Schema{
+						"creationTimestamp": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int64",
 						},
-						"updateTimestamp": &registry.Schema{
+						"updateTimestamp": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int64",
 						},
-						"startTimestamp": &registry.Schema{
+						"startTimestamp": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int64",
 						},
-						"status": &registry.Schema{
+						"status": &openapipb.Schema{
 							Type: "string",
 							Enum: []string{"init", "running", "stopped", "failed", "upgrading"},
 						},
-						"msg": &registry.Schema{
+						"msg": &openapipb.Schema{
 							Type: "string",
 						},
-						"stat": &registry.Schema{
+						"stat": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Stat",
 						},
 					},
 					Required: []string{"name", "bin"},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.ServiceSpec": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.ServiceSpec": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
-						"bin": &registry.Schema{
+						"bin": &openapipb.Schema{
 							Type: "string",
 						},
-						"args": &registry.Schema{
+						"args": &openapipb.Schema{
 							Type:  "array",
-							Items: &registry.Schema{Type: "string"},
+							Items: &openapipb.Schema{Type: "string"},
 						},
-						"dir": &registry.Schema{
+						"dir": &openapipb.Schema{
 							Type: "string",
 						},
-						"env": &registry.Schema{
-							AdditionalProperties: &registry.Schema{},
+						"env": &openapipb.Schema{
+							AdditionalProperties: &openapipb.Schema{},
 						},
-						"sysProcAttr": &registry.Schema{
+						"sysProcAttr": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr",
 						},
-						"log": &registry.Schema{
+						"log": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ProcLog",
 						},
-						"version": &registry.Schema{
+						"version": &openapipb.Schema{
 							Type: "string",
 						},
-						"autoRestart": &registry.Schema{
+						"autoRestart": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int32",
 						},
-						"headerTrimPrefix": &registry.Schema{
+						"headerTrimPrefix": &openapipb.Schema{
 							Type: "string",
 						},
-						"installFlag": &registry.Schema{
+						"installFlag": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int32",
 						},
 					},
 					Required: []string{"name", "bin", "version"},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.EditServiceSpec": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.EditServiceSpec": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"bin": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"bin": &openapipb.Schema{
 							Type: "string",
 						},
-						"args": &registry.Schema{
+						"args": &openapipb.Schema{
 							Type:  "array",
-							Items: &registry.Schema{Type: "string"},
+							Items: &openapipb.Schema{Type: "string"},
 						},
-						"dir": &registry.Schema{
+						"dir": &openapipb.Schema{
 							Type: "string",
 						},
-						"env": &registry.Schema{
-							AdditionalProperties: &registry.Schema{},
+						"env": &openapipb.Schema{
+							AdditionalProperties: &openapipb.Schema{},
 						},
-						"sysProcAttr": &registry.Schema{
+						"sysProcAttr": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr",
 						},
-						"log": &registry.Schema{
+						"log": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ProcLog",
 						},
-						"autoRestart": &registry.Schema{
+						"autoRestart": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int32",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.ServiceVersion": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.ServiceVersion": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"name": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
 							Type: "string",
 						},
-						"version": &registry.Schema{
+						"version": &openapipb.Schema{
 							Type: "string",
 						},
-						"timestamp": &registry.Schema{
+						"timestamp": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int64",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.GpmInfo": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.GpmInfo": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"version": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"version": &openapipb.Schema{
 							Type: "string",
 						},
-						"goos": &registry.Schema{
+						"goos": &openapipb.Schema{
 							Type: "string",
 						},
-						"arch": &registry.Schema{
+						"arch": &openapipb.Schema{
 							Type: "string",
 						},
-						"gov": &registry.Schema{
+						"gov": &openapipb.Schema{
 							Type: "string",
 						},
-						"pid": &registry.Schema{
+						"pid": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int32",
 						},
-						"stat": &registry.Schema{
+						"stat": &openapipb.Schema{
 							Type: "object",
 							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Stat",
 						},
-						"upTime": &registry.Schema{
+						"upTime": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int64",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"chroot": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"chroot": &openapipb.Schema{
 							Type: "string",
 						},
-						"uid": &registry.Schema{
+						"uid": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int32",
 						},
-						"user": &registry.Schema{
+						"user": &openapipb.Schema{
 							Type: "string",
 						},
-						"gid": &registry.Schema{
+						"gid": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int32",
 						},
-						"group": &registry.Schema{
+						"group": &openapipb.Schema{
 							Type: "string",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.ProcLog": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.ProcLog": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"expire": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"expire": &openapipb.Schema{
 							Type:    "integer",
 							Format:  "int32",
 							Default: "30",
 						},
-						"maxSize": &registry.Schema{
+						"maxSize": &openapipb.Schema{
 							Type:   "integer",
 							Format: "int64",
 						},
 					},
 				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.Stat": &registry.Model{
+				"github.com.vine-io.gpm.api.types.gpm.v1.Stat": &openapipb.Model{
 					Type: "object",
-					Properties: map[string]*registry.Schema{
-						"cpuPercent": &registry.Schema{
+					Properties: map[string]*openapipb.Schema{
+						"cpuPercent": &openapipb.Schema{
 							Type:   "number",
 							Format: "double",
 						},
-						"memory": &registry.Schema{},
-						"memPercent": &registry.Schema{
+						"memory": &openapipb.Schema{},
+						"memPercent": &openapipb.Schema{
 							Type:   "number",
 							Format: "float",
 						},
@@ -1939,7 +1940,7 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 		Body:        "*",
 		Handler:     "rpc",
 	}))
-	opts = append(opts, server.OpenAPIHandler(NewGpmServiceOpenAPI()))
+	openapi.RegisterOpenAPIDoc(NewGpmServiceOpenAPI())
 	return s.Handle(s.NewHandler(&GpmService{h}, opts...))
 }
 
