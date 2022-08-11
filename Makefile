@@ -85,6 +85,12 @@ tar-arm: build-arm
 
 tar: tar-amd tar-arm
 
+test-coverage:
+	go test ./... -bench=. -coverage
+
+lint:
+	golint .
+
 clean:
 	rm -fr vendor
 
