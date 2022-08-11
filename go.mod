@@ -22,7 +22,6 @@ require (
 	github.com/vine-io/pkg/unit v0.1.0
 	github.com/vine-io/plugins/logger/zap v1.4.4
 	github.com/vine-io/vine v1.4.9
-	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.12 // indirect
 	google.golang.org/grpc v1.47.0
