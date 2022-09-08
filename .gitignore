@@ -23,3 +23,5 @@ _output
 extract/data
 
 .DS_Store
+
+build/ssl/*.csr
