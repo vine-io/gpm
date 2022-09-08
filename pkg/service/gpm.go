@@ -36,16 +36,13 @@ import (
 	"github.com/vine-io/gpm/pkg/infra/repo"
 	"github.com/vine-io/gpm/pkg/runtime"
 	"github.com/vine-io/gpm/pkg/runtime/inject"
-	"github.com/vine-io/gpm/pkg/runtime/ssl"
 	"github.com/vine-io/pkg/release"
 
 	"github.com/vine-io/cli"
 	"github.com/vine-io/plugins/logger/zap"
 	"github.com/vine-io/vine"
-	grpcClient "github.com/vine-io/vine/core/client/grpc"
 	"github.com/vine-io/vine/core/registry/memory"
 	vserver "github.com/vine-io/vine/core/server"
-	grpcServer "github.com/vine-io/vine/core/server/grpc"
 	apihttp "github.com/vine-io/vine/lib/api/server"
 	"github.com/vine-io/vine/lib/config"
 	"github.com/vine-io/vine/lib/config/source"
@@ -125,17 +122,17 @@ func (s *GpmAPI) Init() error {
 		_ = os.MkdirAll(filepath.Join(ROOT, "packages"), 0o777)
 	}
 
-	gh, err := ssl.GetSSL(ROOT)
-	if err != nil {
-		return fmt.Errorf("load server tls: %v", err)
-	}
-	tls, err := ssl.GetTLS()
-	if err != nil {
-		return fmt.Errorf("load client tls: %v", err)
-	}
+	//gh, err := ssl.GetSSL(ROOT)
+	//if err != nil {
+	//	return fmt.Errorf("load server tls: %v", err)
+	//}
+	//tls, err := ssl.GetTLS()
+	//if err != nil {
+	//	return fmt.Errorf("load client tls: %v", err)
+	//}
 
-	ghTLSOption := func() vine.Option { return func(o *vine.Options) { _ = o.Server.Init(grpcServer.GrpcToHttp(gh)) } }
-	cliTLSOption := func() vine.Option { return func(o *vine.Options) { _ = o.Client.Init(grpcClient.AuthTLS(tls)) } }
+	//ghTLSOption := func() vine.Option { return func(o *vine.Options) { _ = o.Server.Init(grpcServer.GrpcToHttp(gh)) } }
+	//cliTLSOption := func() vine.Option { return func(o *vine.Options) { _ = o.Client.Init(grpcClient.AuthTLS(tls)) } }
 
 	var clisrc source.Source
 
@@ -149,8 +146,8 @@ func (s *GpmAPI) Init() error {
 			"api-address": APIAddress,
 			"namespace":   runtime.Namespace,
 		}),
-		ghTLSOption(),
-		cliTLSOption(),
+		//ghTLSOption(),
+		//cliTLSOption(),
 		vine.Flags(flags...),
 		vine.WrapHandler(newLoggerWrapper()),
 		vine.Action(func(c *cli.Context) error {

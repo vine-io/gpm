@@ -30,6 +30,16 @@ install:
 	go install github.com/vine-io/vine/cmd/protoc-gen-validator
 	go install github.com/vine-io/vine/cmd/protoc-gen-dao
 
+generate-ssl:
+	cd build/ssl && \
+	cfssl gencert -initca ca-csr.json | cfssljson -bare ca - && \
+	cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=localhost server-csr.json | cfssljson -bare server && \
+	cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=localhost client-csr.json | cfssljson -bare client && \
+  	/bin/mv ca.pem ../../pkg/runtime/ssl && /bin/mv ca-key.pem ../../pkg/runtime/ssl && \
+  	/bin/mv client.pem ../../pkg/runtime/ssl && /bin/mv client-key.pem ../../pkg/runtime/ssl && \
+  	/bin/mv server.pem ../../pkg/runtime/ssl && /bin/mv server-key.pem ../../pkg/runtime/ssl
+
+
 vendor:
 	go mod vendor
 
@@ -83,7 +93,7 @@ tar-arm: build-arm
 	tar -zcvf gpm-linux-arm64-$(GIT_TAG).tar.gz linux/*  && \
 	rm -fr darwin/ linux/
 
-tar: tar-amd tar-arm
+tar: generate-ssl tar-amd tar-arm
 
 test-coverage:
 	go test ./... -bench=. -coverage

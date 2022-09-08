@@ -34,7 +34,7 @@ import (
 	"github.com/vine-io/vine/core/server/grpc"
 )
 
-//go:embed ca.pem client.key client.pem server.key server.pem
+//go:embed ca.pem client-key.pem client.pem server-key.pem server.pem
 var f embed.FS
 
 func GetSSL(root string) (*grpc.Grpc2Http, error) {
@@ -43,7 +43,7 @@ func GetSSL(root string) (*grpc.Grpc2Http, error) {
 
 	fca := filepath.Join(dir, "ca.pem")
 	fpem := filepath.Join(dir, "server.pem")
-	fkey := filepath.Join(dir, "server.key")
+	fkey := filepath.Join(dir, "server-key.pem")
 
 	if isNotExists(fca) {
 		ca, err := f.ReadFile("ca.pem")
@@ -64,7 +64,7 @@ func GetSSL(root string) (*grpc.Grpc2Http, error) {
 		}
 	}
 	if isNotExists(fkey) {
-		key, err := f.ReadFile("server.key")
+		key, err := f.ReadFile("server-key.pem")
 		if err != nil {
 			return nil, err
 		}
@@ -96,7 +96,7 @@ func GetTLS() (*tls.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	key, err := f.ReadFile("client.key")
+	key, err := f.ReadFile("client-key.pem")
 	if err != nil {
 		return nil, err
 	}
