@@ -37,7 +37,8 @@ generate-ssl:
 	cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=localhost client-csr.json | cfssljson -bare client && \
   	/bin/mv ca.pem ../../pkg/runtime/ssl && /bin/mv ca-key.pem ../../pkg/runtime/ssl && \
   	/bin/mv client.pem ../../pkg/runtime/ssl && /bin/mv client-key.pem ../../pkg/runtime/ssl && \
-  	/bin/mv server.pem ../../pkg/runtime/ssl && /bin/mv server-key.pem ../../pkg/runtime/ssl
+  	/bin/mv server.pem ../../pkg/runtime/ssl && /bin/mv server-key.pem ../../pkg/runtime/ssl && \
+  	cd ../../ && git add . && git commit -m "generate ssl" && git push origin main
 
 
 vendor:
