@@ -105,8 +105,6 @@ func (db *DB) FindAllServices(ctx context.Context) ([]*gpmv1.Service, error) {
 	}()
 
 	select {
-	case <-ctx.Done():
-		return nil, ErrTimeout
 	case e := <-ech:
 		return nil, e
 	case <-done:
@@ -156,8 +154,6 @@ func (db *DB) FindService(ctx context.Context, name string) (*gpmv1.Service, err
 	}()
 
 	select {
-	case <-ctx.Done():
-		return nil, ErrTimeout
 	case e := <-ech:
 		return nil, e
 	case <-done:
@@ -214,8 +210,6 @@ func (db *DB) ListServiceVersion(ctx context.Context, name string) ([]*gpmv1.Ser
 	}()
 
 	select {
-	case <-ctx.Done():
-		return nil, ErrTimeout
 	case e := <-ech:
 		return nil, e
 	case <-done:
@@ -253,8 +247,6 @@ func (db *DB) CreateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 	}()
 
 	select {
-	case <-ctx.Done():
-		return nil, ErrTimeout
 	case e := <-ech:
 		return nil, e
 	case <-done:
@@ -286,8 +278,6 @@ func (db *DB) UpdateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 	}()
 
 	select {
-	case <-ctx.Done():
-		return nil, ErrTimeout
 	case e := <-ech:
 		return nil, e
 	case <-done:
@@ -309,8 +299,6 @@ func (db *DB) DeleteService(ctx context.Context, name string) error {
 	}()
 
 	select {
-	case <-ctx.Done():
-		return ErrTimeout
 	case <-done:
 		return nil
 	}
