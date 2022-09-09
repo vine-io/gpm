@@ -28,7 +28,6 @@ import (
 	pb "github.com/vine-io/gpm/api/service/gpm/v1"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/runtime"
-	"github.com/vine-io/gpm/pkg/runtime/ssl"
 	"github.com/vine-io/vine/core/client"
 	"github.com/vine-io/vine/core/client/grpc"
 )
@@ -40,11 +39,11 @@ type SimpleClient struct {
 func New() *SimpleClient {
 	sc := &SimpleClient{}
 
-	tls, _ := ssl.GetTLS()
+	//tls, _ := ssl.GetTLS()
 
 	conn := grpc.NewClient(
 		client.Retries(0),
-		grpc.AuthTLS(tls),
+		//grpc.AuthTLS(tls),
 	)
 	sc.cc = pb.NewGpmService(runtime.GpmName, conn)
 

@@ -135,7 +135,9 @@ func (s *GpmAPI) Init() error {
 	}
 
 	ghTLSOption := func() vine.Option { return func(o *vine.Options) { _ = o.Server.Init(grpcServer.GrpcToHttp(gh)) } }
+	_ = ghTLSOption()
 	cliTLSOption := func() vine.Option { return func(o *vine.Options) { _ = o.Client.Init(grpcClient.AuthTLS(tls)) } }
+	_ = cliTLSOption()
 
 	var clisrc source.Source
 
@@ -149,8 +151,8 @@ func (s *GpmAPI) Init() error {
 			"api-address": APIAddress,
 			"namespace":   runtime.Namespace,
 		}),
-		ghTLSOption(),
-		cliTLSOption(),
+		//ghTLSOption(),
+		//cliTLSOption(),
 		vine.Flags(flags...),
 		vine.WrapHandler(newLoggerWrapper()),
 		vine.Action(func(c *cli.Context) error {
