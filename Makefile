@@ -33,8 +33,8 @@ install:
 generate-ssl:
 	cd build/ssl && \
 	cfssl gencert -initca ca-csr.json | cfssljson -bare ca - && \
-	cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=localhost server-csr.json | cfssljson -bare server && \
-	cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=localhost client-csr.json | cfssljson -bare client && \
+	cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=server server-csr.json | cfssljson -bare server && \
+	cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=client client-csr.json | cfssljson -bare client && \
   	/bin/mv ca.pem ../../pkg/runtime/ssl && /bin/mv ca-key.pem ../../pkg/runtime/ssl && \
   	/bin/mv client.pem ../../pkg/runtime/ssl && /bin/mv client-key.pem ../../pkg/runtime/ssl && \
   	/bin/mv server.pem ../../pkg/runtime/ssl && /bin/mv server-key.pem ../../pkg/runtime/ssl && \
