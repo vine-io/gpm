@@ -266,8 +266,8 @@ github.com/vine-io/pkg/unit v0.1.0/go.mod h1:nyfkjNg2pEYlP7CxfexM1dpUuqGhDxBidLu
 github.com/vine-io/plugins/logger/zap v1.4.4 h1:QinhY0UlroEq4hUwMcE8/QgdjzYAwHKwE8bK968MMaY=
 github.com/vine-io/plugins/logger/zap v1.4.4/go.mod h1:nESBPj0ZoUg1MpF0dTFkYAEiGTyiHNR/ecJpCP1eJwo=
 github.com/vine-io/vine v1.4.4/go.mod h1:d4KXNwH+HpkwBKuR5owQxuRSGhCd5eUj2lnAGDACUtg=
-github.com/vine-io/vine v1.4.10 h1:xQVrX3MGLiqxJA+0zdo6wxlwc0RJswh3W6MDUzfH22I=
-github.com/vine-io/vine v1.4.10/go.mod h1:n060XG5tmb8AX+pKQ4d/VmedauSaE15YWhDQnc5o4P8=
+github.com/vine-io/vine v1.4.11 h1:OCekPd8WJrmd5finpeZbJQUaykLfKy087067uJD2bBc=
+github.com/vine-io/vine v1.4.11/go.mod h1:n060XG5tmb8AX+pKQ4d/VmedauSaE15YWhDQnc5o4P8=
 github.com/xlab/treeprint v1.0.0/go.mod h1:IoImgRak9i3zJyuxOKUP1v4UZd1tMoKkq/Cimt1uhCg=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
