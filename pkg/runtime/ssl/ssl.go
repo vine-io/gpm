@@ -34,26 +34,16 @@ import (
 	"github.com/vine-io/vine/core/server/grpc"
 )
 
-//go:embed ca.pem client-key.pem client.pem server-key.pem server.pem
+//go:embed server.key server.pem
 var f embed.FS
 
 func GetSSL(root string) (*grpc.Grpc2Http, error) {
 	dir := filepath.Join(root, "ssl")
 	_ = os.MkdirAll(dir, 0o777)
 
-	fca := filepath.Join(dir, "ca.pem")
 	fpem := filepath.Join(dir, "server.pem")
-	fkey := filepath.Join(dir, "server-key.pem")
+	fkey := filepath.Join(dir, "server.key")
 
-	if isNotExists(fca) {
-		ca, err := f.ReadFile("ca.pem")
-		if err != nil {
-			return nil, err
-		}
-		if err = ioutil.WriteFile(fca, ca, 0o777); err != nil {
-			return nil, err
-		}
-	}
 	if isNotExists(fpem) {
 		pem, err := f.ReadFile("server.pem")
 		if err != nil {
@@ -64,7 +54,7 @@ func GetSSL(root string) (*grpc.Grpc2Http, error) {
 		}
 	}
 	if isNotExists(fkey) {
-		key, err := f.ReadFile("server-key.pem")
+		key, err := f.ReadFile("server.key")
 		if err != nil {
 			return nil, err
 		}
@@ -76,7 +66,6 @@ func GetSSL(root string) (*grpc.Grpc2Http, error) {
 	gh := &grpc.Grpc2Http{
 		CertFile: fpem,
 		KeyFile:  fkey,
-		CaFile:   fca,
 	}
 
 	return gh, nil
@@ -88,33 +77,18 @@ func isNotExists(name string) bool {
 }
 
 func GetTLS() (*tls.Config, error) {
-	ca, err := f.ReadFile("ca.pem")
+	pem, err := f.ReadFile("server.pem")
 	if err != nil {
 		return nil, err
 	}
-	pem, err := f.ReadFile("client.pem")
-	if err != nil {
-		return nil, err
-	}
-	key, err := f.ReadFile("client-key.pem")
-	if err != nil {
-		return nil, err
-	}
-
-	cert, err := tls.X509KeyPair(pem, key)
-	if err != nil {
-		return nil, err
-	}
-
-	cpool := x509.NewCertPool()
-	if ok := cpool.AppendCertsFromPEM(ca); !ok {
-		return nil, fmt.Errorf("AppendCertFromPEM failed")
+	cp := x509.NewCertPool()
+	if !cp.AppendCertsFromPEM(pem) {
+		return nil, fmt.Errorf("credentials: failed to append certificates")
 	}
 
 	c := &tls.Config{
-		Certificates: []tls.Certificate{cert},
-		ServerName:   "localhost",
-		RootCAs:      cpool,
+		ServerName: "www.vine.com",
+		RootCAs:    cp,
 	}
 
 	return c, nil

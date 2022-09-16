@@ -151,8 +151,8 @@ func (s *GpmAPI) Init() error {
 			"api-address": APIAddress,
 			"namespace":   runtime.Namespace,
 		}),
-		//ghTLSOption(),
-		//cliTLSOption(),
+		ghTLSOption(),
+		cliTLSOption(),
 		vine.Flags(flags...),
 		vine.WrapHandler(newLoggerWrapper()),
 		vine.Action(func(c *cli.Context) error {
