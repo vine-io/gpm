@@ -29,8 +29,7 @@ import (
 	"time"
 
 	"github.com/vine-io/cli"
-	"github.com/vine-io/gpm/cmd/gpm/pkg"
-	"github.com/vine-io/gpm/pkg/runtime"
+	"github.com/vine-io/gpm/pkg/ctl"
 	verrs "github.com/vine-io/vine/lib/errors"
 )
 
@@ -38,38 +37,38 @@ func main() {
 	app := &cli.App{
 		Name:    "gpm",
 		Usage:   "package manage tools",
-		Version: runtime.GetVersion(),
+		Version: ctl.GetVersion(),
 		Commands: []*cli.Command{
-			pkg.HealthCmd(),
-			pkg.DeployCmd(),
-			pkg.TarCmd(),
-			pkg.UnTarCmd(),
-			pkg.UpdateCmd(),
-			pkg.RunCmd(),
-			pkg.ShutdownCmd(),
+			ctl.HealthCmd(),
+			ctl.DeployCmd(),
+			ctl.TarCmd(),
+			ctl.UnTarCmd(),
+			ctl.UpdateCmd(),
+			ctl.RunCmd(),
+			ctl.ShutdownCmd(),
 
-			pkg.ListServicesCmd(),
-			pkg.InfoServiceCmd(),
-			pkg.GetServiceCmd(),
-			pkg.CreateServiceCmd(),
-			pkg.EditServiceCmd(),
-			pkg.StartServiceCmd(),
-			pkg.StopServiceCmd(),
-			pkg.DeleteServiceCmd(),
-			pkg.RestartServiceCmd(),
-			pkg.TailServiceCmd(),
+			ctl.ListServicesCmd(),
+			ctl.InfoServiceCmd(),
+			ctl.GetServiceCmd(),
+			ctl.CreateServiceCmd(),
+			ctl.EditServiceCmd(),
+			ctl.StartServiceCmd(),
+			ctl.StopServiceCmd(),
+			ctl.DeleteServiceCmd(),
+			ctl.RestartServiceCmd(),
+			ctl.TailServiceCmd(),
 
-			pkg.InstallServiceCmd(),
-			pkg.UpgradeServiceCmd(),
-			pkg.RollbackServiceCmd(),
-			pkg.ForgetServiceCmd(),
-			pkg.VersionServiceCmd(),
+			ctl.InstallServiceCmd(),
+			ctl.UpgradeServiceCmd(),
+			ctl.RollbackServiceCmd(),
+			ctl.ForgetServiceCmd(),
+			ctl.VersionServiceCmd(),
 
-			pkg.LsBashCmd(),
-			pkg.ExecBashCmd(),
-			pkg.PushBashCmd(),
-			pkg.PullBashCmd(),
-			pkg.TerminalBashCmd(),
+			ctl.LsBashCmd(),
+			ctl.ExecBashCmd(),
+			ctl.PushBashCmd(),
+			ctl.PullBashCmd(),
+			ctl.TerminalBashCmd(),
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
@@ -105,7 +104,7 @@ func main() {
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
 
-	app.Version = runtime.GitTag
+	app.Version = ctl.GetGitTag()
 	err := app.Run(os.Args)
 	if err != nil {
 		fmt.Fprintf(os.Stdout, "gpm exec: %s\n", verrs.FromErr(err).Detail)

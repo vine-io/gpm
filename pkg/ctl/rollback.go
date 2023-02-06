@@ -20,21 +20,63 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package pkg
+package ctl
 
 import (
-	"github.com/vine-io/gpm/pkg/server"
-	log "github.com/vine-io/vine/lib/logger"
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/vine-io/cli"
+	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func Run() {
-	app := server.New()
-
-	if err := app.Init(); err != nil {
-		log.Fatal(err)
+func rollbackService(c *cli.Context) error {
+	name := c.String("name")
+	revision := c.String("revision")
+	if len(name) == 0 {
+		return fmt.Errorf("missing name")
+	}
+	if len(revision) == 0 {
+		return fmt.Errorf("missing revision")
 	}
 
-	if err := app.Run(); err != nil {
-		log.Fatal(err)
+	opts := getCallOptions(c)
+	cc := client.New()
+	ctx := context.Background()
+	outE := os.Stdout
+
+	s, err := cc.GetService(ctx, name, opts...)
+	if err != nil {
+		return err
+	}
+
+	err = cc.RollBackService(ctx, name, revision, opts...)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(outE, "rollback %s %s -> %s\n", s.Name, s.Version, revision)
+	return nil
+}
+
+func RollbackServiceCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "rollback",
+		Usage:    "rollback a service",
+		Category: "service",
+		Action:   rollbackService,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "specify the name of service",
+			},
+			&cli.StringFlag{
+				Name:    "revision",
+				Aliases: []string{"R"},
+				Usage:   "specify the revision of service",
+			},
+		},
 	}
 }

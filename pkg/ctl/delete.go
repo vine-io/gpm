@@ -20,21 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package pkg
+package ctl
 
 import (
-	"github.com/vine-io/gpm/pkg/server"
-	log "github.com/vine-io/vine/lib/logger"
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/vine-io/cli"
+	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func Run() {
-	app := server.New()
+func deleteService(c *cli.Context) error {
 
-	if err := app.Init(); err != nil {
-		log.Fatal(err)
+	cc := client.New()
+	ctx := context.Background()
+	outE := os.Stdout
+	opts := getCallOptions(c)
+
+	name := c.String("name")
+	if len(name) == 0 {
+		return fmt.Errorf("missing name")
 	}
 
-	if err := app.Run(); err != nil {
-		log.Fatal(err)
+	s, err := cc.DeleteService(ctx, name, opts...)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintf(outE, "service '%s' deleted\n", s.Name)
+	return nil
+}
+
+func DeleteServiceCmd() *cli.Command {
+	return &cli.Command{
+		Name:     "delete",
+		Usage:    "delete a service",
+		Category: "service",
+		Action:   deleteService,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "name",
+				Aliases: []string{"N"},
+				Usage:   "specify the name of service",
+			},
+		},
 	}
 }

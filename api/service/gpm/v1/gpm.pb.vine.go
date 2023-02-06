@@ -510,6 +510,16 @@ func NewGpmServiceOpenAPI() *openapipb.OpenAPI {
 								Type: "string",
 							},
 						},
+						&openapipb.PathParameters{
+							Name:        "revision",
+							In:          "query",
+							Description: "ForgetServiceReq field revision",
+							Style:       "form",
+							Explode:     true,
+							Schema: &openapipb.Schema{
+								Type: "string",
+							},
+						},
 					},
 					Responses: map[string]*openapipb.PathResponse{
 						"200": &openapipb.PathResponse{

@@ -1,6 +1,6 @@
 [package]
 kind = "single"
-namespace = "go.vine"
+namespace = "io.gpm"
 
 [pkg]
 name = "gpm"

@@ -20,21 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package pkg
+package ctl
 
 import (
-	"github.com/vine-io/gpm/pkg/server"
-	log "github.com/vine-io/vine/lib/logger"
+	"context"
+	"fmt"
+	"os"
+
+	"github.com/vine-io/cli"
+	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func Run() {
-	app := server.New()
+func healthService(c *cli.Context) error {
 
-	if err := app.Init(); err != nil {
-		log.Fatal(err)
+	opts := getCallOptions(c)
+	cc := client.New()
+	ctx := context.Background()
+	outE := os.Stdout
+
+	err := cc.Healthz(ctx, opts...)
+	if err != nil {
+		return err
 	}
 
-	if err := app.Run(); err != nil {
-		log.Fatal(err)
+	fmt.Fprintf(outE, "OK\n")
+	return nil
+}
+
+func HealthCmd() *cli.Command {
+	return &cli.Command{
+		Name:   "health",
+		Usage:  "confirm gpmd status",
+		Action: healthService,
 	}
 }

@@ -1,8 +1,9 @@
 GIT_COMMIT=$(shell git rev-parse --short HEAD)
 GIT_TAG=$(shell git describe --abbrev=0 --tags --always --match "v*")
-GIT_VERSION=github.com/vine-io/gpm/pkg/runtime/doc
+GIT_VERSION=github.com/vine-io/gpm/pkg/internal/doc
 CGO_ENABLED=0
 BUILD_DATE=$(shell date +%s)
+GPM_DIR=$(shell pwd)/pkg/ctl/testdata
 LDFLAGS=-X $(GIT_VERSION).GitCommit=$(GIT_COMMIT) -X $(GIT_VERSION).GitTag=$(GIT_TAG) -X $(GIT_VERSION).BuildDate=$(BUILD_DATE)
 
 release:
@@ -34,34 +35,34 @@ vendor:
 	go mod vendor
 
 build-darwin-amd64:
-	mkdir -p cmd/gpm/pkg/testdata
+	mkdir -p $(GPM_DIR)
 	mkdir -p _output/darwin
-	GOOS=darwin GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
+	GOOS=darwin GOARCH=amd64 go build -o $(GPM_DIR)/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
 	GOOS=darwin GOARCH=amd64 go build -o _output/darwin/gpm -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpm/main.go
 
 build-darwin-arm64:
-	mkdir -p cmd/gpm/pkg/testdata
+	mkdir -p $(GPM_DIR)
 	mkdir -p _output/darwin
-	GOOS=darwin GOARCH=arm64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
+	GOOS=darwin GOARCH=arm64 go build -o $(GPM_DIR)/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
 	GOOS=darwin GOARCH=arm64 go build -o _output/darwin/gpm -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpm/main.go
 
 build-windows:
-	mkdir -p cmd/gpm/pkg/testdata
+	mkdir -p $(GPM_DIR)
 	mkdir -p _output/windows
-	cp nssm.exe cmd/gpm/pkg/testdata/nssm.exe
-	GOOS=windows GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd.exe -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
+	cp nssm.exe $(GPM_DIR)/nssm.exe
+	GOOS=windows GOARCH=amd64 go build -o $(GPM_DIR)/gpmd.exe -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
 	GOOS=windows GOARCH=amd64 go build -o _output/windows/gpm.exe -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpm/main.go
 
 build-linux-amd64:
-	mkdir -p cmd/gpm/pkg/testdata
+	mkdir -p $(GPM_DIR)
 	mkdir -p _output/linux
-	GOOS=linux GOARCH=amd64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
+	GOOS=linux GOARCH=amd64 go build -o $(GPM_DIR)/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
 	GOOS=linux GOARCH=amd64 go build -o _output/linux/gpm -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpm/main.go
 
 build-linux-arm64:
-	mkdir -p cmd/gpm/pkg/testdata
+	mkdir -p $(GPM_DIR)
 	mkdir -p _output/linux
-	GOOS=linux GOARCH=arm64 go build -o cmd/gpm/pkg/testdata/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
+	GOOS=linux GOARCH=arm64 go build -o $(GPM_DIR)/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
 	GOOS=linux GOARCH=arm64 go build -o _output/linux/gpm -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpm/main.go
 
 build-amd: build-darwin-amd64 build-linux-amd64 build-windows
