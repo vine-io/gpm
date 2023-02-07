@@ -29,9 +29,9 @@ const GpmName = "io.gpm.service.gpm"
 const GpmId = "12df4108-6176-4c93-ac58-bfa003d4ddb1"
 
 var (
-	GitTag     = "v1.9.4"
-	GitCommit  = "e57cc65"
-	BuildDate  = "1662684107"
+	GitTag     = "v1.10.0"
+	GitCommit  = "89234a9"
+	BuildDate  = "1675732082"
 	GetVersion = func() string {
 		v := GitTag
 		if GitCommit != "" {
