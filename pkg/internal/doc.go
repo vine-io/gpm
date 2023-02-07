@@ -30,8 +30,8 @@ const GpmId = "12df4108-6176-4c93-ac58-bfa003d4ddb1"
 
 var (
 	GitTag     = "v1.10.0"
-	GitCommit  = "89234a9"
-	BuildDate  = "1675732082"
+	GitCommit  = "d311d85"
+	BuildDate  = "1675732731"
 	GetVersion = func() string {
 		v := GitTag
 		if GitCommit != "" {
