@@ -37,6 +37,8 @@ import (
 	"github.com/vine-io/gpm/pkg/internal/store"
 	"github.com/vine-io/gpm/pkg/service"
 	"github.com/vine-io/pkg/release"
+	"github.com/vine-io/vine/core/registry"
+	"github.com/vine-io/vine/core/registry/memory"
 	"github.com/vine-io/vine/lib/api/handler/openapi"
 
 	"github.com/vine-io/cli"
@@ -101,7 +103,14 @@ func (s *GpmAPI) Init() error {
 
 	var clisrc source.Source
 
+	mr := memory.NewRegistry()
+	if err = mr.Init(); err != nil {
+		return err
+	}
+	registry.DefaultRegistry = mr
+
 	opts := []vine.Option{
+		vine.Registry(mr),
 		vine.Name(internal.GpmName),
 		vine.ID(internal.GpmId),
 		vine.Version(internal.GetVersion()),
