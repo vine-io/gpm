@@ -46,12 +46,10 @@ import (
 	"github.com/vine-io/vine"
 	vserver "github.com/vine-io/vine/core/server"
 	grpcServer "github.com/vine-io/vine/core/server/grpc"
-	apihttp "github.com/vine-io/vine/lib/api/server"
 	"github.com/vine-io/vine/lib/config"
 	"github.com/vine-io/vine/lib/config/source"
 	ccli "github.com/vine-io/vine/lib/config/source/cli"
 	log "github.com/vine-io/vine/lib/logger"
-	"github.com/vine-io/vine/util/helper"
 	"google.golang.org/grpc/peer"
 )
 
@@ -87,9 +85,6 @@ type GpmAPI struct {
 func (s *GpmAPI) Init() error {
 	var err error
 
-	// Init API
-	var aopts []apihttp.Option
-
 	if ROOT == "" {
 		if gruntime.GOOS == "windows" {
 			ROOT = "C:\\opt\\gpm"
@@ -123,17 +118,6 @@ func (s *GpmAPI) Init() error {
 		vine.Action(func(c *cli.Context) error {
 			clisrc = ccli.NewSource(ccli.Context(c))
 
-			if c.Bool("enable-tls") {
-				cfg, err := helper.TLSConfig(c)
-				if err != nil {
-					log.Errorf(err.Error())
-					return err
-				}
-
-				aopts = append(aopts, apihttp.EnableTLS(true))
-				aopts = append(aopts, apihttp.TLSConfig(cfg))
-			}
-
 			Address = c.String("server-address")
 
 			if c.Bool("enable-log") {
@@ -149,7 +133,6 @@ func (s *GpmAPI) Init() error {
 				if err != nil {
 					return err
 				}
-				defer l.Sync()
 				log.DefaultLogger = l
 			}
 
