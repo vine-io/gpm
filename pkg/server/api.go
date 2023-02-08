@@ -60,7 +60,7 @@ func newAPIServer(s vine.Service, client vclient.Client) *gin.Engine {
 		prefixRouter.GET("/threadcreate", gin.WrapH(pprof.Handler("threadcreate")))
 	}
 
-	openapi.RegisterOpenAPI(app)
+	openapi.RegisterOpenAPI(client, s.Options().Registry, app)
 	// create the namespace resolver
 	nsResolver := namespace.NewResolver(Type, internal.Namespace)
 	// resolver options
