@@ -39,6 +39,7 @@ import (
 	"github.com/vine-io/vine/lib/config"
 	verrs "github.com/vine-io/vine/lib/errors"
 	log "github.com/vine-io/vine/lib/logger"
+	uc "github.com/vine-io/vine/util/config"
 )
 
 func (g *manager) Install(ctx context.Context, stream IOStream) error {
@@ -76,8 +77,9 @@ func (g *manager) Install(ctx context.Context, stream IOStream) error {
 				return verrs.Conflict(g.Name(), "service '%s' already exists", spec.Name)
 			}
 
-			_ = os.MkdirAll(filepath.Join(config.Get("root").String(""), "packages", spec.Name), 0o755)
-			dst = filepath.Join(config.Get("root").String(""), "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
+			root := uc.GetString("root")
+			_ = os.MkdirAll(filepath.Join(root, "packages", spec.Name), 0o755)
+			dst = filepath.Join(root, "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
 			file, err = os.Create(dst)
 			if err != nil {
 				return err

@@ -16,74 +16,34 @@ import (
 	"github.com/vine-io/vine"
 	vclient "github.com/vine-io/vine/core/client"
 	"github.com/vine-io/vine/core/registry"
-	ahandler "github.com/vine-io/vine/lib/api/handler"
-	"github.com/vine-io/vine/lib/api/handler/openapi"
-	arpc "github.com/vine-io/vine/lib/api/handler/rpc"
-	"github.com/vine-io/vine/lib/api/resolver"
-	"github.com/vine-io/vine/lib/api/resolver/grpc"
-	"github.com/vine-io/vine/lib/api/router"
-	regRouter "github.com/vine-io/vine/lib/api/router/registry"
 	log "github.com/vine-io/vine/lib/logger"
-	"github.com/vine-io/vine/util/namespace"
+	uapi "github.com/vine-io/vine/util/api"
 )
 
-const (
-	HandlerType = "rpc"
-	Type        = "api"
-	APIPath     = "/"
-)
+func newAPIServer(s vine.Service) *gin.Engine {
 
-func newAPIServer(s vine.Service, client vclient.Client) *gin.Engine {
+	app := uapi.NewRPCGateway(s, internal.Namespace, func(engine *gin.Engine) {
+		engine.GET("/metrics", gin.WrapH(promhttp.Handler()))
+		engine.GET("/api/v1/endpoints", getEndpointsHandle)
+		engine.POST("/api/v1/push", pushHandle)
 
-	gin.SetMode(gin.ReleaseMode)
-	app := gin.New()
-	app.Use(gin.Recovery())
-
-	app.GET("/metrics", gin.WrapH(promhttp.Handler()))
-	app.GET("/api/v1/endpoints", getEndpointsHandle)
-	app.POST("/api/v1/push", pushHandle)
-
-	prefix := "/debug/pprof"
-	prefixRouter := app.Group(prefix)
-	{
-		prefixRouter.GET("/", gin.WrapF(pprof.Index))
-		prefixRouter.GET("/cmdline", gin.WrapF(pprof.Cmdline))
-		prefixRouter.GET("/profile", gin.WrapF(pprof.Profile))
-		prefixRouter.POST("/symbol", gin.WrapF(pprof.Symbol))
-		prefixRouter.GET("/symbol", gin.WrapF(pprof.Symbol))
-		prefixRouter.GET("/trace", gin.WrapF(pprof.Trace))
-		prefixRouter.GET("/allocs", gin.WrapH(pprof.Handler("allocs")))
-		prefixRouter.GET("/block", gin.WrapH(pprof.Handler("block")))
-		prefixRouter.GET("/goroutine", gin.WrapH(pprof.Handler("goroutine")))
-		prefixRouter.GET("/heap", gin.WrapH(pprof.Handler("heap")))
-		prefixRouter.GET("/mutex", gin.WrapH(pprof.Handler("mutex")))
-		prefixRouter.GET("/threadcreate", gin.WrapH(pprof.Handler("threadcreate")))
-	}
-
-	openapi.RegisterOpenAPI(client, s.Options().Registry, app)
-	// create the namespace resolver
-	nsResolver := namespace.NewResolver(Type, internal.Namespace)
-	// resolver options
-	rops := []resolver.Option{
-		resolver.WithNamespace(nsResolver.ResolveWithType),
-		resolver.WithHandler(HandlerType),
-	}
-
-	log.Infof("Registering API RPC Handler at %s", APIPath)
-	rr := grpc.NewResolver(rops...)
-	rt := regRouter.NewRouter(
-		router.WithHandler(arpc.Handler),
-		router.WithResolver(rr),
-		router.WithRegistry(s.Options().Registry),
-	)
-
-	rp := arpc.NewHandler(
-		ahandler.WithNamespace(internal.Namespace),
-		ahandler.WithRouter(rt),
-		ahandler.WithClient(client),
-	)
-
-	app.Use(rp.Handle)
+		prefix := "/debug/pprof"
+		group := engine.Group(prefix)
+		{
+			group.GET("/", gin.WrapF(pprof.Index))
+			group.GET("/cmdline", gin.WrapF(pprof.Cmdline))
+			group.GET("/profile", gin.WrapF(pprof.Profile))
+			group.POST("/symbol", gin.WrapF(pprof.Symbol))
+			group.GET("/symbol", gin.WrapF(pprof.Symbol))
+			group.GET("/trace", gin.WrapF(pprof.Trace))
+			group.GET("/allocs", gin.WrapH(pprof.Handler("allocs")))
+			group.GET("/block", gin.WrapH(pprof.Handler("block")))
+			group.GET("/goroutine", gin.WrapH(pprof.Handler("goroutine")))
+			group.GET("/heap", gin.WrapH(pprof.Handler("heap")))
+			group.GET("/mutex", gin.WrapH(pprof.Handler("mutex")))
+			group.GET("/threadcreate", gin.WrapH(pprof.Handler("threadcreate")))
+		}
+	})
 
 	return app
 }

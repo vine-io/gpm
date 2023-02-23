@@ -23,25 +23,26 @@
 package server
 
 import (
+	"context"
+
 	pb "github.com/vine-io/gpm/api/service/gpm/v1"
-	"github.com/vine-io/vine"
 	verrs "github.com/vine-io/vine/lib/errors"
 )
 
-func (s *GpmAPI) Healthz(ctx *vine.Context, _ *pb.Empty, rsp *pb.Empty) error {
+func (s *GpmAPI) Healthz(ctx context.Context, _ *pb.Empty, rsp *pb.Empty) error {
 	return nil
 }
 
-func (s *GpmAPI) UpdateSelf(ctx *vine.Context, stream pb.GpmService_UpdateSelfStream) error {
+func (s *GpmAPI) UpdateSelf(ctx context.Context, stream pb.GpmService_UpdateSelfStream) error {
 	return s.G.Update(ctx, &simpleUpdateSelfStream{stream: stream})
 }
 
-func (s *GpmAPI) Info(ctx *vine.Context, _ *pb.InfoReq, rsp *pb.InfoRsp) (err error) {
+func (s *GpmAPI) Info(ctx context.Context, _ *pb.InfoReq, rsp *pb.InfoRsp) (err error) {
 	rsp.Gpm, err = s.G.Info(ctx)
 	return
 }
 
-func (s *GpmAPI) ListService(ctx *vine.Context, req *pb.ListServiceReq, rsp *pb.ListServiceRsp) (err error) {
+func (s *GpmAPI) ListService(ctx context.Context, req *pb.ListServiceReq, rsp *pb.ListServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -49,7 +50,7 @@ func (s *GpmAPI) ListService(ctx *vine.Context, req *pb.ListServiceReq, rsp *pb.
 	return
 }
 
-func (s *GpmAPI) GetService(ctx *vine.Context, req *pb.GetServiceReq, rsp *pb.GetServiceRsp) (err error) {
+func (s *GpmAPI) GetService(ctx context.Context, req *pb.GetServiceReq, rsp *pb.GetServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -57,7 +58,7 @@ func (s *GpmAPI) GetService(ctx *vine.Context, req *pb.GetServiceReq, rsp *pb.Ge
 	return
 }
 
-func (s *GpmAPI) CreateService(ctx *vine.Context, req *pb.CreateServiceReq, rsp *pb.CreateServiceRsp) (err error) {
+func (s *GpmAPI) CreateService(ctx context.Context, req *pb.CreateServiceReq, rsp *pb.CreateServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -65,7 +66,7 @@ func (s *GpmAPI) CreateService(ctx *vine.Context, req *pb.CreateServiceReq, rsp 
 	return
 }
 
-func (s *GpmAPI) EditService(ctx *vine.Context, req *pb.EditServiceReq, rsp *pb.EditServiceRsp) (err error) {
+func (s *GpmAPI) EditService(ctx context.Context, req *pb.EditServiceReq, rsp *pb.EditServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -73,7 +74,7 @@ func (s *GpmAPI) EditService(ctx *vine.Context, req *pb.EditServiceReq, rsp *pb.
 	return
 }
 
-func (s *GpmAPI) StartService(ctx *vine.Context, req *pb.StartServiceReq, rsp *pb.StartServiceRsp) (err error) {
+func (s *GpmAPI) StartService(ctx context.Context, req *pb.StartServiceReq, rsp *pb.StartServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -81,7 +82,7 @@ func (s *GpmAPI) StartService(ctx *vine.Context, req *pb.StartServiceReq, rsp *p
 	return
 }
 
-func (s *GpmAPI) StopService(ctx *vine.Context, req *pb.StopServiceReq, rsp *pb.StopServiceRsp) (err error) {
+func (s *GpmAPI) StopService(ctx context.Context, req *pb.StopServiceReq, rsp *pb.StopServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -89,7 +90,7 @@ func (s *GpmAPI) StopService(ctx *vine.Context, req *pb.StopServiceReq, rsp *pb.
 	return
 }
 
-func (s *GpmAPI) RestartService(ctx *vine.Context, req *pb.RestartServiceReq, rsp *pb.RestartServiceRsp) (err error) {
+func (s *GpmAPI) RestartService(ctx context.Context, req *pb.RestartServiceReq, rsp *pb.RestartServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -97,7 +98,7 @@ func (s *GpmAPI) RestartService(ctx *vine.Context, req *pb.RestartServiceReq, rs
 	return
 }
 
-func (s *GpmAPI) DeleteService(ctx *vine.Context, req *pb.DeleteServiceReq, rsp *pb.DeleteServiceRsp) (err error) {
+func (s *GpmAPI) DeleteService(ctx context.Context, req *pb.DeleteServiceReq, rsp *pb.DeleteServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -105,18 +106,18 @@ func (s *GpmAPI) DeleteService(ctx *vine.Context, req *pb.DeleteServiceReq, rsp 
 	return
 }
 
-func (s *GpmAPI) WatchServiceLog(ctx *vine.Context, req *pb.WatchServiceLogReq, stream pb.GpmService_WatchServiceLogStream) (err error) {
+func (s *GpmAPI) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq, stream pb.GpmService_WatchServiceLogStream) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
 	return s.G.TailLog(ctx, req.Name, req.Number, req.Follow, &simpleWatchLogSender{stream: stream})
 }
 
-func (s *GpmAPI) InstallService(ctx *vine.Context, stream pb.GpmService_InstallServiceStream) error {
+func (s *GpmAPI) InstallService(ctx context.Context, stream pb.GpmService_InstallServiceStream) error {
 	return s.G.Install(ctx, &simpleInstallStream{stream: stream})
 }
 
-func (s *GpmAPI) ListServiceVersions(ctx *vine.Context, req *pb.ListServiceVersionsReq, rsp *pb.ListServiceVersionsRsp) (err error) {
+func (s *GpmAPI) ListServiceVersions(ctx context.Context, req *pb.ListServiceVersionsReq, rsp *pb.ListServiceVersionsRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -124,11 +125,11 @@ func (s *GpmAPI) ListServiceVersions(ctx *vine.Context, req *pb.ListServiceVersi
 	return
 }
 
-func (s *GpmAPI) UpgradeService(ctx *vine.Context, stream pb.GpmService_UpgradeServiceStream) error {
+func (s *GpmAPI) UpgradeService(ctx context.Context, stream pb.GpmService_UpgradeServiceStream) error {
 	return s.G.Upgrade(ctx, &simpleUpgradeStream{stream: stream})
 }
 
-func (s *GpmAPI) RollBackService(ctx *vine.Context, req *pb.RollbackServiceReq, rsp *pb.RollbackServiceRsp) (err error) {
+func (s *GpmAPI) RollBackService(ctx context.Context, req *pb.RollbackServiceReq, rsp *pb.RollbackServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -136,7 +137,7 @@ func (s *GpmAPI) RollBackService(ctx *vine.Context, req *pb.RollbackServiceReq, 
 	return
 }
 
-func (s *GpmAPI) ForgetService(ctx *vine.Context, req *pb.ForgetServiceReq, rsp *pb.ForgetServiceRsp) (err error) {
+func (s *GpmAPI) ForgetService(ctx context.Context, req *pb.ForgetServiceReq, rsp *pb.ForgetServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -144,7 +145,7 @@ func (s *GpmAPI) ForgetService(ctx *vine.Context, req *pb.ForgetServiceReq, rsp 
 	return
 }
 
-func (s *GpmAPI) Ls(ctx *vine.Context, req *pb.LsReq, rsp *pb.LsRsp) (err error) {
+func (s *GpmAPI) Ls(ctx context.Context, req *pb.LsReq, rsp *pb.LsRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -153,18 +154,18 @@ func (s *GpmAPI) Ls(ctx *vine.Context, req *pb.LsReq, rsp *pb.LsRsp) (err error)
 	return
 }
 
-func (s *GpmAPI) Pull(ctx *vine.Context, req *pb.PullReq, stream pb.GpmService_PullStream) (err error) {
+func (s *GpmAPI) Pull(ctx context.Context, req *pb.PullReq, stream pb.GpmService_PullStream) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
 	return s.T.Pull(ctx, req.Name, req.Dir, &simplePullSender{stream: stream})
 }
 
-func (s *GpmAPI) Push(ctx *vine.Context, stream pb.GpmService_PushStream) (err error) {
+func (s *GpmAPI) Push(ctx context.Context, stream pb.GpmService_PushStream) (err error) {
 	return s.T.Push(ctx, &simplePushReader{stream: stream})
 }
 
-func (s *GpmAPI) Exec(ctx *vine.Context, req *pb.ExecReq, rsp *pb.ExecRsp) (err error) {
+func (s *GpmAPI) Exec(ctx context.Context, req *pb.ExecReq, rsp *pb.ExecRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
@@ -172,6 +173,6 @@ func (s *GpmAPI) Exec(ctx *vine.Context, req *pb.ExecReq, rsp *pb.ExecRsp) (err 
 	return
 }
 
-func (s *GpmAPI) Terminal(ctx *vine.Context, stream pb.GpmService_TerminalStream) error {
+func (s *GpmAPI) Terminal(ctx context.Context, stream pb.GpmService_TerminalStream) error {
 	return s.T.Terminal(ctx, &simpleTerminalStream{stream: stream})
 }

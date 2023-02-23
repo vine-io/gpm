@@ -31,48 +31,27 @@ import (
 	gruntime "runtime"
 	"time"
 
+	"github.com/spf13/cobra"
 	pb "github.com/vine-io/gpm/api/service/gpm/v1"
 	"github.com/vine-io/gpm/pkg/internal"
 	"github.com/vine-io/gpm/pkg/internal/inject"
 	"github.com/vine-io/gpm/pkg/internal/store"
 	"github.com/vine-io/gpm/pkg/service"
 	"github.com/vine-io/pkg/release"
-	"github.com/vine-io/vine/core/registry"
-	"github.com/vine-io/vine/core/registry/memory"
 	"github.com/vine-io/vine/lib/api/handler/openapi"
 
-	"github.com/vine-io/cli"
 	"github.com/vine-io/plugins/logger/zap"
 	"github.com/vine-io/vine"
 	vserver "github.com/vine-io/vine/core/server"
 	grpcServer "github.com/vine-io/vine/core/server/grpc"
-	"github.com/vine-io/vine/lib/config"
-	"github.com/vine-io/vine/lib/config/source"
-	ccli "github.com/vine-io/vine/lib/config/source/cli"
 	log "github.com/vine-io/vine/lib/logger"
+	uc "github.com/vine-io/vine/util/config"
 	"google.golang.org/grpc/peer"
 )
 
 var (
-	EnableLog = false
-	Address   = ":7700"
-	ROOT      = "/opt/gpm"
-
-	flags = []cli.Flag{
-		&cli.StringFlag{
-			Name:        "root",
-			Usage:       "the root directory of gpmd",
-			EnvVars:     []string{"VINE_ROOT"},
-			Destination: &ROOT,
-			Value:       ROOT,
-		},
-		&cli.BoolFlag{
-			Name:        "enable-log",
-			Usage:       "write log to file",
-			EnvVars:     []string{"VINE_LOG"},
-			Destination: &EnableLog,
-		},
-	}
+	Address = ":7700"
+	ROOT    = "/opt/gpm"
 )
 
 type GpmAPI struct {
@@ -96,16 +75,7 @@ func (s *GpmAPI) Init() error {
 		_ = os.MkdirAll(filepath.Join(ROOT, "packages"), 0o777)
 	}
 
-	var clisrc source.Source
-
-	mr := memory.NewRegistry()
-	if err = mr.Init(); err != nil {
-		return err
-	}
-	registry.DefaultRegistry = mr
-
 	opts := []vine.Option{
-		vine.Registry(mr),
 		vine.Name(internal.GpmName),
 		vine.ID(internal.GpmId),
 		vine.Version(internal.GetVersion()),
@@ -113,45 +83,37 @@ func (s *GpmAPI) Init() error {
 		vine.Metadata(map[string]string{
 			"namespace": internal.Namespace,
 		}),
-		vine.Flags(flags...),
 		vine.WrapHandler(newLoggerWrapper()),
-		vine.Action(func(c *cli.Context) error {
-			clisrc = ccli.NewSource(ccli.Context(c))
+		vine.Action(func(c *cobra.Command, args []string) error {
 
-			Address = c.String("server-address")
+			Address = uc.GetString("server-address")
 
-			if c.Bool("enable-log") {
-				EnableLog = true
+			zap.WithFileWriter(zap.FileWriter{
+				FileName:   filepath.Join(ROOT, "logs", "gpmd.log"),
+				MaxSize:    1,
+				MaxBackups: 5,
+				MaxAge:     30,
+				Compress:   false,
+			})
 
-				l, err := zap.New(zap.WithFileWriter(zap.FileWriter{
-					FileName:   filepath.Join(ROOT, "logs", "gpmd.log"),
-					MaxSize:    1,
-					MaxBackups: 5,
-					MaxAge:     30,
-					Compress:   false,
-				}))
-				if err != nil {
-					return err
-				}
-				log.DefaultLogger = l
+			l, err := zap.New(zap.WithJSONEncode())
+			if err != nil {
+				return err
 			}
+			log.DefaultLogger = l
 
 			return nil
 		}),
 	}
 
 	s.Service.Init(opts...)
-	app := newAPIServer(s.Service, s.Client())
+	app := newAPIServer(s.Service)
 	if err = s.Server().Init(grpcServer.HttpHandler(app)); err != nil {
 		log.Fatal(err)
 	}
 
 	or, _ := release.Get()
 	log.Infof("system information: %s", or)
-
-	if err = config.Load(clisrc); err != nil {
-		log.Fatal(err)
-	}
 
 	db := new(store.DB)
 	if err = inject.Provide(s.Service, s.Client(), s, db); err != nil {
