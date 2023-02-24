@@ -2,8 +2,8 @@
 
 ### Features
 
-- [d9eeb187](https://github.com/vine-io/gpm/commit/d9eeb1874e9b0fa999cb63f55a1eb950ca35f6bf) feat: cobra group
-- [1750e200](https://github.com/vine-io/gpm/commit/1750e200d40beea2c8c9adb014a27aad162dbad8) feat: 移除 vine/cli
+- [d9eeb187](https://github.com/vine-io/gpm/commit/d9eeb1874e9b0fa999cb63f55a1eb950ca35f6bf) : cobra group
+- [1750e200](https://github.com/vine-io/gpm/commit/1750e200d40beea2c8c9adb014a27aad162dbad8) : 移除 vine/cli
 
 ### Bug Fixes
 
@@ -82,7 +82,7 @@
 
 ### Features
 
-- [472bc028](https://github.com/vine-io/gpm/commit/472bc028870f56b3c5a8284ea7ff7cf16ec2bd5c) feat: 适配 redhat6
+- [472bc028](https://github.com/vine-io/gpm/commit/472bc028870f56b3c5a8284ea7ff7cf16ec2bd5c) : 适配 redhat6
 
 ### Others
 
@@ -128,7 +128,7 @@
 
 ### Features
 
-- [c2f09ef7](https://github.com/vine-io/gpm/commit/c2f09ef78c210078bc3c05c393c878c43c570c95) feat: 删除 install 的服务的同时直接删除安装目录
+- [c2f09ef7](https://github.com/vine-io/gpm/commit/c2f09ef78c210078bc3c05c393c878c43c570c95) : 删除 install 的服务的同时直接删除安装目录
 
 ### Bug Fixes
 
@@ -152,7 +152,7 @@
 
 ### Features
 
-- [5ed6c8d1](https://github.com/vine-io/gpm/commit/5ed6c8d11c9fa2bc98ccdb2df34d35a5453d5abc) feat: 调整安装服务处理逻辑
+- [5ed6c8d1](https://github.com/vine-io/gpm/commit/5ed6c8d11c9fa2bc98ccdb2df34d35a5453d5abc) : 调整安装服务处理逻辑
 
 ### Others
 
