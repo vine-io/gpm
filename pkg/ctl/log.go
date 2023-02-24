@@ -30,7 +30,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/vine-io/gpm/pkg/internal/client"
+	"github.com/vine-io/gpm/pkg/client"
 	"google.golang.org/grpc/status"
 )
 

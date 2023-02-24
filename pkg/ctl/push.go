@@ -33,10 +33,10 @@ import (
 
 	pbr "github.com/schollz/progressbar/v3"
 	"github.com/spf13/cobra"
+	client2 "github.com/vine-io/gpm/pkg/client"
 	vclient "github.com/vine-io/vine/core/client"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
-	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
 func pushBash(c *cobra.Command, args []string) error {
@@ -91,7 +91,7 @@ func pushBash(c *cobra.Command, args []string) error {
 }
 
 func push(ctx context.Context, pb *pbr.ProgressBar, src, dst string, opts ...vclient.CallOption) error {
-	cc := client.New()
+	cc := client2.New()
 	buf := make([]byte, 1024*32)
 
 	stream, err := cc.Push(ctx, opts...)
@@ -107,7 +107,7 @@ func push(ctx context.Context, pb *pbr.ProgressBar, src, dst string, opts ...vcl
 	return stream.Wait()
 }
 
-func send(path, dst string, bar *pbr.ProgressBar, stream *client.PushStream, buf []byte) error {
+func send(path, dst string, bar *pbr.ProgressBar, stream *client2.PushStream, buf []byte) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return err

@@ -39,8 +39,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/vine-io/gpm/pkg/client"
 	"github.com/vine-io/gpm/pkg/internal"
-	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
 //go:embed testdata/nssm.exe

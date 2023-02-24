@@ -31,15 +31,15 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	client2 "github.com/vine-io/gpm/pkg/client"
 	"google.golang.org/grpc/status"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
-	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
 type Sender struct {
 	in *gpmv1.TerminalIn
-	s  *client.TerminalStream
+	s  *client2.TerminalStream
 }
 
 func (s *Sender) Write(data []byte) (int, error) {
@@ -54,7 +54,7 @@ func (s *Sender) Write(data []byte) (int, error) {
 func terminalBash(c *cobra.Command, args []string) error {
 
 	opts := getCallOptions(c)
-	cc := client.New()
+	cc := client2.New()
 	ctx := context.Background()
 
 	stdin := os.Stdin

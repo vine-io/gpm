@@ -28,7 +28,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/vine-io/gpm/pkg/internal/client"
+	"github.com/vine-io/gpm/pkg/client"
 )
 
 func restartService(c *cobra.Command, args []string) error {

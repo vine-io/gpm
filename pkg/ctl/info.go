@@ -32,7 +32,7 @@ import (
 	json "github.com/json-iterator/go"
 	tw "github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
-	"github.com/vine-io/gpm/pkg/internal/client"
+	"github.com/vine-io/gpm/pkg/client"
 	"github.com/vine-io/pkg/unit"
 	log "github.com/vine-io/vine/lib/logger"
 	"gopkg.in/yaml.v3"

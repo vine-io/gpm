@@ -30,7 +30,7 @@ import (
 
 	"github.com/spf13/cobra"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
-	"github.com/vine-io/gpm/pkg/internal/client"
+	"github.com/vine-io/gpm/pkg/client"
 )
 
 func createService(c *cobra.Command, args []string) error {

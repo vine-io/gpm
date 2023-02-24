@@ -34,7 +34,7 @@ import (
 	pbr "github.com/schollz/progressbar/v3"
 	"github.com/spf13/cobra"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
-	"github.com/vine-io/gpm/pkg/internal/client"
+	"github.com/vine-io/gpm/pkg/client"
 	"google.golang.org/grpc/status"
 )
 
