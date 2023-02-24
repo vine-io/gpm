@@ -72,6 +72,7 @@ build-arm: build-darwin-arm64 build-linux-arm64 build-windows
 build: build-amd build-arm
 
 changelog:
+	mkdir _output
 	changelog --last --output _output/CHANGELOG.md
 
 tar-amd: build-amd
