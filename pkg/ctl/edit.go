@@ -28,12 +28,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func editService(c *cli.Context) error {
+func editService(c *cobra.Command, args []string) error {
 
 	opts := getCallOptions(c)
 	cc := client.New()
@@ -43,13 +43,13 @@ func editService(c *cli.Context) error {
 		Env: map[string]string{},
 	}
 
-	name := c.String("name")
-	spec.Bin = c.String("bin")
-	spec.Args = c.StringSlice("args")
-	spec.Dir = c.String("dir")
-	env := c.StringSlice("env")
-	user := c.String("user")
-	group := c.String("group")
+	name, _ := c.Flags().GetString("name")
+	spec.Bin, _ = c.Flags().GetString("bin")
+	spec.Args, _ = c.Flags().GetStringSlice("args")
+	spec.Dir, _ = c.Flags().GetString("dir")
+	env, _ := c.Flags().GetStringSlice("env")
+	user, _ := c.Flags().GetString("user")
+	group, _ := c.Flags().GetString("group")
 	if user != "" || group != "" {
 		spec.SysProcAttr = &gpmv1.SysProcAttr{}
 	}
@@ -60,8 +60,8 @@ func editService(c *cli.Context) error {
 		spec.SysProcAttr.Group = group
 	}
 
-	expire := int32(c.Int("log-expire"))
-	maxSize := c.Int64("log-max-size")
+	expire, _ := c.Flags().GetInt32("log-expire")
+	maxSize, _ := c.Flags().GetInt64("log-max-size")
 	if expire > 0 || maxSize > 0 {
 		spec.Log = &gpmv1.ProcLog{}
 	}
@@ -72,7 +72,7 @@ func editService(c *cli.Context) error {
 		spec.Log.MaxSize = maxSize
 	}
 
-	spec.AutoRestart = int32(c.Int("auto-restart"))
+	spec.AutoRestart, _ = c.Flags().GetInt32("auto-restart")
 	if err := spec.Validate(); err != nil {
 		return err
 	}
@@ -92,59 +92,25 @@ func editService(c *cli.Context) error {
 	return nil
 }
 
-func EditServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "edit",
-		Usage:    "update a service parameters",
-		Category: "service",
-		Action:   editService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name for service",
-			},
-			&cli.StringFlag{
-				Name:    "bin",
-				Aliases: []string{"B"},
-				Usage:   "specify the bin for service",
-			},
-			&cli.StringSliceFlag{
-				Name:    "args",
-				Aliases: []string{"A"},
-				Usage:   "specify the args for service",
-			},
-			&cli.StringFlag{
-				Name:    "dir",
-				Aliases: []string{"D"},
-				Usage:   "specify the root directory for service",
-			},
-			&cli.StringSliceFlag{
-				Name:    "env",
-				Aliases: []string{"E"},
-				Usage:   "specify the env for service",
-			},
-			&cli.StringFlag{
-				Name:  "user",
-				Usage: "specify the user for service",
-			},
-			&cli.StringFlag{
-				Name:  "group",
-				Usage: "specify the group for service",
-			},
-			&cli.IntFlag{
-				Name:  "log-expire",
-				Usage: "specify the expire for service log",
-			},
-			&cli.Int64Flag{
-				Name:  "log-max-size",
-				Usage: "specify the max size for service log",
-			},
-			&cli.IntFlag{
-				Name:  "auto-restart",
-				Usage: "Whether auto restart service when it crashing (1,-1)",
-				Value: 1,
-			},
-		},
+func EditServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "edit",
+		Short:   "update a service parameters",
+		GroupID: "service",
+		RunE:    editService,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "specify the name for service")
+	cmd.PersistentFlags().StringP("bin", "B", "", "specify the bin for service")
+	cmd.PersistentFlags().StringSliceP("args", "A", []string{}, "specify the args for service")
+	cmd.PersistentFlags().StringP("dir", "D", "", "specify the root directory for service")
+	cmd.PersistentFlags().StringP("env", "E", "", "specify the env for service")
+	cmd.PersistentFlags().String("user", "", "specify the user for service")
+	cmd.PersistentFlags().String("group", "", "specify the group for service")
+	cmd.PersistentFlags().Int("log-expire", 15, "specify the expire for service log")
+	cmd.PersistentFlags().Int64("log-max-size", 1024*1024*10, "specify the max size for service log")
+	cmd.PersistentFlags().StringP("version", "V", "", "specify the version for service")
+	cmd.PersistentFlags().Int("auto-restart", 1, "Whether auto restart service when it crashing")
+
+	return cmd
 }

@@ -30,20 +30,20 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/spf13/cobra"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/internal/client"
 
 	pbr "github.com/schollz/progressbar/v3"
-	"github.com/vine-io/cli"
 	"github.com/vine-io/pkg/unit"
 	"google.golang.org/grpc/status"
 )
 
-func pullBash(c *cli.Context) error {
+func pullBash(c *cobra.Command, args []string) error {
 
-	src := c.String("src")
-	regular := c.Bool("regular")
-	dst := c.String("dst")
+	src, _ := c.Flags().GetString("src")
+	regular, _ := c.Flags().GetBool("regular")
+	dst, _ := c.Flags().GetString("dst")
 	if src == "" {
 		return fmt.Errorf("missing src")
 	}
@@ -147,28 +147,17 @@ func pullBash(c *cli.Context) error {
 	return nil
 }
 
-func PullBashCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "pull",
-		Usage:    "pull file from service",
-		Category: "bash",
-		Action:   pullBash,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "src",
-				Aliases: []string{"S"},
-				Usage:   "specify the source for pull",
-			},
-			&cli.BoolFlag{
-				Name:    "regular",
-				Aliases: []string{"R"},
-				Usage:   "whether pull all files",
-			},
-			&cli.StringFlag{
-				Name:    "dst",
-				Aliases: []string{"D"},
-				Usage:   "specify the target for pull",
-			},
-		},
+func PullBashCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "pull",
+		Short:   "pull file from service",
+		GroupID: "bash",
+		RunE:    pullBash,
 	}
+
+	cmd.PersistentFlags().StringP("src", "S", "", "specify the source for pull")
+	cmd.PersistentFlags().StringP("dst", "D", "", "specify the target for pull")
+	cmd.PersistentFlags().BoolP("regular", "R", false, "whether pull all files")
+
+	return cmd
 }

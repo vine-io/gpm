@@ -79,55 +79,7 @@ func New(opts ...vine.Option) (*GpmApp, error) {
 			"namespace": internal.Namespace,
 		}),
 		vine.WrapHandler(wrap.NewLoggerWrapper()),
-		vine.Action(func(c *cobra.Command, args []string) error {
-
-			root := uc.GetString("gpm.root")
-			if root == "" {
-				if gruntime.GOOS == "windows" {
-					root = "C:\\opt\\gpm"
-				} else {
-					root = "/opt/gpm"
-				}
-				_ = os.MkdirAll(filepath.Join(root, "logs"), 0o777)
-				_ = os.MkdirAll(filepath.Join(root, "services"), 0o777)
-				_ = os.MkdirAll(filepath.Join(root, "packages"), 0o777)
-			}
-
-			lopts := []log.Option{zap.WithJSONEncode()}
-			filename := uc.GetString("logger.zap.filename")
-			if filename != "" {
-				writer := zap.FileWriter{
-					FileName:   filename,
-					MaxSize:    1,
-					MaxBackups: 5,
-					MaxAge:     30,
-					Compress:   false,
-				}
-
-				if v := uc.GetInt("logger.zap.max-size"); v != 0 {
-					writer.MaxSize = v
-				}
-				if v := uc.GetInt("logger.zap.max-backups"); v != 0 {
-					writer.MaxBackups = v
-				}
-				if v := uc.GetInt("logger.zap.max-age"); v != 0 {
-					writer.MaxAge = v
-				}
-				if v := cast.ToBool(uc.Get("logger.zap.compress")); v {
-					writer.Compress = true
-				}
-
-				lopts = append(lopts, zap.WithFileWriter(writer))
-			}
-
-			l, err := zap.New(lopts...)
-			if err != nil {
-				return err
-			}
-			log.DefaultLogger = l
-
-			return nil
-		}),
+		vine.Action(newAction),
 	)
 
 	// vine service 初始化，解析命令行参数
@@ -183,6 +135,57 @@ func (app *GpmApp) Run() error {
 	if err := app.s.Run(); err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func newAction(cmd *cobra.Command, args []string) error {
+	root := uc.GetString("gpm.root")
+	if root == "" {
+
+		switch gruntime.GOOS {
+		case "windows":
+			root = "C:\\opt\\gpm"
+		default:
+			root = "/opt/gpm"
+		}
+		_ = os.MkdirAll(filepath.Join(root, "logs"), 0o777)
+		_ = os.MkdirAll(filepath.Join(root, "services"), 0o777)
+		_ = os.MkdirAll(filepath.Join(root, "packages"), 0o777)
+	}
+
+	lopts := []log.Option{zap.WithJSONEncode()}
+	filename := uc.GetString("logger.zap.filename")
+	if filename != "" {
+		writer := zap.FileWriter{
+			FileName:   filename,
+			MaxSize:    1,
+			MaxBackups: 5,
+			MaxAge:     30,
+			Compress:   false,
+		}
+
+		if v := uc.GetInt("logger.zap.max-size"); v != 0 {
+			writer.MaxSize = v
+		}
+		if v := uc.GetInt("logger.zap.max-backups"); v != 0 {
+			writer.MaxBackups = v
+		}
+		if v := uc.GetInt("logger.zap.max-age"); v != 0 {
+			writer.MaxAge = v
+		}
+		if v := cast.ToBool(uc.Get("logger.zap.compress")); v {
+			writer.Compress = true
+		}
+
+		lopts = append(lopts, zap.WithFileWriter(writer))
+	}
+
+	l, err := zap.New(lopts...)
+	if err != nil {
+		return err
+	}
+	log.DefaultLogger = l
 
 	return nil
 }

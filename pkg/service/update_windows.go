@@ -99,7 +99,7 @@ EXIT:
 	go func() {
 		addr := uc.GetString("server", "address")
 		if addr == "" {
-			addr = "0.0.0.0:7700"
+			addr = "0.0.0.0:33700"
 		}
 		args := []string{"deploy", "--run", "--args", fmt.Sprintf(`"--server-address=%s"`, addr)}
 		shell := fmt.Sprintf(`%s %s`, dst, strings.Join(args, " "))

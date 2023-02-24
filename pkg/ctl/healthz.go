@@ -27,11 +27,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func healthService(c *cli.Context) error {
+func healthService(c *cobra.Command, args []string) error {
 
 	opts := getCallOptions(c)
 	cc := client.New()
@@ -47,10 +47,10 @@ func healthService(c *cli.Context) error {
 	return nil
 }
 
-func HealthCmd() *cli.Command {
-	return &cli.Command{
-		Name:   "health",
-		Usage:  "confirm gpmd status",
-		Action: healthService,
+func HealthCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "health",
+		Short: "confirm gpmd status",
+		RunE:  healthService,
 	}
 }

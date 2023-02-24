@@ -27,13 +27,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func restartService(c *cli.Context) error {
+func restartService(c *cobra.Command, args []string) error {
 
-	name := c.String("name")
+	name, _ := c.Flags().GetString("name")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
@@ -52,18 +52,15 @@ func restartService(c *cli.Context) error {
 	return nil
 }
 
-func RestartServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "restart",
-		Usage:    "restart a service",
-		Category: "service",
-		Action:   restartService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name of service",
-			},
-		},
+func RestartServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "restart",
+		Short:   "restart a service",
+		GroupID: "service",
+		RunE:    restartService,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "specify the name of service")
+
+	return cmd
 }

@@ -31,16 +31,16 @@ import (
 
 	json "github.com/json-iterator/go"
 	tw "github.com/olekukonko/tablewriter"
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 	"github.com/vine-io/pkg/unit"
 	log "github.com/vine-io/vine/lib/logger"
 	"gopkg.in/yaml.v3"
 )
 
-func infoService(c *cli.Context) error {
+func infoService(c *cobra.Command, args []string) error {
 	opts := getCallOptions(c)
-	output := c.String("output")
+	output, _ := c.Flags().GetString("output")
 	cc := client.New()
 	ctx := context.Background()
 	outE := os.Stdout
@@ -98,18 +98,14 @@ func infoService(c *cli.Context) error {
 	return nil
 }
 
-func InfoServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:   "info",
-		Usage:  "get the information of gpmd",
-		Action: infoService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "output",
-				Aliases: []string{"o"},
-				Usage:   "specify the format of output, example wide, json, yaml",
-				Value:   "wide",
-			},
-		},
+func InfoServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "info",
+		Short: "get the information of gpmd",
+		RunE:  infoService,
 	}
+
+	cmd.PersistentFlags().StringP("output", "o", "wide", "specify the format of output, example wide, json, yaml")
+
+	return cmd
 }

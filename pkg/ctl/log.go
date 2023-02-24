@@ -29,16 +29,16 @@ import (
 	"io"
 	"os"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 	"google.golang.org/grpc/status"
 )
 
-func tailService(c *cli.Context) error {
+func tailService(c *cobra.Command, args []string) error {
 	opts := getCallOptions(c)
-	name := c.String("name")
-	number := c.Int64("number")
-	follow := c.Bool("follow")
+	name, _ := c.Flags().GetString("name")
+	number, _ := c.Flags().GetInt64("number")
+	follow, _ := c.Flags().GetBool("follow")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
@@ -76,29 +76,17 @@ func tailService(c *cli.Context) error {
 	return nil
 }
 
-func TailServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "tail",
-		Usage:    "tail service logs",
-		Category: "service",
-		Action:   tailService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name of service",
-			},
-			&cli.Int64Flag{
-				Name:    "number",
-				Aliases: []string{"n"},
-				Usage:   "specify the number of service log",
-				Value:   1024,
-			},
-			&cli.BoolFlag{
-				Name:    "follow",
-				Aliases: []string{"f"},
-				Usage:   "whether watching service log",
-			},
-		},
+func TailServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "tail",
+		Short:   "tail service logs",
+		GroupID: "service",
+		RunE:    tailService,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "specify the name of service")
+	cmd.PersistentFlags().Int64P("number", "n", 1024, "specify the number of service log")
+	cmd.PersistentFlags().BoolP("follow", "f", false, "whether watching service log")
+
+	return cmd
 }

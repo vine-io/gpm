@@ -29,13 +29,13 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func versionService(c *cli.Context) error {
+func versionService(c *cobra.Command, args []string) error {
 
-	name := c.String("name")
+	name, _ := c.Flags().GetString("name")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
@@ -68,18 +68,15 @@ func versionService(c *cli.Context) error {
 	return nil
 }
 
-func VersionServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "version",
-		Usage:    "list service history versions",
-		Category: "service",
-		Action:   versionService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "the specify the name for version",
-			},
-		},
+func VersionServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "version",
+		Short:   "list service history versions",
+		GroupID: "service",
+		RunE:    versionService,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "the specify the name for version")
+
+	return cmd
 }

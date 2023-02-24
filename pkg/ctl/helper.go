@@ -26,22 +26,25 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal"
 	"github.com/vine-io/gpm/pkg/internal/config"
 	vclient "github.com/vine-io/vine/core/client"
 )
 
-func getCallOptions(c *cli.Context) []vclient.CallOption {
-	host := c.String("host")
+func getCallOptions(c *cobra.Command) []vclient.CallOption {
+	host, _ := c.Flags().GetString("host")
 	if index := strings.Index(host, ":"); index == -1 {
 		host += fmt.Sprintf(":%d", config.DefaultPort)
 	}
+
+	dialTimeout, _ := c.Flags().GetDuration("dial-timeout")
+	requestTimeout, _ := c.Flags().GetDuration("request-timeout")
 	return []vclient.CallOption{
 		vclient.WithAddress(host),
-		vclient.WithDialTimeout(c.Duration("dial-timeout")),
-		vclient.WithRequestTimeout(c.Duration("request-timeout")),
-		vclient.WithStreamTimeout(c.Duration("request-timeout")),
+		vclient.WithDialTimeout(dialTimeout),
+		vclient.WithRequestTimeout(requestTimeout),
+		vclient.WithStreamTimeout(requestTimeout),
 	}
 }
 

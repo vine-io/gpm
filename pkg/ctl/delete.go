@@ -27,18 +27,18 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func deleteService(c *cli.Context) error {
+func deleteService(c *cobra.Command, args []string) error {
 
 	cc := client.New()
 	ctx := context.Background()
 	outE := os.Stdout
 	opts := getCallOptions(c)
 
-	name := c.String("name")
+	name, _ := c.Flags().GetString("name")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
@@ -52,18 +52,14 @@ func deleteService(c *cli.Context) error {
 	return nil
 }
 
-func DeleteServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "delete",
-		Usage:    "delete a service",
-		Category: "service",
-		Action:   deleteService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name of service",
-			},
-		},
+func DeleteServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "delete",
+		Short:   "delete a service",
+		GroupID: "service", RunE: deleteService,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "specify the name of service")
+
+	return cmd
 }

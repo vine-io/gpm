@@ -31,29 +31,29 @@ import (
 	"path/filepath"
 
 	pbr "github.com/schollz/progressbar/v3"
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/internal/client"
 	"google.golang.org/grpc/status"
 )
 
-func upgradeService(c *cli.Context) error {
+func upgradeService(c *cobra.Command, args []string) error {
 
 	spec := &gpmv1.UpgradeSpec{}
-	pack := c.String("package")
+	pack, _ := c.Flags().GetString("package")
 	if len(pack) == 0 {
 		return fmt.Errorf("missing package")
 	}
 
-	spec.Name = c.String("name")
-	spec.Version = c.String("version")
+	spec.Name, _ = c.Flags().GetString("name")
+	spec.Version, _ = c.Flags().GetString("version")
 	if spec.Name == "" {
 		return fmt.Errorf("missing name")
 	}
 	if spec.Version == "" {
 		return fmt.Errorf("missing version")
 	}
-	spec.HeaderTrimPrefix = c.String("header-prefix")
+	spec.HeaderTrimPrefix, _ = c.Flags().GetString("header-prefix")
 
 	opts := getCallOptions(c)
 	cc := client.New()
@@ -150,33 +150,18 @@ func upgradeService(c *cli.Context) error {
 	return nil
 }
 
-func UpgradeServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "upgrade",
-		Usage:    "upgrade a service",
-		Category: "service",
-		Action:   upgradeService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "package",
-				Aliases: []string{"P"},
-				Usage:   "specify the package for service",
-			},
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name for service",
-			},
-			&cli.StringFlag{
-				Name:    "version",
-				Aliases: []string{"V"},
-				Usage:   "specify the version for service",
-			},
-			&cli.StringFlag{
-				Name:  "header-prefix",
-				Usage: "specify the version for gzip header",
-				Value: "",
-			},
-		},
+func UpgradeServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "upgrade",
+		Short:   "upgrade a service",
+		GroupID: "service",
+		RunE:    upgradeService,
 	}
+
+	cmd.PersistentFlags().StringP("package", "P", "", "specify the package for service")
+	cmd.PersistentFlags().StringP("name", "N", "", "specify the name for service")
+	cmd.PersistentFlags().StringP("version", "V", "", "specify the version for service")
+	cmd.PersistentFlags().String("header-prefix", "", "specify the version for gzip header")
+
+	return cmd
 }

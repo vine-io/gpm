@@ -16,15 +16,9 @@ import (
 	"github.com/vine-io/gpm/pkg/internal/client"
 	vclient "github.com/vine-io/vine/core/client"
 	"github.com/vine-io/vine/core/registry"
-	ahandler "github.com/vine-io/vine/lib/api/handler"
 	"github.com/vine-io/vine/lib/api/handler/openapi"
-	arpc "github.com/vine-io/vine/lib/api/handler/rpc"
-	"github.com/vine-io/vine/lib/api/resolver"
-	"github.com/vine-io/vine/lib/api/resolver/grpc"
-	"github.com/vine-io/vine/lib/api/router"
-	regRouter "github.com/vine-io/vine/lib/api/router/registry"
 	log "github.com/vine-io/vine/lib/logger"
-	"github.com/vine-io/vine/util/namespace"
+	uapi "github.com/vine-io/vine/util/api"
 )
 
 type GpmHttpServer struct {
@@ -41,7 +35,6 @@ func RegistryGpmAPIServer(ctx context.Context, reg registry.Registry, client vcl
 	app.Use(gin.Recovery())
 
 	s := &GpmHttpServer{
-		Engine:   app,
 		register: reg,
 		client:   client,
 	}
@@ -69,31 +62,9 @@ func RegistryGpmAPIServer(ctx context.Context, reg registry.Registry, client vcl
 		group.GET("/threadcreate", gin.WrapH(pprof.Handler("threadcreate")))
 	}
 
-	Type := "api"
-	HandlerType := "rpc"
 	ns := internal.Namespace
-
-	// create the namespace resolver
-	nsResolver := namespace.NewResolver(Type, ns)
-	// resolver options
-	rops := []resolver.Option{
-		resolver.WithNamespace(nsResolver.ResolveWithType),
-		resolver.WithHandler(HandlerType),
-	}
-
-	rr := grpc.NewResolver(rops...)
-	rt := regRouter.NewRouter(
-		router.WithHandler(arpc.Handler),
-		router.WithResolver(rr),
-		router.WithRegistry(reg),
-	)
-
-	rp := arpc.NewHandler(
-		ahandler.WithNamespace(ns),
-		ahandler.WithRouter(rt),
-		ahandler.WithClient(client),
-	)
-	s.Use(rp.Handle)
+	uapi.PrimpHandler(app, reg, client, ns)
+	s.Engine = app
 
 	return s, nil
 }

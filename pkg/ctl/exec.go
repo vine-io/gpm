@@ -28,13 +28,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/internal/client"
 	verrs "github.com/vine-io/vine/lib/errors"
 )
 
-func execBash(c *cli.Context) error {
+func execBash(c *cobra.Command, args []string) error {
 
 	opts := getCallOptions(c)
 	cc := client.New()
@@ -42,11 +42,11 @@ func execBash(c *cli.Context) error {
 	outE := os.Stdout
 
 	in := &gpmv1.ExecIn{}
-	in.Shell = c.String("shell")
-	in.Dir = c.String("dir")
-	env := c.StringSlice("env")
-	in.User = c.String("user")
-	in.Group = c.String("group")
+	in.Shell, _ = c.Flags().GetString("shell")
+	in.Dir, _ = c.Flags().GetString("dir")
+	env, _ := c.Flags().GetStringSlice("env")
+	in.User, _ = c.Flags().GetString("user")
+	in.Group, _ = c.Flags().GetString("group")
 	if err := in.Validate(); err != nil {
 		return err
 	}
@@ -71,35 +71,19 @@ func execBash(c *cli.Context) error {
 	return nil
 }
 
-func ExecBashCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "exec",
-		Usage:    "execute command",
-		Category: "bash",
-		Action:   execBash,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "shell",
-				Aliases: []string{"S"},
-				Usage:   "specify the command for exec",
-			},
-			&cli.StringFlag{
-				Name:  "dir",
-				Usage: "specify the directory path for exec",
-			},
-			&cli.StringSliceFlag{
-				Name:    "env",
-				Aliases: []string{"E"},
-				Usage:   "specify the env for exec",
-			},
-			&cli.StringFlag{
-				Name:  "user",
-				Usage: "specify the user for exec",
-			},
-			&cli.StringFlag{
-				Name:  "group",
-				Usage: "specify the group for exec",
-			},
-		},
+func ExecBashCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "exec",
+		Short:   "execute command",
+		GroupID: "bash",
+		RunE:    execBash,
 	}
+
+	cmd.PersistentFlags().StringP("shell", "S", "", "specify the command for exec")
+	cmd.PersistentFlags().StringP("dir", "D", "", "specify the directory path for exec")
+	cmd.PersistentFlags().StringSliceP("env", "E", []string{}, "specify the env for exec")
+	cmd.PersistentFlags().String("user", "", "specify the user for exec")
+	cmd.PersistentFlags().String("group", "", "specify the group for exec")
+
+	return cmd
 }

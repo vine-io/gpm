@@ -29,14 +29,14 @@ import (
 	"time"
 
 	"github.com/olekukonko/tablewriter"
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 	"github.com/vine-io/pkg/unit"
 )
 
-func lsBash(c *cli.Context) error {
+func lsBash(c *cobra.Command, args []string) error {
 
-	path := c.String("path")
+	path, _ := c.Flags().GetString("path")
 	if path == "" {
 		return fmt.Errorf("missing path")
 	}
@@ -70,18 +70,15 @@ func lsBash(c *cli.Context) error {
 	return nil
 }
 
-func LsBashCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "ls",
-		Usage:    "list remote directory",
-		Category: "bash",
-		Action:   lsBash,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "path",
-				Aliases: []string{"P"},
-				Usage:   "the specify the path for command",
-			},
-		},
+func LsBashCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "ls",
+		Short:   "list remote directory",
+		GroupID: "bash",
+		RunE:    lsBash,
 	}
+
+	cmd.PersistentFlags().StringP("path", "P", "", "the specify the path for command")
+
+	return cmd
 }

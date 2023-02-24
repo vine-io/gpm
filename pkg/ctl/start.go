@@ -27,13 +27,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func startService(c *cli.Context) error {
+func startService(c *cobra.Command, args []string) error {
 
-	name := c.String("name")
+	name, _ := c.Flags().GetString("name")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
@@ -52,18 +52,15 @@ func startService(c *cli.Context) error {
 	return nil
 }
 
-func StartServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "start",
-		Usage:    "start a service",
-		Category: "service",
-		Action:   startService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name of service",
-			},
-		},
+func StartServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "start",
+		Short:   "start a service",
+		GroupID: "service",
+		RunE:    startService,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "specify the name of service")
+
+	return cmd
 }

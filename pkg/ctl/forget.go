@@ -27,13 +27,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func forgetService(c *cli.Context) error {
-	name := c.String("name")
-	revision := c.String("revision")
+func forgetService(c *cobra.Command, args []string) error {
+	name, _ := c.Flags().GetString("name")
+	revision, _ := c.Flags().GetString("revision")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
@@ -64,23 +64,16 @@ func forgetService(c *cli.Context) error {
 	return nil
 }
 
-func ForgetServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "forget",
-		Usage:    "forget a service version",
-		Category: "service",
-		Action:   forgetService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name of service",
-			},
-			&cli.StringFlag{
-				Name:    "revision",
-				Aliases: []string{"R"},
-				Usage:   "specify the revision of service",
-			},
-		},
+func ForgetServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "forget",
+		Short:   "forget a service version",
+		GroupID: "service",
+		RunE:    forgetService,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "specify the name of service")
+	cmd.PersistentFlags().StringP("revision", "R", "", "specify the revision of service")
+
+	return cmd
 }

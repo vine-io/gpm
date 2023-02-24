@@ -30,7 +30,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"google.golang.org/grpc/status"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
@@ -51,7 +51,7 @@ func (s *Sender) Write(data []byte) (int, error) {
 	return n, nil
 }
 
-func terminalBash(c *cli.Context) error {
+func terminalBash(c *cobra.Command, args []string) error {
 
 	opts := getCallOptions(c)
 	cc := client.New()
@@ -62,9 +62,9 @@ func terminalBash(c *cli.Context) error {
 	outE := os.Stderr
 
 	in := &gpmv1.TerminalIn{}
-	env := c.StringSlice("env")
-	in.User = c.String("user")
-	in.Group = c.String("group")
+	env, _ := c.Flags().GetStringSlice("env")
+	in.User, _ = c.Flags().GetString("user")
+	in.Group, _ = c.Flags().GetString("group")
 	if err := in.Validate(); err != nil {
 		return err
 	}
@@ -105,26 +105,17 @@ func terminalBash(c *cli.Context) error {
 	return nil
 }
 
-func TerminalBashCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "terminal",
-		Usage:    "start a terminal",
-		Category: "bash",
-		Action:   terminalBash,
-		Flags: []cli.Flag{
-			&cli.StringSliceFlag{
-				Name:    "env",
-				Aliases: []string{"E"},
-				Usage:   "specify the env for exec",
-			},
-			&cli.StringFlag{
-				Name:  "user",
-				Usage: "specify the user for exec",
-			},
-			&cli.StringFlag{
-				Name:  "group",
-				Usage: "specify the group for exec",
-			},
-		},
+func TerminalBashCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "terminal",
+		Short:   "start a terminal",
+		GroupID: "bash",
+		RunE:    terminalBash,
 	}
+
+	cmd.PersistentFlags().StringSliceP("env", "E", []string{}, "specify the env for exec")
+	cmd.PersistentFlags().String("user", "", "specify the user for exec")
+	cmd.PersistentFlags().String("group", "", "specify the group for exec")
+
+	return cmd
 }

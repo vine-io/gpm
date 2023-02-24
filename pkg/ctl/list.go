@@ -29,12 +29,12 @@ import (
 	"time"
 
 	twr "github.com/olekukonko/tablewriter"
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 	"github.com/vine-io/pkg/unit"
 )
 
-func listService(c *cli.Context) error {
+func listService(c *cobra.Command, args []string) error {
 
 	opts := getCallOptions(c)
 	cc := client.New()
@@ -77,11 +77,13 @@ func listService(c *cli.Context) error {
 	return nil
 }
 
-func ListServicesCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "list",
-		Usage:    "list all local services",
-		Category: "service",
-		Action:   listService,
+func ListServicesCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "list",
+		Short:   "list all local services",
+		GroupID: "service",
+		RunE:    listService,
 	}
+
+	return cmd
 }

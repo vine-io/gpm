@@ -28,12 +28,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func createService(c *cli.Context) error {
+func createService(c *cobra.Command, args []string) error {
 
 	opts := getCallOptions(c)
 	cc := client.New()
@@ -46,17 +46,17 @@ func createService(c *cli.Context) error {
 		AutoRestart: 1,
 	}
 
-	spec.Name = c.String("name")
-	spec.Bin = c.String("bin")
-	spec.Args = c.StringSlice("args")
-	spec.Dir = c.String("dir")
-	env := c.StringSlice("env")
-	spec.SysProcAttr.User = c.String("user")
-	spec.SysProcAttr.Group = c.String("group")
-	spec.Log.Expire = int32(c.Int("log-expire"))
-	spec.Log.MaxSize = c.Int64("log-max-size")
-	spec.Version = c.String("version")
-	autoRestart := c.Bool("auto-restart")
+	spec.Name, _ = c.Flags().GetString("name")
+	spec.Bin, _ = c.Flags().GetString("bin")
+	spec.Args, _ = c.Flags().GetStringSlice("args")
+	spec.Dir, _ = c.Flags().GetString("dir")
+	env, _ := c.Flags().GetStringSlice("env")
+	spec.SysProcAttr.User, _ = c.Flags().GetString("user")
+	spec.SysProcAttr.Group, _ = c.Flags().GetString("group")
+	spec.Log.Expire, _ = c.Flags().GetInt32("log-expire")
+	spec.Log.MaxSize, _ = c.Flags().GetInt64("log-max-size")
+	spec.Version, _ = c.Flags().GetString("version")
+	autoRestart, _ := c.Flags().GetBool("auto-restart")
 	if err := spec.Validate(); err != nil {
 		return err
 	}
@@ -81,66 +81,26 @@ func createService(c *cli.Context) error {
 	return nil
 }
 
-func CreateServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "create",
-		Usage:    "create a service",
-		Category: "service",
-		Action:   createService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name for service",
-			},
-			&cli.StringFlag{
-				Name:    "bin",
-				Aliases: []string{"B"},
-				Usage:   "specify the bin for service",
-			},
-			&cli.StringSliceFlag{
-				Name:    "args",
-				Aliases: []string{"A"},
-				Usage:   "specify the args for service",
-			},
-			&cli.StringFlag{
-				Name:    "dir",
-				Aliases: []string{"D"},
-				Usage:   "specify the root directory for service",
-			},
-			&cli.StringSliceFlag{
-				Name:    "env",
-				Aliases: []string{"E"},
-				Usage:   "specify the env for service",
-			},
-			&cli.StringFlag{
-				Name:  "user",
-				Usage: "specify the user for service",
-			},
-			&cli.StringFlag{
-				Name:  "group",
-				Usage: "specify the group for service",
-			},
-			&cli.IntFlag{
-				Name:  "log-expire",
-				Usage: "specify the expire for service log",
-				Value: 15,
-			},
-			&cli.Int64Flag{
-				Name:  "log-max-size",
-				Usage: "specify the max size for service log",
-				Value: 1024 * 1024 * 10,
-			},
-			&cli.StringFlag{
-				Name:    "version",
-				Aliases: []string{"V"},
-				Usage:   "specify the version for service",
-			},
-			&cli.BoolFlag{
-				Name:  "auto-restart",
-				Usage: "Whether auto restart service when it crashing",
-				Value: true,
-			},
-		},
+func CreateServiceCmd() *cobra.Command {
+
+	cmd := &cobra.Command{
+		Use:     "create",
+		Short:   "create a service",
+		GroupID: "service",
+		RunE:    createService,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "specify the name for service")
+	cmd.PersistentFlags().StringP("bin", "B", "", "specify the bin for service")
+	cmd.PersistentFlags().StringSliceP("args", "A", []string{}, "specify the args for service")
+	cmd.PersistentFlags().StringP("dir", "D", "", "specify the root directory for service")
+	cmd.PersistentFlags().StringP("env", "E", "", "specify the env for service")
+	cmd.PersistentFlags().String("user", "", "specify the user for service")
+	cmd.PersistentFlags().String("group", "", "specify the group for service")
+	cmd.PersistentFlags().Int("log-expire", 15, "specify the expire for service log")
+	cmd.PersistentFlags().Int64("log-max-size", 1024*1024*10, "specify the max size for service log")
+	cmd.PersistentFlags().StringP("version", "V", "", "specify the version for service")
+	cmd.PersistentFlags().Bool("auto-restart", true, "Whether auto restart service when it crashing")
+
+	return cmd
 }

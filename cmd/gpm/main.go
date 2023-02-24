@@ -25,87 +25,66 @@ package main
 import (
 	"fmt"
 	"os"
-	"sort"
 	"time"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/ctl"
 	verrs "github.com/vine-io/vine/lib/errors"
 )
 
 func main() {
-	app := &cli.App{
-		Name:    "gpm",
-		Usage:   "package manage tools",
-		Version: ctl.GetVersion(),
-		Commands: []*cli.Command{
-			ctl.HealthCmd(),
-			ctl.DeployCmd(),
-			ctl.TarCmd(),
-			ctl.UnTarCmd(),
-			ctl.UpdateCmd(),
-			ctl.RunCmd(),
-			ctl.ShutdownCmd(),
-
-			ctl.ListServicesCmd(),
-			ctl.InfoServiceCmd(),
-			ctl.GetServiceCmd(),
-			ctl.CreateServiceCmd(),
-			ctl.EditServiceCmd(),
-			ctl.StartServiceCmd(),
-			ctl.StopServiceCmd(),
-			ctl.DeleteServiceCmd(),
-			ctl.RestartServiceCmd(),
-			ctl.TailServiceCmd(),
-
-			ctl.InstallServiceCmd(),
-			ctl.UpgradeServiceCmd(),
-			ctl.RollbackServiceCmd(),
-			ctl.ForgetServiceCmd(),
-			ctl.VersionServiceCmd(),
-
-			ctl.LsBashCmd(),
-			ctl.ExecBashCmd(),
-			ctl.PushBashCmd(),
-			ctl.PullBashCmd(),
-			ctl.TerminalBashCmd(),
-		},
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "host",
-				Aliases: []string{"H"},
-				Usage:   "the ip address of gpmd",
-				EnvVars: []string{"GPM_HOST"},
-				Value:   "127.0.0.1:33700",
-			},
-			&cli.DurationFlag{
-				Name:    "dial-timeout",
-				Usage:   "specify dial timeout for call option",
-				EnvVars: []string{"GPM_DIAL_TIMEOUT"},
-				Value:   time.Second * 30,
-			},
-			&cli.DurationFlag{
-				Name:    "request-timeout",
-				Usage:   "specify request timeout for call option",
-				EnvVars: []string{"GPM_REQUEST_TIMEOUT"},
-				Value:   time.Second * 30,
-			},
-		},
-		EnableBashCompletion: true,
-		Action: func(ctx *cli.Context) error {
+	rootCmd := &cobra.Command{
+		Use:     "gpm",
+		Short:   "package manage tools",
+		Version: ctl.GetGitTag(),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("invalid subcommand")
 		},
-		Authors: []*cli.Author{{
-			Name:  "lack",
-			Email: "598223084@qq.com",
-		}},
 	}
 
-	sort.Sort(cli.FlagsByName(app.Flags))
-	sort.Sort(cli.CommandsByName(app.Commands))
+	rootCmd.ResetFlags()
+	rootCmd.PersistentFlags().StringP("host", "H", "127.0.0.1:33700", "the ip address of gpmd")
+	rootCmd.PersistentFlags().Duration("dial-timeout", time.Second*30, "specify dial timeout for call option")
+	rootCmd.PersistentFlags().Duration("request-timeout", time.Second*30, "pecify request timeout for call option")
 
-	app.Version = ctl.GetGitTag()
-	err := app.Run(os.Args)
+	rootCmd.ResetCommands()
+	rootCmd.AddCommand(
+		ctl.HealthCmd(),
+		ctl.DeployCmd(),
+		ctl.TarCmd(),
+		ctl.UnTarCmd(),
+		ctl.UpdateCmd(),
+		ctl.RunCmd(),
+		ctl.ShutdownCmd(),
+
+		ctl.ListServicesCmd(),
+		ctl.InfoServiceCmd(),
+		ctl.GetServiceCmd(),
+		ctl.CreateServiceCmd(),
+		ctl.EditServiceCmd(),
+		ctl.StartServiceCmd(),
+		ctl.StopServiceCmd(),
+		ctl.DeleteServiceCmd(),
+		ctl.RestartServiceCmd(),
+		ctl.TailServiceCmd(),
+
+		ctl.InstallServiceCmd(),
+		ctl.UpgradeServiceCmd(),
+		ctl.RollbackServiceCmd(),
+		ctl.ForgetServiceCmd(),
+		ctl.VersionServiceCmd(),
+
+		ctl.LsBashCmd(),
+		ctl.ExecBashCmd(),
+		ctl.PushBashCmd(),
+		ctl.PullBashCmd(),
+		ctl.TerminalBashCmd(),
+	)
+
+	//sort.Sort(cli.FlagsByName(app.Flags))
+	//sort.Sort(cli.CommandsByName(app.Commands))
+
+	err := rootCmd.Execute()
 	if err != nil {
 		fmt.Fprintf(os.Stdout, "gpm exec: %s\n", verrs.FromErr(err).Detail)
 	}

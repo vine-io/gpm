@@ -32,17 +32,17 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 )
 
-func unTarFn(c *cli.Context) error {
+func unTarFn(c *cobra.Command, args []string) error {
 
 	outE := os.Stdout
-	pack := c.String("package")
+	pack, _ := c.Flags().GetString("package")
 	if len(pack) == 0 {
 		return fmt.Errorf("missing package")
 	}
-	target := c.String("target")
+	target, _ := c.Flags().GetString("target")
 	if len(target) == 0 {
 		return fmt.Errorf("missing target")
 	}
@@ -103,25 +103,17 @@ func decompress(dir string, tr *tar.Reader, out io.Writer) error {
 	return nil
 }
 
-func UnTarCmd() *cli.Command {
-	return &cli.Command{
-		Name:   "untar",
-		Usage:  "decompress a package",
-		Action: unTarFn,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "package",
-				Aliases: []string{"P"},
-				Usage:   "the specify the package for compressing",
-			},
-			&cli.StringFlag{
-				Name:    "target",
-				Aliases: []string{"C"},
-				Usage:   "the specify the target for saving file",
-				Value:   ".",
-			},
-		},
+func UnTarCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "untar",
+		Short: "decompress a package",
+		RunE:  unTarFn,
 	}
+
+	cmd.PersistentFlags().StringP("package", "P", "", "the specify the package for compressing")
+	cmd.PersistentFlags().StringP("target", "C", ".", "the specify the target for saving file")
+
+	return cmd
 }
 
 func createFile(name string) (*os.File, error) {

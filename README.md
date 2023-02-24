@@ -74,7 +74,7 @@ install gpm successfully!
 ### gpmd 相关服务命令
 #### 启动 gpmd
 ```bash
-$ gpm run --args '--server-address=0.0.0.0:7700' --args '--enable-log'
+$ gpm run --args '--server-address=0.0.0.0:33700' --args '--enable-log'
 start gpmd successfully!
 ```
 

@@ -32,17 +32,17 @@ import (
 	"strings"
 
 	pbr "github.com/schollz/progressbar/v3"
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	vclient "github.com/vine-io/vine/core/client"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func pushBash(c *cli.Context) error {
+func pushBash(c *cobra.Command, args []string) error {
 
-	src := c.String("src")
-	dst := c.String("dst")
+	src, _ := c.Flags().GetString("src")
+	dst, _ := c.Flags().GetString("dst")
 	if src == "" {
 		return fmt.Errorf("missing src")
 	}
@@ -143,23 +143,16 @@ func send(path, dst string, bar *pbr.ProgressBar, stream *client.PushStream, buf
 	return nil
 }
 
-func PushBashCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "push",
-		Usage:    "push files",
-		Category: "bash",
-		Action:   pushBash,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "src",
-				Aliases: []string{"S"},
-				Usage:   "specify the source for push",
-			},
-			&cli.StringFlag{
-				Name:    "dst",
-				Aliases: []string{"D"},
-				Usage:   "specify the target for push",
-			},
-		},
+func PushBashCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "push",
+		Short:   "push files",
+		GroupID: "bash",
+		RunE:    pushBash,
 	}
+
+	cmd.PersistentFlags().StringP("src", "S", "", "specify the source for pull")
+	cmd.PersistentFlags().StringP("dst", "D", "", "specify the target for pull")
+
+	return cmd
 }

@@ -32,15 +32,15 @@ import (
 
 	json "github.com/json-iterator/go"
 	tw "github.com/olekukonko/tablewriter"
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 	"github.com/vine-io/pkg/unit"
 	"gopkg.in/yaml.v3"
 )
 
-func getService(c *cli.Context) error {
-	name := c.String("name")
-	output := c.String("output")
+func getService(c *cobra.Command, args []string) error {
+	name, _ := c.Flags().GetString("name")
+	output, _ := c.Flags().GetString("output")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
@@ -126,24 +126,16 @@ func getService(c *cli.Context) error {
 	return nil
 }
 
-func GetServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "get",
-		Usage:    "get service by name",
-		Category: "service",
-		Action:   getService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name of service",
-			},
-			&cli.StringFlag{
-				Name:    "output",
-				Aliases: []string{"o"},
-				Usage:   "specify the format of output, example wide, json, yaml",
-				Value:   "wide",
-			},
-		},
+func GetServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "get",
+		Short:   "get service by name",
+		GroupID: "service",
+		RunE:    getService,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "specify the name of service")
+	cmd.PersistentFlags().StringP("output", "o", "wide", "specify the format of output, example wide, json, yaml")
+
+	return cmd
 }

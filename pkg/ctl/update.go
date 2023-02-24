@@ -31,7 +31,7 @@ import (
 	"time"
 
 	pbr "github.com/schollz/progressbar/v3"
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"google.golang.org/grpc/status"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
@@ -39,9 +39,9 @@ import (
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func update(c *cli.Context) error {
+func update(c *cobra.Command, args []string) error {
 
-	pack := c.String("package")
+	pack, _ := c.Flags().GetString("package")
 
 	opts := getCallOptions(c)
 	ctx := context.Background()
@@ -159,17 +159,14 @@ func update(c *cli.Context) error {
 	return nil
 }
 
-func UpdateCmd() *cli.Command {
-	return &cli.Command{
-		Name:   "update",
-		Usage:  "update gpm and gpmd",
-		Action: update,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "package",
-				Aliases: []string{"P"},
-				Usage:   "specify the package for update",
-			},
-		},
+func UpdateCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "update",
+		Short: "update gpm and gpmd",
+		RunE:  update,
 	}
+
+	cmd.PersistentFlags().StringP("package", "P", "", "specify the package for update")
+
+	return cmd
 }

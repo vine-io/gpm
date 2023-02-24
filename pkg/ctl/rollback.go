@@ -27,13 +27,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal/client"
 )
 
-func rollbackService(c *cli.Context) error {
-	name := c.String("name")
-	revision := c.String("revision")
+func rollbackService(c *cobra.Command, args []string) error {
+	name, _ := c.Flags().GetString("name")
+	revision, _ := c.Flags().GetString("revision")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
@@ -60,23 +60,16 @@ func rollbackService(c *cli.Context) error {
 	return nil
 }
 
-func RollbackServiceCmd() *cli.Command {
-	return &cli.Command{
-		Name:     "rollback",
-		Usage:    "rollback a service",
-		Category: "service",
-		Action:   rollbackService,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "specify the name of service",
-			},
-			&cli.StringFlag{
-				Name:    "revision",
-				Aliases: []string{"R"},
-				Usage:   "specify the revision of service",
-			},
-		},
+func RollbackServiceCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "rollback",
+		Short:   "rollback a service",
+		GroupID: "service",
+		RunE:    rollbackService,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "specify the name of service")
+	cmd.PersistentFlags().StringP("revision", "R", "", "specify the revision of service")
+
+	return cmd
 }

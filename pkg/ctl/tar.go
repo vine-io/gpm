@@ -30,17 +30,17 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 )
 
-func tarFn(c *cli.Context) error {
+func tarFn(c *cobra.Command, args []string) error {
 
 	outE := os.Stdout
-	name := c.String("name")
+	name, _ := c.Flags().GetString("name")
 	if len(name) == 0 {
 		return fmt.Errorf("missing name")
 	}
-	targets := c.StringSlice("target")
+	targets, _ := c.Flags().GetStringSlice("target")
 	if len(targets) == 0 {
 		return fmt.Errorf("missing target")
 	}
@@ -108,22 +108,15 @@ func compress(path string, prefix string, tw *tar.Writer, out io.Writer) error {
 	return err
 }
 
-func TarCmd() *cli.Command {
-	return &cli.Command{
-		Name:   "tar",
-		Usage:  "create a compress package for Install subcommand",
-		Action: tarFn,
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "name",
-				Aliases: []string{"N"},
-				Usage:   "the specify the name for package",
-			},
-			&cli.StringSliceFlag{
-				Name:    "target",
-				Aliases: []string{"T"},
-				Usage:   "the specify the target list for package",
-			},
-		},
+func TarCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "tar",
+		Short: "create a compress package for Install subcommand",
+		RunE:  tarFn,
 	}
+
+	cmd.PersistentFlags().StringP("name", "N", "", "the specify the name for package")
+	cmd.PersistentFlags().StringSliceP("target", "T", []string{}, "the specify the target list for package")
+
+	return cmd
 }

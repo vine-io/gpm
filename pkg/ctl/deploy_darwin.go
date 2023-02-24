@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 //go:build darwin
-// +build darwin
 
 package ctl
 
@@ -36,7 +35,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/vine-io/cli"
+	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal"
 )
 
@@ -48,17 +47,17 @@ const (
 	gpmd = "/usr/local/sbin/gpmd"
 )
 
-func deploy(c *cli.Context) error {
+func deploy(c *cobra.Command, args []string) error {
 
-	isRun := c.Bool("run")
-	args := c.StringSlice("args")
+	isRun, _ := c.Flags().GetBool("run")
+	dArgs, _ := c.Flags().GetStringSlice("args")
 
 	outE := os.Stdout
 	root := "/opt/gpm"
 	vv, err := exec.Command("gpm", "-v").CombinedOutput()
 	if err == nil {
 		fmt.Fprintln(outE, "gpm already exists")
-		_ = shutdown(c)
+		_ = shutdown(c, args)
 	}
 	v := strings.ReplaceAll(string(vv), "\n", "")
 
@@ -132,7 +131,7 @@ func deploy(c *cli.Context) error {
 	fmt.Fprintf(outE, "install gpm %s successfully!\n", internal.GitTag)
 
 	if isRun {
-		cmd := exec.Command("gpmd", args...)
+		cmd := exec.Command("gpmd", dArgs...)
 		if err := cmd.Start(); err != nil {
 			return fmt.Errorf("gpmd start: %v", err)
 		}
@@ -143,30 +142,24 @@ func deploy(c *cli.Context) error {
 	return nil
 }
 
-func DeployCmd() *cli.Command {
-	return &cli.Command{
-		Name:   "deploy",
-		Usage:  "deploy gpmd and gpm",
-		Action: deploy,
-		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:  "run",
-				Usage: "run gpmd after deployed",
-			},
-			&cli.StringSliceFlag{
-				Name:    "args",
-				Aliases: []string{"A"},
-				Usage:   "the specify args for gpmd",
-			},
-		},
+func DeployCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "deploy",
+		Short: "deploy gpmd and gpm",
+		RunE:  deploy,
 	}
+
+	cmd.PersistentFlags().Bool("run", false, "run gpmd after deployed")
+	cmd.PersistentFlags().StringP("args", "A", "", "the specify args for gpmd")
+
+	return cmd
 }
 
-func run(c *cli.Context) error {
+func run(c *cobra.Command, args []string) error {
 
 	outE := os.Stdout
-	args := c.StringSlice("args")
-	cmd := exec.Command("gpmd", args...)
+	nArgs, _ := c.Flags().GetStringSlice("args")
+	cmd := exec.Command("gpmd", nArgs...)
 	if err := cmd.Start(); err != nil {
 		return fmt.Errorf("gpmd start: %v", err)
 	}
@@ -175,22 +168,19 @@ func run(c *cli.Context) error {
 	return nil
 }
 
-func RunCmd() *cli.Command {
-	return &cli.Command{
-		Name:   "run",
-		Usage:  "run gpmd process",
-		Action: run,
-		Flags: []cli.Flag{
-			&cli.StringSliceFlag{
-				Name:    "args",
-				Aliases: []string{"A"},
-				Usage:   "the specify args for gpmd",
-			},
-		},
+func RunCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "run",
+		Short: "run gpmd process",
+		RunE:  run,
 	}
+
+	cmd.PersistentFlags().StringSliceP("args", "A", []string{}, "the specify args for gpmd")
+
+	return cmd
 }
 
-func shutdown(c *cli.Context) error {
+func shutdown(c *cobra.Command, args []string) error {
 
 	outE := os.Stdout
 	b, err := exec.Command("sh", "-c", `ps aux|grep "gpmd" | grep -v "grep" |  awk -F' ' '{print $2}'`).CombinedOutput()
@@ -219,10 +209,12 @@ func shutdown(c *cli.Context) error {
 	return nil
 }
 
-func ShutdownCmd() *cli.Command {
-	return &cli.Command{
-		Name:   "shutdown",
-		Usage:  "stop gpmd process",
-		Action: shutdown,
+func ShutdownCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "shutdown",
+		Short: "stop gpmd process",
+		RunE:  shutdown,
 	}
+
+	return cmd
 }
