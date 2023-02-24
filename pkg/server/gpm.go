@@ -26,153 +26,305 @@ import (
 	"context"
 
 	pb "github.com/vine-io/gpm/api/service/gpm/v1"
+	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
+	"github.com/vine-io/gpm/pkg/service"
+	vserver "github.com/vine-io/vine/core/server"
 	verrs "github.com/vine-io/vine/lib/errors"
 )
 
-func (s *GpmAPI) Healthz(ctx context.Context, _ *pb.Empty, rsp *pb.Empty) error {
+type GpmServer struct {
+	server vserver.Server
+
+	manager service.GenerateManager
+	ftp     service.GenerateFTP
+}
+
+func RegistryGpmRpcServer(ctx context.Context, s vserver.Server, manager service.GenerateManager, ftp service.GenerateFTP) error {
+
+	gs := &GpmServer{
+		server:  s,
+		manager: manager,
+		ftp:     ftp,
+	}
+
+	if err := pb.RegisterGpmServiceHandler(s, gs); err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (s *GpmAPI) UpdateSelf(ctx context.Context, stream pb.GpmService_UpdateSelfStream) error {
-	return s.G.Update(ctx, &simpleUpdateSelfStream{stream: stream})
+func (s *GpmServer) Name() string {
+	return s.server.Options().Name
 }
 
-func (s *GpmAPI) Info(ctx context.Context, _ *pb.InfoReq, rsp *pb.InfoRsp) (err error) {
-	rsp.Gpm, err = s.G.Info(ctx)
+func (s *GpmServer) Healthz(ctx context.Context, _ *pb.Empty, rsp *pb.Empty) error {
+	return nil
+}
+
+func (s *GpmServer) UpdateSelf(ctx context.Context, stream pb.GpmService_UpdateSelfStream) error {
+	return s.manager.Update(ctx, &simpleUpdateSelfStream{stream: stream})
+}
+
+func (s *GpmServer) Info(ctx context.Context, _ *pb.InfoReq, rsp *pb.InfoRsp) (err error) {
+	rsp.Gpm, err = s.manager.Info(ctx)
 	return
 }
 
-func (s *GpmAPI) ListService(ctx context.Context, req *pb.ListServiceReq, rsp *pb.ListServiceRsp) (err error) {
+func (s *GpmServer) ListService(ctx context.Context, req *pb.ListServiceReq, rsp *pb.ListServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Services, rsp.Total, err = s.G.List(ctx)
+	rsp.Services, rsp.Total, err = s.manager.List(ctx)
 	return
 }
 
-func (s *GpmAPI) GetService(ctx context.Context, req *pb.GetServiceReq, rsp *pb.GetServiceRsp) (err error) {
+func (s *GpmServer) GetService(ctx context.Context, req *pb.GetServiceReq, rsp *pb.GetServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.G.Get(ctx, req.Name)
+	rsp.Service, err = s.manager.Get(ctx, req.Name)
 	return
 }
 
-func (s *GpmAPI) CreateService(ctx context.Context, req *pb.CreateServiceReq, rsp *pb.CreateServiceRsp) (err error) {
+func (s *GpmServer) CreateService(ctx context.Context, req *pb.CreateServiceReq, rsp *pb.CreateServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.G.Create(ctx, req.Spec)
+	rsp.Service, err = s.manager.Create(ctx, req.Spec)
 	return
 }
 
-func (s *GpmAPI) EditService(ctx context.Context, req *pb.EditServiceReq, rsp *pb.EditServiceRsp) (err error) {
+func (s *GpmServer) EditService(ctx context.Context, req *pb.EditServiceReq, rsp *pb.EditServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.G.Edit(ctx, req.Name, req.Spec)
+	rsp.Service, err = s.manager.Edit(ctx, req.Name, req.Spec)
 	return
 }
 
-func (s *GpmAPI) StartService(ctx context.Context, req *pb.StartServiceReq, rsp *pb.StartServiceRsp) (err error) {
+func (s *GpmServer) StartService(ctx context.Context, req *pb.StartServiceReq, rsp *pb.StartServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.G.Start(ctx, req.Name)
+	rsp.Service, err = s.manager.Start(ctx, req.Name)
 	return
 }
 
-func (s *GpmAPI) StopService(ctx context.Context, req *pb.StopServiceReq, rsp *pb.StopServiceRsp) (err error) {
+func (s *GpmServer) StopService(ctx context.Context, req *pb.StopServiceReq, rsp *pb.StopServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.G.Stop(ctx, req.Name)
+	rsp.Service, err = s.manager.Stop(ctx, req.Name)
 	return
 }
 
-func (s *GpmAPI) RestartService(ctx context.Context, req *pb.RestartServiceReq, rsp *pb.RestartServiceRsp) (err error) {
+func (s *GpmServer) RestartService(ctx context.Context, req *pb.RestartServiceReq, rsp *pb.RestartServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.G.Restart(ctx, req.Name)
+	rsp.Service, err = s.manager.Restart(ctx, req.Name)
 	return
 }
 
-func (s *GpmAPI) DeleteService(ctx context.Context, req *pb.DeleteServiceReq, rsp *pb.DeleteServiceRsp) (err error) {
+func (s *GpmServer) DeleteService(ctx context.Context, req *pb.DeleteServiceReq, rsp *pb.DeleteServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Service, err = s.G.Delete(ctx, req.Name)
+	rsp.Service, err = s.manager.Delete(ctx, req.Name)
 	return
 }
 
-func (s *GpmAPI) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq, stream pb.GpmService_WatchServiceLogStream) (err error) {
+func (s *GpmServer) WatchServiceLog(ctx context.Context, req *pb.WatchServiceLogReq, stream pb.GpmService_WatchServiceLogStream) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	return s.G.TailLog(ctx, req.Name, req.Number, req.Follow, &simpleWatchLogSender{stream: stream})
+	return s.manager.TailLog(ctx, req.Name, req.Number, req.Follow, &simpleWatchLogSender{stream: stream})
 }
 
-func (s *GpmAPI) InstallService(ctx context.Context, stream pb.GpmService_InstallServiceStream) error {
-	return s.G.Install(ctx, &simpleInstallStream{stream: stream})
+func (s *GpmServer) InstallService(ctx context.Context, stream pb.GpmService_InstallServiceStream) error {
+	return s.manager.Install(ctx, &simpleInstallStream{stream: stream})
 }
 
-func (s *GpmAPI) ListServiceVersions(ctx context.Context, req *pb.ListServiceVersionsReq, rsp *pb.ListServiceVersionsRsp) (err error) {
+func (s *GpmServer) ListServiceVersions(ctx context.Context, req *pb.ListServiceVersionsReq, rsp *pb.ListServiceVersionsRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Versions, err = s.G.ListVersions(ctx, req.Name)
+	rsp.Versions, err = s.manager.ListVersions(ctx, req.Name)
 	return
 }
 
-func (s *GpmAPI) UpgradeService(ctx context.Context, stream pb.GpmService_UpgradeServiceStream) error {
-	return s.G.Upgrade(ctx, &simpleUpgradeStream{stream: stream})
+func (s *GpmServer) UpgradeService(ctx context.Context, stream pb.GpmService_UpgradeServiceStream) error {
+	return s.manager.Upgrade(ctx, &simpleUpgradeStream{stream: stream})
 }
 
-func (s *GpmAPI) RollBackService(ctx context.Context, req *pb.RollbackServiceReq, rsp *pb.RollbackServiceRsp) (err error) {
+func (s *GpmServer) RollBackService(ctx context.Context, req *pb.RollbackServiceReq, rsp *pb.RollbackServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	err = s.G.Rollback(ctx, req.Name, req.Revision)
+	err = s.manager.Rollback(ctx, req.Name, req.Revision)
 	return
 }
 
-func (s *GpmAPI) ForgetService(ctx context.Context, req *pb.ForgetServiceReq, rsp *pb.ForgetServiceRsp) (err error) {
+func (s *GpmServer) ForgetService(ctx context.Context, req *pb.ForgetServiceReq, rsp *pb.ForgetServiceRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	err = s.G.Forget(ctx, req.Name, req.Revision)
+	err = s.manager.Forget(ctx, req.Name, req.Revision)
 	return
 }
 
-func (s *GpmAPI) Ls(ctx context.Context, req *pb.LsReq, rsp *pb.LsRsp) (err error) {
+func (s *GpmServer) Ls(ctx context.Context, req *pb.LsReq, rsp *pb.LsRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
 
-	rsp.Files, err = s.T.List(ctx, req.Path)
+	rsp.Files, err = s.ftp.List(ctx, req.Path)
 	return
 }
 
-func (s *GpmAPI) Pull(ctx context.Context, req *pb.PullReq, stream pb.GpmService_PullStream) (err error) {
+func (s *GpmServer) Pull(ctx context.Context, req *pb.PullReq, stream pb.GpmService_PullStream) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	return s.T.Pull(ctx, req.Name, req.Dir, &simplePullSender{stream: stream})
+	return s.ftp.Pull(ctx, req.Name, req.Dir, &simplePullSender{stream: stream})
 }
 
-func (s *GpmAPI) Push(ctx context.Context, stream pb.GpmService_PushStream) (err error) {
-	return s.T.Push(ctx, &simplePushReader{stream: stream})
+func (s *GpmServer) Push(ctx context.Context, stream pb.GpmService_PushStream) (err error) {
+	return s.ftp.Push(ctx, &simplePushReader{stream: stream})
 }
 
-func (s *GpmAPI) Exec(ctx context.Context, req *pb.ExecReq, rsp *pb.ExecRsp) (err error) {
+func (s *GpmServer) Exec(ctx context.Context, req *pb.ExecReq, rsp *pb.ExecRsp) (err error) {
 	if err = req.Validate(); err != nil {
 		return verrs.BadRequest(s.Name(), err.Error())
 	}
-	rsp.Result, err = s.T.Exec(ctx, req.In)
+	rsp.Result, err = s.ftp.Exec(ctx, req.In)
 	return
 }
 
-func (s *GpmAPI) Terminal(ctx context.Context, stream pb.GpmService_TerminalStream) error {
-	return s.T.Terminal(ctx, &simpleTerminalStream{stream: stream})
+func (s *GpmServer) Terminal(ctx context.Context, stream pb.GpmService_TerminalStream) error {
+	return s.ftp.Terminal(ctx, &simpleTerminalStream{stream: stream})
+}
+
+type simpleUpdateSelfStream struct {
+	stream pb.GpmService_UpdateSelfStream
+}
+
+func (s *simpleUpdateSelfStream) Recv() (interface{}, error) {
+	b, err := s.stream.Recv()
+	if err != nil {
+		return nil, err
+	}
+	return b.In, nil
+}
+
+func (s *simpleUpdateSelfStream) Send(msg interface{}) error {
+	return s.stream.Send(&pb.UpdateSelfRsp{Result: msg.(*gpmv1.UpdateResult)})
+}
+
+func (s *simpleUpdateSelfStream) Close() error {
+	return s.stream.Close()
+}
+
+type simpleWatchLogSender struct {
+	stream pb.GpmService_WatchServiceLogStream
+}
+
+func (s *simpleWatchLogSender) Send(msg interface{}) error {
+	return s.stream.Send(&pb.WatchServiceLogRsp{Log: msg.(*gpmv1.ServiceLog)})
+}
+
+func (s *simpleWatchLogSender) Close() error {
+	return s.stream.Close()
+}
+
+type simpleInstallStream struct {
+	stream pb.GpmService_InstallServiceStream
+}
+
+func (s *simpleInstallStream) Recv() (interface{}, error) {
+	b, err := s.stream.Recv()
+	if err != nil {
+		return nil, err
+	}
+	return b.In, nil
+}
+
+func (s *simpleInstallStream) Send(msg interface{}) error {
+	return s.stream.Send(&pb.InstallServiceRsp{Result: msg.(*gpmv1.InstallServiceResult)})
+}
+
+func (s *simpleInstallStream) Close() error {
+	return s.stream.Close()
+}
+
+type simpleUpgradeStream struct {
+	stream pb.GpmService_UpgradeServiceStream
+}
+
+func (s *simpleUpgradeStream) Recv() (interface{}, error) {
+	b, err := s.stream.Recv()
+	if err != nil {
+		return nil, err
+	}
+	return b.In, nil
+}
+
+func (s *simpleUpgradeStream) Send(msg interface{}) error {
+	return s.stream.Send(&pb.UpgradeServiceRsp{Result: msg.(*gpmv1.UpgradeServiceResult)})
+}
+
+func (s *simpleUpgradeStream) Close() error {
+	return s.stream.Close()
+}
+
+type simplePullSender struct {
+	stream pb.GpmService_PullStream
+}
+
+func (s *simplePullSender) Send(msg interface{}) error {
+	return s.stream.Send(&pb.PullRsp{Result: msg.(*gpmv1.PullResult)})
+}
+
+func (s *simplePullSender) Close() error {
+	return s.stream.Close()
+}
+
+type simplePushReader struct {
+	stream pb.GpmService_PushStream
+}
+
+func (s *simplePushReader) Recv() (interface{}, error) {
+	b, err := s.stream.Recv()
+	if err != nil {
+		return nil, err
+	}
+	return b.In, nil
+}
+
+func (s *simplePushReader) Close() error {
+	if e := s.stream.Send(&pb.PushRsp{}); e != nil {
+		return e
+	}
+	return s.stream.Close()
+}
+
+type simpleTerminalStream struct {
+	stream pb.GpmService_TerminalStream
+}
+
+func (s *simpleTerminalStream) Recv() (interface{}, error) {
+	b, err := s.stream.Recv()
+	if err != nil {
+		return nil, err
+	}
+	return b.In, nil
+}
+
+func (s *simpleTerminalStream) Send(msg interface{}) error {
+	return s.stream.Send(&pb.TerminalRsp{Result: msg.(*gpmv1.TerminalResult)})
+}
+
+func (s *simpleTerminalStream) Close() error {
+	return s.stream.Close()
 }

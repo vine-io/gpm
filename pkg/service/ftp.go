@@ -33,24 +33,35 @@ import (
 
 	"github.com/google/uuid"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
-	"github.com/vine-io/gpm/pkg/internal/inject"
-	"github.com/vine-io/vine"
+	vserver "github.com/vine-io/vine/core/server"
 	verrs "github.com/vine-io/vine/lib/errors"
 	log "github.com/vine-io/vine/lib/logger"
 )
 
-func init() {
-	inject.ProvidePanic(new(sftp))
+func NewSFtpService(ctx context.Context, server vserver.Server) (GenerateFTP, error) {
+
+	ftp := &sftp{
+		ctx:    ctx,
+		server: server,
+	}
+
+	return ftp, nil
 }
 
 type sftp struct {
-	S vine.Service `inject:""`
+	ctx context.Context
+
+	server vserver.Server
+}
+
+func (s *sftp) Name() string {
+	return s.server.Options().Name
 }
 
 func (s *sftp) List(ctx context.Context, root string) ([]*gpmv1.FileInfo, error) {
 	stat, _ := os.Stat(root)
 	if stat == nil {
-		return nil, verrs.NotFound(s.S.Name(), "invalid path '%s'", root)
+		return nil, verrs.NotFound(s.Name(), "invalid path '%s'", root)
 	}
 
 	files := make([]*gpmv1.FileInfo, 0)
@@ -139,13 +150,13 @@ func (s *sftp) Pull(ctx context.Context, name string, isDir bool, sender IOWrite
 
 	stat, _ := os.Stat(name)
 	if stat == nil {
-		return verrs.NotFound(s.S.Name(), "%s not exist", name)
+		return verrs.NotFound(s.Name(), "%s not exist", name)
 	}
 	if stat.IsDir() && !isDir {
-		return verrs.BadRequest(s.S.Name(), "%s is a directory", name)
+		return verrs.BadRequest(s.Name(), "%s is a directory", name)
 	}
 	if !stat.IsDir() && isDir {
-		return verrs.BadRequest(s.S.Name(), "%s is not a directory", name)
+		return verrs.BadRequest(s.Name(), "%s is not a directory", name)
 	}
 
 	buf := make([]byte, 1024*32)
@@ -245,7 +256,7 @@ func (s *sftp) Exec(ctx context.Context, in *gpmv1.ExecIn) (*gpmv1.ExecResult, e
 
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, verrs.InternalServerError(s.S.Name(), "exec %v: %v", err, string(beauty(b)))
+		return nil, verrs.InternalServerError(s.Name(), "exec %v: %v", err, string(beauty(b)))
 	}
 
 	out := &gpmv1.ExecResult{
@@ -281,7 +292,7 @@ func (s *sftp) Terminal(ctx context.Context, stream IOStream) error {
 	b := data.(*gpmv1.TerminalIn)
 
 	if err = b.Validate(); err != nil {
-		return verrs.BadRequest(s.S.Name(), err.Error())
+		return verrs.BadRequest(s.Name(), err.Error())
 	}
 	tid := uuid.New().String()
 
@@ -290,15 +301,15 @@ func (s *sftp) Terminal(ctx context.Context, stream IOStream) error {
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
-		return verrs.InternalServerError(s.S.Name(), err.Error())
+		return verrs.InternalServerError(s.Name(), err.Error())
 	}
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return verrs.InternalServerError(s.S.Name(), err.Error())
+		return verrs.InternalServerError(s.Name(), err.Error())
 	}
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		return verrs.InternalServerError(s.S.Name(), err.Error())
+		return verrs.InternalServerError(s.Name(), err.Error())
 	}
 
 	go io.Copy(stdin, into)
@@ -306,7 +317,7 @@ func (s *sftp) Terminal(ctx context.Context, stream IOStream) error {
 	go io.Copy(into, stderr)
 
 	if err = cmd.Start(); err != nil {
-		return verrs.InternalServerError(s.S.Name(), err.Error())
+		return verrs.InternalServerError(s.Name(), err.Error())
 	}
 
 	_, err = cmd.Process.Wait()

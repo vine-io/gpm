@@ -39,10 +39,10 @@ import (
 	"github.com/shirou/gopsutil/mem"
 	proc "github.com/shirou/gopsutil/process"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
+	"github.com/vine-io/gpm/pkg/internal/config"
 	"github.com/vine-io/gpm/pkg/internal/inject"
 	"github.com/vine-io/gpm/pkg/internal/store"
 	"github.com/vine-io/pkg/unit"
-	"github.com/vine-io/vine/lib/config"
 	log "github.com/vine-io/vine/lib/logger"
 )
 
@@ -128,7 +128,7 @@ func (p *Process) run() (int32, error) {
 		injectSysProcAttr(cmd, p.SysProcAttr)
 	}
 
-	root := filepath.Join(config.Get("root").String(""), "logs", p.Name)
+	root := filepath.Join(config.LoadRoot(), "logs", p.Name)
 	_ = os.MkdirAll(root, 0o777)
 
 	flog := filepath.Join(root, p.Name+".log")
@@ -208,7 +208,7 @@ func (p *Process) rotating() {
 			now := time.Now()
 			param := p.Log
 			// 日志目录
-			root := filepath.Join(config.Get("root").String(""), "logs", p.Name)
+			root := filepath.Join(config.LoadRoot(), "logs", p.Name)
 			// 当前日志文件
 			plog := filepath.Join(root, p.Name+".log")
 

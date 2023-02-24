@@ -36,7 +36,7 @@ import (
 	"time"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
-	"github.com/vine-io/vine/lib/config"
+	"github.com/vine-io/gpm/pkg/internal/config"
 	verrs "github.com/vine-io/vine/lib/errors"
 	log "github.com/vine-io/vine/lib/logger"
 	uc "github.com/vine-io/vine/util/config"
@@ -164,7 +164,7 @@ CHUNKED:
 }
 
 func (g *manager) ListVersions(ctx context.Context, name string) ([]*gpmv1.ServiceVersion, error) {
-	vs, err := g.DB.ListServiceVersion(ctx, name)
+	vs, err := g.db.ListServiceVersion(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -216,8 +216,8 @@ func (g *manager) Upgrade(ctx context.Context, stream IOStream) error {
 				return verrs.Conflict(g.Name(), "version %s already exists", spec.Version)
 			}
 
-			_ = os.MkdirAll(filepath.Join(config.Get("root").String(""), "packages", spec.Name), 0o755)
-			dst = filepath.Join(config.Get("root").String(""), "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
+			_ = os.MkdirAll(filepath.Join(config.LoadRoot(), "packages", spec.Name), 0o755)
+			dst = filepath.Join(config.LoadRoot(), "packages", spec.Name, spec.Name+"-"+spec.Version+".tar.gz")
 			log.Infof("save package: %v", dst)
 			file, err = os.Create(dst)
 			if err != nil {
@@ -315,10 +315,10 @@ CHUNKED:
 
 	vf := spec.Version + "@" + time.Now().Format("20060102150405")
 	log.Infof("service %s append version %s", service.Name, spec.Version)
-	_ = ioutil.WriteFile(filepath.Join(config.Get("root").String(""), "services", spec.Name, "versions", vf), []byte(""), 0o777)
+	_ = ioutil.WriteFile(filepath.Join(config.LoadRoot(), "services", spec.Name, "versions", vf), []byte(""), 0o777)
 
 	service.Version = spec.Version
-	g.DB.UpdateService(ctx, service)
+	g.db.UpdateService(ctx, service)
 
 	p = NewProcess(service)
 	if isRunning {
@@ -368,7 +368,7 @@ func (g *manager) Rollback(ctx context.Context, name string, version string) err
 	}
 
 	s.Version = version
-	_, err = g.DB.UpdateService(ctx, s)
+	_, err = g.db.UpdateService(ctx, s)
 	if err != nil {
 		return err
 	}
@@ -403,13 +403,13 @@ func (g *manager) Forget(ctx context.Context, name string, version string) error
 	}
 
 	vf := version + "@" + time.Unix(v.Timestamp, 0).Format("20060102150405")
-	vstore := filepath.Join(config.Get("root").String(""), "services", name, "versions", vf)
+	vstore := filepath.Join(config.LoadRoot(), "services", name, "versions", vf)
 	log.Infof("remove %s@%s version file %s", name, version, vstore)
 	if err = os.Remove(vstore); err != nil {
 		log.Errorf("remove %s@%s version file: %v", name, version, err)
 	}
 
-	pkg := filepath.Join(config.Get("root").String(""), "packages", name, name+"-"+version+".tar.gz")
+	pkg := filepath.Join(config.LoadRoot(), "packages", name, name+"-"+version+".tar.gz")
 	log.Infof("remove %s@%s version package %s", name, version, pkg)
 	if err = os.Remove(pkg); err != nil {
 		log.Errorf("remove %s:%s version directory: %v", name, version, err)

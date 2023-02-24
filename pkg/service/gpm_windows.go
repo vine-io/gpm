@@ -21,14 +21,13 @@
 // SOFTWARE.
 
 //go:build windows
-// +build windows
 
 package service
 
 import (
 	"bytes"
 	"context"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/exec"
 	"syscall"
@@ -39,7 +38,6 @@ import (
 )
 
 func fillService(service *gpmv1.Service) error {
-
 	return nil
 }
 
@@ -116,6 +114,6 @@ func startTerminal(ctx context.Context, in *gpmv1.TerminalIn) *exec.Cmd {
 
 func beauty(b []byte) []byte {
 	reader := transform.NewReader(bytes.NewReader(bytes.TrimSuffix(b, []byte("\r\n"))), simplifiedchinese.GBK.NewDecoder())
-	d, _ := ioutil.ReadAll(reader)
+	d, _ := io.ReadAll(reader)
 	return d
 }

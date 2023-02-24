@@ -6,7 +6,7 @@ import (
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 )
 
-type Manager interface {
+type GenerateManager interface {
 	Init() error
 	Info(context.Context) (*gpmv1.GpmInfo, error)
 	Update(context.Context, IOStream) error
@@ -27,7 +27,7 @@ type Manager interface {
 	Forget(context.Context, string, string) error
 }
 
-type FTP interface {
+type GenerateFTP interface {
 	List(context.Context, string) ([]*gpmv1.FileInfo, error)
 	Pull(context.Context, string, bool, IOWriter) error
 	Push(context.Context, IOReader) error

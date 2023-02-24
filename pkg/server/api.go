@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,42 +14,91 @@ import (
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/internal"
 	"github.com/vine-io/gpm/pkg/internal/client"
-	"github.com/vine-io/vine"
 	vclient "github.com/vine-io/vine/core/client"
 	"github.com/vine-io/vine/core/registry"
+	ahandler "github.com/vine-io/vine/lib/api/handler"
+	"github.com/vine-io/vine/lib/api/handler/openapi"
+	arpc "github.com/vine-io/vine/lib/api/handler/rpc"
+	"github.com/vine-io/vine/lib/api/resolver"
+	"github.com/vine-io/vine/lib/api/resolver/grpc"
+	"github.com/vine-io/vine/lib/api/router"
+	regRouter "github.com/vine-io/vine/lib/api/router/registry"
 	log "github.com/vine-io/vine/lib/logger"
-	uapi "github.com/vine-io/vine/util/api"
+	"github.com/vine-io/vine/util/namespace"
 )
 
-func newAPIServer(s vine.Service) *gin.Engine {
+type GpmHttpServer struct {
+	*gin.Engine
 
-	app := uapi.NewRPCGateway(s, internal.Namespace, func(engine *gin.Engine) {
-		engine.GET("/metrics", gin.WrapH(promhttp.Handler()))
-		engine.GET("/api/v1/endpoints", getEndpointsHandle)
-		engine.POST("/api/v1/push", pushHandle)
-
-		prefix := "/debug/pprof"
-		group := engine.Group(prefix)
-		{
-			group.GET("/", gin.WrapF(pprof.Index))
-			group.GET("/cmdline", gin.WrapF(pprof.Cmdline))
-			group.GET("/profile", gin.WrapF(pprof.Profile))
-			group.POST("/symbol", gin.WrapF(pprof.Symbol))
-			group.GET("/symbol", gin.WrapF(pprof.Symbol))
-			group.GET("/trace", gin.WrapF(pprof.Trace))
-			group.GET("/allocs", gin.WrapH(pprof.Handler("allocs")))
-			group.GET("/block", gin.WrapH(pprof.Handler("block")))
-			group.GET("/goroutine", gin.WrapH(pprof.Handler("goroutine")))
-			group.GET("/heap", gin.WrapH(pprof.Handler("heap")))
-			group.GET("/mutex", gin.WrapH(pprof.Handler("mutex")))
-			group.GET("/threadcreate", gin.WrapH(pprof.Handler("threadcreate")))
-		}
-	})
-
-	return app
+	register registry.Registry
+	client   vclient.Client
 }
 
-func getEndpointsHandle(ctx *gin.Context) {
+func RegistryGpmAPIServer(ctx context.Context, reg registry.Registry, client vclient.Client) (http.Handler, error) {
+
+	gin.SetMode(gin.ReleaseMode)
+	app := gin.New()
+	app.Use(gin.Recovery())
+
+	s := &GpmHttpServer{
+		Engine:   app,
+		register: reg,
+		client:   client,
+	}
+
+	openapi.RegisterOpenAPI(client, reg, app)
+
+	s.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	s.GET("/api/v1/endpoints", s.getEndpointsHandle)
+	s.POST("/api/v1/push", s.pushHandle)
+
+	prefix := "/debug/pprof"
+	group := s.Group(prefix)
+	{
+		group.GET("/", gin.WrapF(pprof.Index))
+		group.GET("/cmdline", gin.WrapF(pprof.Cmdline))
+		group.GET("/profile", gin.WrapF(pprof.Profile))
+		group.POST("/symbol", gin.WrapF(pprof.Symbol))
+		group.GET("/symbol", gin.WrapF(pprof.Symbol))
+		group.GET("/trace", gin.WrapF(pprof.Trace))
+		group.GET("/allocs", gin.WrapH(pprof.Handler("allocs")))
+		group.GET("/block", gin.WrapH(pprof.Handler("block")))
+		group.GET("/goroutine", gin.WrapH(pprof.Handler("goroutine")))
+		group.GET("/heap", gin.WrapH(pprof.Handler("heap")))
+		group.GET("/mutex", gin.WrapH(pprof.Handler("mutex")))
+		group.GET("/threadcreate", gin.WrapH(pprof.Handler("threadcreate")))
+	}
+
+	Type := "api"
+	HandlerType := "rpc"
+	ns := internal.Namespace
+
+	// create the namespace resolver
+	nsResolver := namespace.NewResolver(Type, ns)
+	// resolver options
+	rops := []resolver.Option{
+		resolver.WithNamespace(nsResolver.ResolveWithType),
+		resolver.WithHandler(HandlerType),
+	}
+
+	rr := grpc.NewResolver(rops...)
+	rt := regRouter.NewRouter(
+		router.WithHandler(arpc.Handler),
+		router.WithResolver(rr),
+		router.WithRegistry(reg),
+	)
+
+	rp := arpc.NewHandler(
+		ahandler.WithNamespace(ns),
+		ahandler.WithRouter(rt),
+		ahandler.WithClient(client),
+	)
+	s.Use(rp.Handle)
+
+	return s, nil
+}
+
+func (s *GpmHttpServer) getEndpointsHandle(ctx *gin.Context) {
 	endpoints := make([]map[string]string, 0)
 	keys := make(map[string]struct{}, 0)
 	list, _ := registry.GetService(ctx, internal.GpmName)
@@ -79,7 +129,7 @@ func getEndpointsHandle(ctx *gin.Context) {
 	})
 }
 
-func pushHandle(ctx *gin.Context) {
+func (s *GpmHttpServer) pushHandle(ctx *gin.Context) {
 	mf, err := ctx.MultipartForm()
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, err)

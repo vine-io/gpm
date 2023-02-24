@@ -28,7 +28,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -107,7 +106,7 @@ EXIT:
 		log.Infof("starting upgrade gpmd and gpm, %s", shell)
 		script := filepath.Join(os.TempDir(), "start.bat")
 
-		_ = ioutil.WriteFile(script, []byte(fmt.Sprintf(`@echo off
+		_ = os.WriteFile(script, []byte(fmt.Sprintf(`@echo off
 %s`, shell)), 0o777)
 		cmd := exec.Command("cmd", "/C", shell)
 		adminCmd(cmd)

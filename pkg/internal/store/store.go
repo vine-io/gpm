@@ -34,7 +34,7 @@ import (
 	"time"
 
 	json "github.com/json-iterator/go"
-	"github.com/vine-io/vine/lib/config"
+	"github.com/vine-io/gpm/pkg/internal/config"
 	"gopkg.in/yaml.v3"
 
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
@@ -55,7 +55,7 @@ func (db *DB) FindAllServices(ctx context.Context) ([]*gpmv1.Service, error) {
 	)
 
 	go func() {
-		err := filepath.WalkDir(filepath.Join(config.Get("root").String(""), "services"), func(path string, d fs.DirEntry, err error) error {
+		err := filepath.WalkDir(filepath.Join(config.LoadRoot(), "services"), func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
@@ -120,10 +120,10 @@ func (db *DB) FindService(ctx context.Context, name string) (*gpmv1.Service, err
 	)
 
 	go func() {
-		f := filepath.Join(config.Get("root").String(""), "services", name, name+".yml")
+		f := filepath.Join(config.LoadRoot(), "services", name, name+".yml")
 		stat, _ := os.Stat(f)
 		if stat == nil {
-			f = filepath.Join(config.Get("root").String(""), "services", name, name+".json")
+			f = filepath.Join(config.LoadRoot(), "services", name, name+".json")
 			stat, _ = os.Stat(f)
 			if stat == nil {
 				ech <- fmt.Errorf("%w: service '%s'", ErrNotFound, name)
@@ -131,7 +131,7 @@ func (db *DB) FindService(ctx context.Context, name string) (*gpmv1.Service, err
 			}
 		}
 
-		b, err := ioutil.ReadFile(f)
+		b, err := os.ReadFile(f)
 		if err != nil {
 			ech <- err
 			return
@@ -169,7 +169,7 @@ func (db *DB) ListServiceVersion(ctx context.Context, name string) ([]*gpmv1.Ser
 	)
 
 	go func() {
-		root := filepath.Join(config.Get("root").String(""), "services", name, "versions")
+		root := filepath.Join(config.LoadRoot(), "services", name, "versions")
 		err := filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return err
@@ -225,18 +225,18 @@ func (db *DB) CreateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 	)
 
 	go func() {
-		_ = os.MkdirAll(filepath.Join(config.Get("root").String(""), "services", s.Name), 0o777)
-		_ = os.MkdirAll(filepath.Join(config.Get("root").String(""), "logs", s.Name), 0o777)
-		_ = os.MkdirAll(filepath.Join(config.Get("root").String(""), "services", s.Name, "versions"), 0o777)
+		_ = os.MkdirAll(filepath.Join(config.LoadRoot(), "services", s.Name), 0o777)
+		_ = os.MkdirAll(filepath.Join(config.LoadRoot(), "logs", s.Name), 0o777)
+		_ = os.MkdirAll(filepath.Join(config.LoadRoot(), "services", s.Name, "versions"), 0o777)
 		version := s.Version + "@" + time.Now().Format("20060102150405")
-		_ = ioutil.WriteFile(filepath.Join(config.Get("root").String(""), "services", s.Name, "versions", version), []byte(""), 0o777)
+		_ = os.WriteFile(filepath.Join(config.LoadRoot(), "services", s.Name, "versions", version), []byte(""), 0o777)
 
 		b, err := yaml.Marshal(s)
 		if err != nil {
 			ech <- err
 			return
 		}
-		f := filepath.Join(config.Get("root").String(""), "services", s.Name, s.Name+".yml")
+		f := filepath.Join(config.LoadRoot(), "services", s.Name, s.Name+".yml")
 		if err = ioutil.WriteFile(f, b, 0o777); err != nil {
 			ech <- err
 			return
@@ -267,7 +267,7 @@ func (db *DB) UpdateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 			ech <- err
 			return
 		}
-		f := filepath.Join(config.Get("root").String(""), "services", s.Name, s.Name+".yml")
+		f := filepath.Join(config.LoadRoot(), "services", s.Name, s.Name+".yml")
 		if err = ioutil.WriteFile(f, b, 0o777); err != nil {
 			ech <- err
 			return
@@ -291,9 +291,9 @@ func (db *DB) DeleteService(ctx context.Context, name string) error {
 	)
 
 	go func() {
-		_ = os.RemoveAll(filepath.Join(config.Get("root").String(""), "services", name))
-		_ = os.RemoveAll(filepath.Join(config.Get("root").String(""), "logs", name))
-		_ = os.RemoveAll(filepath.Join(config.Get("root").String(""), "packages", name))
+		_ = os.RemoveAll(filepath.Join(config.LoadRoot(), "services", name))
+		_ = os.RemoveAll(filepath.Join(config.LoadRoot(), "logs", name))
+		_ = os.RemoveAll(filepath.Join(config.LoadRoot(), "packages", name))
 
 		done <- struct{}{}
 	}()

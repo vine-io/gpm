@@ -36,36 +36,51 @@ import (
 	proc "github.com/shirou/gopsutil/process"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/internal"
-	"github.com/vine-io/gpm/pkg/internal/inject"
+	"github.com/vine-io/gpm/pkg/internal/config"
 	"github.com/vine-io/gpm/pkg/internal/store"
-	"github.com/vine-io/vine"
-	"github.com/vine-io/vine/lib/config"
+	vserver "github.com/vine-io/vine/core/server"
 	verrs "github.com/vine-io/vine/lib/errors"
 	log "github.com/vine-io/vine/lib/logger"
 )
 
-func init() {
-	inject.ProvidePanic(new(manager))
-}
-
 type manager struct {
-	vine.Service `inject:""`
+	sync.RWMutex
+	ctx context.Context
 
-	DB *store.DB `inject:""`
+	server vserver.Server
+
+	db *store.DB
 
 	up time.Time
-	sync.RWMutex
 	ps map[string]*Process
+}
+
+func NewManagerService(ctx context.Context, server vserver.Server, db *store.DB) (GenerateManager, error) {
+
+	s := &manager{
+		ctx:     ctx,
+		server:  server,
+		db:      db,
+		up:      time.Time{},
+		RWMutex: sync.RWMutex{},
+		ps:      nil,
+	}
+
+	if err := s.Init(); err != nil {
+		return nil, err
+	}
+
+	return s, nil
 }
 
 func (g *manager) Init() error {
 	var err error
 
-	if err = os.MkdirAll(filepath.Join(config.Get("root").String(""), "services"), 0o777); err != nil {
+	if err = os.MkdirAll(filepath.Join(config.LoadRoot(), "services"), 0o777); err != nil {
 		return err
 	}
 	ctx := context.Background()
-	list, err := g.DB.FindAllServices(ctx)
+	list, err := g.db.FindAllServices(ctx)
 	if err != nil {
 		return err
 	}
@@ -81,6 +96,10 @@ func (g *manager) Init() error {
 
 	g.up = time.Now()
 	return nil
+}
+
+func (g *manager) Name() string {
+	return g.server.Options().Name
 }
 
 func (g *manager) Info(ctx context.Context) (*gpmv1.GpmInfo, error) {
@@ -110,7 +129,7 @@ func (g *manager) Info(ctx context.Context) (*gpmv1.GpmInfo, error) {
 }
 
 func (g *manager) List(ctx context.Context) ([]*gpmv1.Service, int64, error) {
-	outs, err := g.DB.FindAllServices(ctx)
+	outs, err := g.db.FindAllServices(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -134,7 +153,7 @@ func (g *manager) Get(ctx context.Context, name string) (*gpmv1.Service, error) 
 }
 
 func (g *manager) getService(ctx context.Context, name string) (*gpmv1.Service, error) {
-	s, err := g.DB.FindService(ctx, name)
+	s, err := g.db.FindService(ctx, name)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +190,7 @@ func (g *manager) Create(ctx context.Context, spec *gpmv1.ServiceSpec) (*gpmv1.S
 		service.Version = "v0.0.1"
 	}
 
-	service, err = g.DB.CreateService(ctx, service)
+	service, err = g.db.CreateService(ctx, service)
 	if err != nil {
 		return nil, err
 	}
@@ -232,7 +251,7 @@ func (g *manager) Edit(ctx context.Context, name string, spec *gpmv1.EditService
 		return nil, err
 	}
 
-	service, err = g.DB.UpdateService(ctx, service)
+	service, err = g.db.UpdateService(ctx, service)
 	if err != nil {
 		return nil, err
 	}
@@ -282,7 +301,7 @@ func (g *manager) startService(ctx context.Context, p *Process) (*gpmv1.Service,
 	}
 
 	var e error
-	s, e = g.DB.UpdateService(ctx, s)
+	s, e = g.db.UpdateService(ctx, s)
 	if err != nil {
 		return nil, err
 	}
@@ -321,7 +340,7 @@ func (g *manager) stopService(ctx context.Context, p *Process) (*gpmv1.Service, 
 	s.Status = gpmv1.StatusStopped
 	now := time.Now()
 	s.UpdateTimestamp = now.Unix()
-	s, err = g.DB.UpdateService(ctx, s)
+	s, err = g.db.UpdateService(ctx, s)
 	if err != nil {
 		return nil, err
 	}
@@ -369,7 +388,7 @@ func (g *manager) Delete(ctx context.Context, name string) (*gpmv1.Service, erro
 	delete(g.ps, s.Name)
 	g.Unlock()
 
-	err = g.DB.DeleteService(ctx, s.Name)
+	err = g.db.DeleteService(ctx, s.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -386,7 +405,7 @@ func (g *manager) Delete(ctx context.Context, name string) (*gpmv1.Service, erro
 }
 
 func (g *manager) TailLog(ctx context.Context, name string, number int64, follow bool, sender IOWriter) error {
-	f := filepath.Join(config.Get("root").String(""), "logs", name, name+".log")
+	f := filepath.Join(config.LoadRoot(), "logs", name, name+".log")
 	stat, _ := os.Stat(f)
 	if stat == nil {
 		return verrs.NotFound(g.Name(), "service '%s' log not exists", name)

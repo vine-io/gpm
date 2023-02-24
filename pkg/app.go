@@ -27,14 +27,18 @@ import (
 	log "github.com/vine-io/vine/lib/logger"
 )
 
-func Run() {
-	app := server.New()
+var (
+	Address = ":7700"
+	ROOT    = "/opt/gpm"
+)
 
-	if err := app.Init(); err != nil {
+func Run() {
+	s, err := server.New()
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := app.Run(); err != nil {
+	if err = s.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
