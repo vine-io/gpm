@@ -40,7 +40,6 @@ import (
 	proc "github.com/shirou/gopsutil/process"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/internal/config"
-	"github.com/vine-io/gpm/pkg/internal/inject"
 	"github.com/vine-io/gpm/pkg/internal/store"
 	"github.com/vine-io/pkg/unit"
 	log "github.com/vine-io/vine/lib/logger"
@@ -62,10 +61,10 @@ type Process struct {
 	done chan struct{}
 }
 
-func NewProcess(in *gpmv1.Service) *Process {
+func NewProcess(in *gpmv1.Service, db *store.DB) *Process {
 	process := &Process{
 		Service: in,
-		db:      &store.DB{},
+		db:      db,
 		done:    make(chan struct{}, 1),
 	}
 	if process.Pid != 0 {
@@ -76,8 +75,6 @@ func NewProcess(in *gpmv1.Service) *Process {
 			process.Pid = 0
 		}
 	}
-
-	_ = inject.Resolve(process.db)
 
 	return process
 }

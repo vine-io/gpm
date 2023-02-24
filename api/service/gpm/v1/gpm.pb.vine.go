@@ -41,7 +41,7 @@ func NewGpmServiceEndpoints() []*api.Endpoint {
 		&api.Endpoint{
 			Name:        "GpmService.ListService",
 			Description: "GpmService.ListService",
-			Path:        []string{"/api/v1/Service"},
+			Path:        []string{"/api/v1/Services"},
 			Method:      []string{"GET"},
 			Body:        "*",
 			Handler:     "rpc",
@@ -225,24 +225,6 @@ func NewGpmServiceOpenAPI() *openapipb.OpenAPI {
 				},
 			},
 			"/api/v1/Service": &openapipb.OpenAPIPath{
-				Get: &openapipb.OpenAPIPathDocs{
-					Tags:        []string{"GpmService"},
-					Summary:     "查询所有服务",
-					Description: "GpmService ListService",
-					OperationId: "GpmServiceListService",
-					Parameters:  []*openapipb.PathParameters{},
-					Responses: map[string]*openapipb.PathResponse{
-						"200": &openapipb.PathResponse{
-							Description: "successful response (stream response)",
-							Content: &openapipb.PathRequestBodyContent{
-								ApplicationJson: &openapipb.ApplicationContent{
-									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ListServiceRsp"},
-								},
-							},
-						},
-					},
-					Security: []*openapipb.PathSecurity{},
-				},
 				Post: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
 					Summary:     "新建服务",
@@ -607,6 +589,26 @@ func NewGpmServiceOpenAPI() *openapipb.OpenAPI {
 					Security: []*openapipb.PathSecurity{},
 				},
 			},
+			"/api/v1/Services": &openapipb.OpenAPIPath{
+				Get: &openapipb.OpenAPIPathDocs{
+					Tags:        []string{"GpmService"},
+					Summary:     "查询所有服务",
+					Description: "GpmService ListService",
+					OperationId: "GpmServiceListService",
+					Parameters:  []*openapipb.PathParameters{},
+					Responses: map[string]*openapipb.PathResponse{
+						"200": &openapipb.PathResponse{
+							Description: "successful response (stream response)",
+							Content: &openapipb.PathRequestBodyContent{
+								ApplicationJson: &openapipb.ApplicationContent{
+									Schema: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.service.gpm.v1.ListServiceRsp"},
+								},
+							},
+						},
+					},
+					Security: []*openapipb.PathSecurity{},
+				},
+			},
 			"/api/v1/info": &openapipb.OpenAPIPath{
 				Get: &openapipb.OpenAPIPathDocs{
 					Tags:        []string{"GpmService"},
@@ -665,23 +667,6 @@ func NewGpmServiceOpenAPI() *openapipb.OpenAPI {
 						"files": &openapipb.Schema{
 							Type:  "array",
 							Items: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.FileInfo"},
-						},
-					},
-				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceReq": &openapipb.Model{
-					Type:       "object",
-					Properties: map[string]*openapipb.Schema{},
-				},
-				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceRsp": &openapipb.Model{
-					Type: "object",
-					Properties: map[string]*openapipb.Schema{
-						"services": &openapipb.Schema{
-							Type:  "array",
-							Items: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service"},
-						},
-						"total": &openapipb.Schema{
-							Type:   "integer",
-							Format: "int64",
 						},
 					},
 				},
@@ -866,6 +851,23 @@ func NewGpmServiceOpenAPI() *openapipb.OpenAPI {
 						},
 					},
 				},
+				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceReq": &openapipb.Model{
+					Type:       "object",
+					Properties: map[string]*openapipb.Schema{},
+				},
+				"github.com.vine-io.gpm.api.service.gpm.v1.ListServiceRsp": &openapipb.Model{
+					Type: "object",
+					Properties: map[string]*openapipb.Schema{
+						"services": &openapipb.Schema{
+							Type:  "array",
+							Items: &openapipb.Schema{Ref: "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.Service"},
+						},
+						"total": &openapipb.Schema{
+							Type:   "integer",
+							Format: "int64",
+						},
+					},
+				},
 				"github.com.vine-io.gpm.api.service.gpm.v1.InfoReq": &openapipb.Model{
 					Type:       "object",
 					Properties: map[string]*openapipb.Schema{},
@@ -927,6 +929,50 @@ func NewGpmServiceOpenAPI() *openapipb.OpenAPI {
 							Type: "boolean",
 						},
 					},
+				},
+				"github.com.vine-io.gpm.api.types.gpm.v1.ServiceSpec": &openapipb.Model{
+					Type: "object",
+					Properties: map[string]*openapipb.Schema{
+						"name": &openapipb.Schema{
+							Type: "string",
+						},
+						"bin": &openapipb.Schema{
+							Type: "string",
+						},
+						"args": &openapipb.Schema{
+							Type:  "array",
+							Items: &openapipb.Schema{Type: "string"},
+						},
+						"dir": &openapipb.Schema{
+							Type: "string",
+						},
+						"env": &openapipb.Schema{
+							AdditionalProperties: &openapipb.Schema{},
+						},
+						"sysProcAttr": &openapipb.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr",
+						},
+						"log": &openapipb.Schema{
+							Type: "object",
+							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ProcLog",
+						},
+						"version": &openapipb.Schema{
+							Type: "string",
+						},
+						"autoRestart": &openapipb.Schema{
+							Type:   "integer",
+							Format: "int32",
+						},
+						"headerTrimPrefix": &openapipb.Schema{
+							Type: "string",
+						},
+						"installFlag": &openapipb.Schema{
+							Type:   "integer",
+							Format: "int32",
+						},
+					},
+					Required: []string{"name", "bin", "version"},
 				},
 				"github.com.vine-io.gpm.api.types.gpm.v1.Service": &openapipb.Model{
 					Type: "object",
@@ -995,50 +1041,6 @@ func NewGpmServiceOpenAPI() *openapipb.OpenAPI {
 						},
 					},
 					Required: []string{"name", "bin"},
-				},
-				"github.com.vine-io.gpm.api.types.gpm.v1.ServiceSpec": &openapipb.Model{
-					Type: "object",
-					Properties: map[string]*openapipb.Schema{
-						"name": &openapipb.Schema{
-							Type: "string",
-						},
-						"bin": &openapipb.Schema{
-							Type: "string",
-						},
-						"args": &openapipb.Schema{
-							Type:  "array",
-							Items: &openapipb.Schema{Type: "string"},
-						},
-						"dir": &openapipb.Schema{
-							Type: "string",
-						},
-						"env": &openapipb.Schema{
-							AdditionalProperties: &openapipb.Schema{},
-						},
-						"sysProcAttr": &openapipb.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.SysProcAttr",
-						},
-						"log": &openapipb.Schema{
-							Type: "object",
-							Ref:  "#/components/schemas/github.com.vine-io.gpm.api.types.gpm.v1.ProcLog",
-						},
-						"version": &openapipb.Schema{
-							Type: "string",
-						},
-						"autoRestart": &openapipb.Schema{
-							Type:   "integer",
-							Format: "int32",
-						},
-						"headerTrimPrefix": &openapipb.Schema{
-							Type: "string",
-						},
-						"installFlag": &openapipb.Schema{
-							Type:   "integer",
-							Format: "int32",
-						},
-					},
-					Required: []string{"name", "bin", "version"},
 				},
 				"github.com.vine-io.gpm.api.types.gpm.v1.EditServiceSpec": &openapipb.Model{
 					Type: "object",
@@ -1180,7 +1182,7 @@ type GpmService interface {
 	// +gen:get=/api/v1/info
 	Info(ctx context.Context, in *InfoReq, opts ...client.CallOption) (*InfoRsp, error)
 	// +gen:summary=查询所有服务
-	// +gen:get=/api/v1/Service
+	// +gen:get=/api/v1/Services
 	ListService(ctx context.Context, in *ListServiceReq, opts ...client.CallOption) (*ListServiceRsp, error)
 	// +gen:summary=查询单个服务
 	// +gen:get=/api/v1/Service/{name}
@@ -1758,7 +1760,7 @@ type GpmServiceHandler interface {
 	// +gen:get=/api/v1/info
 	Info(context.Context, *InfoReq, *InfoRsp) error
 	// +gen:summary=查询所有服务
-	// +gen:get=/api/v1/Service
+	// +gen:get=/api/v1/Services
 	ListService(context.Context, *ListServiceReq, *ListServiceRsp) error
 	// +gen:summary=查询单个服务
 	// +gen:get=/api/v1/Service/{name}
@@ -1850,7 +1852,7 @@ func RegisterGpmServiceHandler(s server.Server, hdlr GpmServiceHandler, opts ...
 	opts = append(opts, api.WithEndpoint(&api.Endpoint{
 		Name:        "GpmService.ListService",
 		Description: "GpmService.ListService",
-		Path:        []string{"/api/v1/Service"},
+		Path:        []string{"/api/v1/Services"},
 		Method:      []string{"GET"},
 		Body:        "*",
 		Handler:     "rpc",

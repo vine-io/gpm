@@ -87,7 +87,7 @@ func (g *manager) Init() error {
 
 	g.ps = map[string]*Process{}
 	for _, item := range list {
-		p := NewProcess(item)
+		p := NewProcess(item, g.db)
 		if item.Status == gpmv1.StatusRunning {
 			_, _ = g.startService(ctx, p)
 		}
@@ -196,7 +196,7 @@ func (g *manager) Create(ctx context.Context, spec *gpmv1.ServiceSpec) (*gpmv1.S
 	}
 
 	g.Lock()
-	g.ps[service.Name] = NewProcess(service)
+	g.ps[service.Name] = NewProcess(service, g.db)
 	g.Unlock()
 
 	return service, nil
@@ -256,7 +256,7 @@ func (g *manager) Edit(ctx context.Context, name string, spec *gpmv1.EditService
 		return nil, err
 	}
 
-	p = NewProcess(service)
+	p = NewProcess(service, g.db)
 	if isRunning {
 		g.startService(ctx, p)
 	}

@@ -7480,7 +7480,7 @@ type GpmServiceClient interface {
 	// +gen:get=/api/v1/info
 	Info(ctx context.Context, in *InfoReq, opts ...grpc.CallOption) (*InfoRsp, error)
 	// +gen:summary=查询所有服务
-	// +gen:get=/api/v1/Service
+	// +gen:get=/api/v1/Services
 	ListService(ctx context.Context, in *ListServiceReq, opts ...grpc.CallOption) (*ListServiceRsp, error)
 	// +gen:summary=查询单个服务
 	// +gen:get=/api/v1/Service/{name}
@@ -7904,7 +7904,7 @@ type GpmServiceServer interface {
 	// +gen:get=/api/v1/info
 	Info(context.Context, *InfoReq) (*InfoRsp, error)
 	// +gen:summary=查询所有服务
-	// +gen:get=/api/v1/Service
+	// +gen:get=/api/v1/Services
 	ListService(context.Context, *ListServiceReq) (*ListServiceRsp, error)
 	// +gen:summary=查询单个服务
 	// +gen:get=/api/v1/Service/{name}

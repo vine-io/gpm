@@ -23,17 +23,19 @@
 package ctl
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/vine-io/cli"
 	"github.com/vine-io/gpm/pkg/internal"
+	"github.com/vine-io/gpm/pkg/internal/config"
 	vclient "github.com/vine-io/vine/core/client"
 )
 
 func getCallOptions(c *cli.Context) []vclient.CallOption {
 	host := c.String("host")
 	if index := strings.Index(host, ":"); index == -1 {
-		host += ":7700"
+		host += fmt.Sprintf(":%d", config.DefaultPort)
 	}
 	return []vclient.CallOption{
 		vclient.WithAddress(host),

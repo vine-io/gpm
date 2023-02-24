@@ -76,7 +76,7 @@ func main() {
 				Aliases: []string{"H"},
 				Usage:   "the ip address of gpmd",
 				EnvVars: []string{"GPM_HOST"},
-				Value:   "127.0.0.1:7700",
+				Value:   "127.0.0.1:33700",
 			},
 			&cli.DurationFlag{
 				Name:    "dial-timeout",

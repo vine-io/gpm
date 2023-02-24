@@ -320,7 +320,7 @@ CHUNKED:
 	service.Version = spec.Version
 	g.db.UpdateService(ctx, service)
 
-	p = NewProcess(service)
+	p = NewProcess(service, g.db)
 	if isRunning {
 		log.Infof("start service %s", service.Name)
 		g.startService(ctx, p)
@@ -373,7 +373,7 @@ func (g *manager) Rollback(ctx context.Context, name string, version string) err
 		return err
 	}
 
-	p = NewProcess(s)
+	p = NewProcess(s, g.db)
 	if isRunning {
 		g.startService(ctx, p)
 	}

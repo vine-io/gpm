@@ -16,7 +16,7 @@ service GpmService {
   // +gen:get=/api/v1/info
   rpc Info(InfoReq) returns (InfoRsp);
   // +gen:summary=查询所有服务
-  // +gen:get=/api/v1/Service
+  // +gen:get=/api/v1/Services
   rpc ListService(ListServiceReq) returns (ListServiceRsp);
   // +gen:summary=查询单个服务
   // +gen:get=/api/v1/Service/{name}
