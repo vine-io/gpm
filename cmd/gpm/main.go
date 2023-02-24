@@ -42,10 +42,16 @@ func main() {
 		},
 	}
 
-	rootCmd.ResetFlags()
-	rootCmd.PersistentFlags().StringP("host", "H", "127.0.0.1:33700", "the ip address of gpmd")
-	rootCmd.PersistentFlags().Duration("dial-timeout", time.Second*30, "specify dial timeout for call option")
-	rootCmd.PersistentFlags().Duration("request-timeout", time.Second*30, "pecify request timeout for call option")
+	rootCmd.AddGroup(
+		&cobra.Group{
+			ID:    "service",
+			Title: "Service Subcommands",
+		},
+		&cobra.Group{
+			ID:    "bash",
+			Title: "Bash Subcommands",
+		},
+	)
 
 	rootCmd.ResetCommands()
 	rootCmd.AddCommand(
@@ -80,6 +86,11 @@ func main() {
 		ctl.PullBashCmd(),
 		ctl.TerminalBashCmd(),
 	)
+
+	rootCmd.ResetFlags()
+	rootCmd.PersistentFlags().StringP("host", "H", "127.0.0.1:33700", "the ip address of gpmd")
+	rootCmd.PersistentFlags().Duration("dial-timeout", time.Second*30, "specify dial timeout for call option")
+	rootCmd.PersistentFlags().Duration("request-timeout", time.Second*30, "pecify request timeout for call option")
 
 	//sort.Sort(cli.FlagsByName(app.Flags))
 	//sort.Sort(cli.CommandsByName(app.Commands))

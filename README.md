@@ -11,54 +11,56 @@
 ## 使用 gpm
 gpm 命令详情如下:
 ```shell
-NAME:
-   gpm - package manage tools
+package manage tools
 
-USAGE:
-   gpm [global options] command [command options] [arguments...]
+Usage:
+  gpm [flags]
+  gpm [command]
 
-VERSION:
-   v1.1.2
+Service Subcommands
+  create      create a service
+  delete      delete a service
+  edit        update a service parameters
+  forget      forget a service version
+  get         get service by name
+  install     install a service
+  list        list all local services
+  restart     restart a service
+  rollback    rollback a service
+  start       start a service
+  stop        stop a service
+  tail        tail service logs
+  upgrade     upgrade a service
+  version     list service history versions
 
-AUTHOR:
-   lack <598223084@qq.com>
+Bash Subcommands
+  exec        execute command
+  ls          list remote directory
+  pull        pull file from service
+  push        push files
+  terminal    start a terminal
 
-COMMANDS:
-   deploy    deploy gpmd and gpm
-   health    confirm gpmd status
-   info      get the information of gpmd
-   run       run gpmd process
-   shutdown  stop gpmd process
-   tar       create a package for Install subcommand
-   update    update gpm and gpmd
-   help, h   Shows a list of commands or help for one command
-   bash:
-     exec      execute command
-     ls        list remote directory
-     pull      pull file from service
-     push      push files
-     terminal  start a terminal
-     version   list service history versions
-   service:
-     create    create a service
-     delete    delete a service
-     edit      update a service parameters
-     get       get service by name
-     install   install a service
-     list      list all local services
-     reboot    reboot a service
-     rollback  reboot a service
-     start     start a service
-     stop      stop a service
-     tail      tail service logs
-     upgrade   upgrade a service
+Additional Commands:
+  completion  Generate the autocompletion script for the specified shell
+  deploy      deploy gpmd and gpm
+  health      confirm gpmd status
+  help        Help about any command
+  info        get the information of gpmd
+  run         run gpmd process
+  shutdown    stop gpmd process
+  tar         create a compress package for Install subcommand
+  untar       decompress a package
+  update      update gpm and gpmd
 
-GLOBAL OPTIONS:
-   --dial-timeout int64      specify dial timeout for call option (default: 30s) [$GPM_DIAL_TIMEOUT]
-   --host string, -H string  the ip address of gpmd (default: "127.0.0.1:7700") [$GPM_HOST]
-   --request-timeout int64   specify request timeout for call option (default: 30s) [$GPM_REQUEST_TIMEOUT]
-   --help, -h                show help (default: false)
-   --version, -v             print the version (default: false)
+Flags:
+      --dial-timeout duration      specify dial timeout for call option (default 30s)
+  -h, --help                       help for gpm
+  -H, --host string                the ip address of gpmd (default "127.0.0.1:33700")
+      --request-timeout duration   pecify request timeout for call option (default 30s)
+  -v, --version                    version for gpm
+
+Use "gpm [command] --help" for more information about a command.
+
 ```
 ### 安装 gpm
 现在相应操作系统版本的 [gpm](https://github.com/vine-io/gpm/releases) 。
@@ -74,7 +76,7 @@ install gpm successfully!
 ### gpmd 相关服务命令
 #### 启动 gpmd
 ```bash
-$ gpm run --args '--server-address=0.0.0.0:33700' --args '--enable-log'
+$ gpm run --args '--server.address=0.0.0.0:33700' --args '--enable-log'
 start gpmd successfully!
 ```
 
@@ -114,7 +116,7 @@ $ ./linux/gpm update
 ```
 远程升级则需要如下命令:
 ```shell
-$ ./linux/gpm --host 192.168.1.10:7700 --package ./gpm
+$ ./linux/gpm --host 192.168.1.10:33700 --package ./gpm
 ```
 > 注: `--package` 选项指定新版本的二进制包，这种方式可以升级远程机器上不同操作系统下的 gpm。
 
@@ -133,7 +135,7 @@ tar /tmp/test.tar.gz successfully
 
 安装服务 
 ```shell
-$ gpm --host 192.168.1.10:7700 install --package /tmp/test.tar.gz --name test --dir /opt/test --bin /opt/test/bin/test --auto-restart --version v1.0.0
+$ gpm install --host 192.168.1.10:33700 --package /tmp/test.tar.gz --name test --dir /opt/test --bin /opt/test/bin/test --auto-restart --version v1.0.0
 upload [/tmp/test.tar.gz] 100% |████████████████████████████████████████| (14.593 MB/s)
 install service test successfully
 ```
@@ -271,7 +273,7 @@ $ gpm ls --path /tmp/san/
 
 #### 执行远程命令
 ```shell
-$ go run cmd/gpm/main.go --host 192.168.3.111:7700 exec --cmd "ls" --A "/tmp/san"
+$ go run cmd/gpm/main.go --host 192.168.3.111:33700 exec --cmd "ls" --A "/tmp/san"
 ca.pem
 ```
 支持的参数:
@@ -288,7 +290,7 @@ OPTIONS:
 
 #### 上传文件
 ```shell
-$ gpm --host 192.168.3.111:7700 push --src /tmp/1.txt --dst /tmp/1.txt
+$ gpm --host 192.168.3.111:33700 push --src /tmp/1.txt --dst /tmp/1.txt
  100% |████████████████████████████████████████| (1.712 kB/s)
 ```
 

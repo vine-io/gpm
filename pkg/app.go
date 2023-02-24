@@ -27,11 +27,6 @@ import (
 	log "github.com/vine-io/vine/lib/logger"
 )
 
-var (
-	Address = ":7700"
-	ROOT    = "/opt/gpm"
-)
-
 func Run() {
 	s, err := server.New()
 	if err != nil {
