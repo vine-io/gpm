@@ -11,7 +11,6 @@ ifeq "$(TAG)" ""
 	@echo "missing tag"
 	exit 1
 endif
-	changelog --output CHANGELOG.md
 	git tag $(TAG)
 	make build-tag
 	git add .
