@@ -30,12 +30,14 @@ jobs:
           echo "tag=${{ github.ref_name }}" >> $GITHUB_ENV
           echo "tag=${{ github.ref_name }}"
 
-      - name: Build Tar
-        run: make tar
-
       - name: Changelog
         uses: scottbrenner/generate-changelog-action@master
-        id: Changelog
+        run: |
+          export PATH=$PATH:$(go env GOPATH)/bin
+          go install github.com/lack-io/changelog@latest
+
+      - name: Build Tar
+        run: make tar
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -43,8 +45,7 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           release_name: Release ${{ github.ref_name }}
-          body: |
-            ${{ steps.Changelog.outputs.changelog }}
+          body_path: _output/CHANGELOG.md
           draft: false
           prerelease: false
           files: |

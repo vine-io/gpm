@@ -11,6 +11,7 @@ ifeq "$(TAG)" ""
 	@echo "missing tag"
 	exit 1
 endif
+	changelog --output CHANGELOG.md
 	git tag $(TAG)
 	make build-tag
 	git add .
@@ -71,6 +72,9 @@ build-arm: build-darwin-arm64 build-linux-arm64 build-windows
 
 build: build-amd build-arm
 
+changelog:
+	changelog --last --output _output/CHANGELOG.md
+
 tar-amd: build-amd
 	cd _output && \
 	tar -zcvf gpm-darwin-amd64-$(GIT_TAG).tar.gz darwin/* && \
@@ -84,7 +88,7 @@ tar-arm: build-arm
 	tar -zcvf gpm-linux-arm64-$(GIT_TAG).tar.gz linux/*  && \
 	rm -fr darwin/ linux/
 
-tar: tar-amd tar-arm
+tar: changelog tar-amd tar-arm
 
 test-coverage:
 	go test ./... -bench=. -coverage
