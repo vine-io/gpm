@@ -2,17 +2,20 @@
 
 ### Features
 
+- [eaf914ab](https://github.com/vine-io/gpm/commit/eaf914ab0be82c780d38443480a1a7b750829d37) : 添加 changelog
 - [d9eeb187](https://github.com/vine-io/gpm/commit/d9eeb1874e9b0fa999cb63f55a1eb950ca35f6bf) : cobra group
 - [1750e200](https://github.com/vine-io/gpm/commit/1750e200d40beea2c8c9adb014a27aad162dbad8) : 移除 vine/cli
 
 ### Bug Fixes
 
+- [ac959acc](https://github.com/vine-io/gpm/commit/ac959accb1b7f17db0f9457387c20a80bd6d81dc) : github action release
 - [66052dfc](https://github.com/vine-io/gpm/commit/66052dfcf6a240e7987b430ec5e9489d8cfecdfb) : client be public
 - [3229103d](https://github.com/vine-io/gpm/commit/3229103dc4469c4371c555fb37ed9a181f4c4739) : 库升级
 - [af8aa434](https://github.com/vine-io/gpm/commit/af8aa43412ad6a568294a4fb12adccd989f50997) : vine 升级
 
 ### Others
 
+- [ac959acc](https://github.com/vine-io/gpm/commit/ac959accb1b7f17db0f9457387c20a80bd6d81dc) : github action release
 - [66052dfc](https://github.com/vine-io/gpm/commit/66052dfcf6a240e7987b430ec5e9489d8cfecdfb) : client be public
 - [3229103d](https://github.com/vine-io/gpm/commit/3229103dc4469c4371c555fb37ed9a181f4c4739) : 库升级
 - [af8aa434](https://github.com/vine-io/gpm/commit/af8aa43412ad6a568294a4fb12adccd989f50997) : vine 升级
