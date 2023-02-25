@@ -95,7 +95,7 @@ func (g *manager) Update(ctx context.Context, stream IOStream) error {
 	}
 
 EXIT:
-	file.Chmod(0o777)
+	file.Chmod(os.ModePerm)
 	_ = file.Close()
 
 	go func() {
@@ -109,7 +109,7 @@ EXIT:
 		script := filepath.Join(os.TempDir(), "start.sh")
 
 		_ = ioutil.WriteFile(script, []byte(fmt.Sprintf(`#! /bin/bash
-nohup %s &`, shell)), 0o777)
+nohup %s &`, shell)), os.ModePerm)
 		cmd := exec.Command("/bin/bash", "-c", shell)
 		adminCmd(cmd)
 		err = cmd.Start()

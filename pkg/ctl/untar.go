@@ -105,9 +105,10 @@ func decompress(dir string, tr *tar.Reader, out io.Writer) error {
 
 func UnTarCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "untar",
-		Short: "decompress a package",
-		RunE:  unTarFn,
+		Use:     "untar",
+		Short:   "decompress a package",
+		GroupID: "gpm",
+		RunE:    unTarFn,
 	}
 
 	cmd.PersistentFlags().StringP("package", "P", "", "the specify the package for compressing")

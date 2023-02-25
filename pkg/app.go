@@ -28,8 +28,12 @@ import (
 )
 
 func Run() {
-	s, err := server.New()
+	s, err := server.New(nil)
 	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = s.Init(); err != nil {
 		log.Fatal(err)
 	}
 

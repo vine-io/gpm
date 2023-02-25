@@ -110,9 +110,10 @@ func compress(path string, prefix string, tw *tar.Writer, out io.Writer) error {
 
 func TarCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "tar",
-		Short: "create a compress package for Install subcommand",
-		RunE:  tarFn,
+		Use:     "tar",
+		Short:   "create a compress package for Install subcommand",
+		GroupID: "gpm",
+		RunE:    tarFn,
 	}
 
 	cmd.PersistentFlags().StringP("name", "N", "", "the specify the name for package")

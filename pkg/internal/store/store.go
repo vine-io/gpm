@@ -225,11 +225,11 @@ func (db *DB) CreateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 	)
 
 	go func() {
-		_ = os.MkdirAll(filepath.Join(config.LoadRoot(), "services", s.Name), 0o777)
-		_ = os.MkdirAll(filepath.Join(config.LoadRoot(), "logs", s.Name), 0o777)
-		_ = os.MkdirAll(filepath.Join(config.LoadRoot(), "services", s.Name, "versions"), 0o777)
+		_ = os.MkdirAll(filepath.Join(config.LoadRoot(), "services", s.Name), os.ModePerm)
+		_ = os.MkdirAll(filepath.Join(config.LoadRoot(), "logs", s.Name), os.ModePerm)
+		_ = os.MkdirAll(filepath.Join(config.LoadRoot(), "services", s.Name, "versions"), os.ModePerm)
 		version := s.Version + "@" + time.Now().Format("20060102150405")
-		_ = os.WriteFile(filepath.Join(config.LoadRoot(), "services", s.Name, "versions", version), []byte(""), 0o777)
+		_ = os.WriteFile(filepath.Join(config.LoadRoot(), "services", s.Name, "versions", version), []byte(""), os.ModePerm)
 
 		b, err := yaml.Marshal(s)
 		if err != nil {
@@ -237,7 +237,7 @@ func (db *DB) CreateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 			return
 		}
 		f := filepath.Join(config.LoadRoot(), "services", s.Name, s.Name+".yml")
-		if err = ioutil.WriteFile(f, b, 0o777); err != nil {
+		if err = ioutil.WriteFile(f, b, os.ModePerm); err != nil {
 			ech <- err
 			return
 		}
@@ -268,7 +268,7 @@ func (db *DB) UpdateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 			return
 		}
 		f := filepath.Join(config.LoadRoot(), "services", s.Name, s.Name+".yml")
-		if err = ioutil.WriteFile(f, b, 0o777); err != nil {
+		if err = ioutil.WriteFile(f, b, os.ModePerm); err != nil {
 			ech <- err
 			return
 		}

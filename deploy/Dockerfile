@@ -1,3 +1,3 @@
 FROM alpine
-ADD gpmd /gpmd
-ENTRYPOINT [ "/gpmd" ]
+ADD gpm /gpm
+ENTRYPOINT [ "/gpm", "run" ]

@@ -315,7 +315,7 @@ CHUNKED:
 
 	vf := spec.Version + "@" + time.Now().Format("20060102150405")
 	log.Infof("service %s append version %s", service.Name, spec.Version)
-	_ = ioutil.WriteFile(filepath.Join(config.LoadRoot(), "services", spec.Name, "versions", vf), []byte(""), 0o777)
+	_ = ioutil.WriteFile(filepath.Join(config.LoadRoot(), "services", spec.Name, "versions", vf), []byte(""), os.ModePerm)
 
 	service.Version = spec.Version
 	g.db.UpdateService(ctx, service)

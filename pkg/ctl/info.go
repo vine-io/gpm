@@ -100,9 +100,10 @@ func infoService(c *cobra.Command, args []string) error {
 
 func InfoServiceCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "info",
-		Short: "get the information of gpmd",
-		RunE:  infoService,
+		Use:     "info",
+		Short:   "get the information of gpmd",
+		GroupID: "gpm",
+		RunE:    infoService,
 	}
 
 	cmd.PersistentFlags().StringP("output", "o", "wide", "specify the format of output, example wide, json, yaml")

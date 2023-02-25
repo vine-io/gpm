@@ -161,9 +161,10 @@ func update(c *cobra.Command, args []string) error {
 
 func UpdateCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "update",
-		Short: "update gpm and gpmd",
-		RunE:  update,
+		Use:     "update",
+		Short:   "update gpm and gpmd",
+		GroupID: "gpm",
+		RunE:    update,
 	}
 
 	cmd.PersistentFlags().StringP("package", "P", "", "specify the package for update")

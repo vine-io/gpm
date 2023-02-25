@@ -1,7 +1,13 @@
-
 server:
-  name: gpm
   address: 127.0.0.1:33700
 
 gpm:
   root: /opt/gpm
+
+#logger:
+#  zap:
+#    format: json
+#    filename: /var/log/gpm.log
+#    max-age: 15
+#    max-backups: 3
+#    max-size: 1

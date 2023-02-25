@@ -28,7 +28,6 @@ import (
 	"embed"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -37,20 +36,19 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/internal"
+	"github.com/vine-io/gpm/pkg/internal/wrap"
+	"github.com/vine-io/gpm/pkg/server"
+	"github.com/vine-io/vine"
+	vcmd "github.com/vine-io/vine/lib/cmd"
 )
 
-//go:embed testdata/gpmd
 var f embed.FS
 
 const (
-	gpm  = "/usr/local/sbin/gpm"
-	gpmd = "/usr/local/sbin/gpmd"
+	gpm = "/usr/sbin/gpm"
 )
 
 func deploy(c *cobra.Command, args []string) error {
-
-	isRun, _ := c.Flags().GetBool("run")
-	dArgs, _ := c.Flags().GetStringSlice("args")
 
 	outE := os.Stdout
 	root := "/opt/gpm"
@@ -70,7 +68,7 @@ func deploy(c *cobra.Command, args []string) error {
 	}
 
 	for _, dir := range dirs {
-		e := os.MkdirAll(dir, 0o777)
+		e := os.MkdirAll(dir, os.ModePerm)
 		if e != nil {
 			return e
 		}
@@ -92,7 +90,7 @@ func deploy(c *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("install gpm: %v", err)
 	}
-	_ = dst.Chmod(0o777)
+	_ = dst.Chmod(os.ModePerm)
 
 	link, _ := os.Readlink(gpm)
 	_ = os.Remove(gpm)
@@ -105,85 +103,74 @@ func deploy(c *cobra.Command, args []string) error {
 		fmt.Fprintf(outE, "remove old version: %v\n", link)
 	}
 
-	// 安装 gpmd
-	buf, err := f.ReadFile("testdata/gpmd")
-	if err != nil {
-		return fmt.Errorf("get gpmd binary: %v", err)
-	}
-	fname = filepath.Join(root, "bin", "gpmd-"+internal.GitTag)
-	err = ioutil.WriteFile(fname, buf, 0o777)
-	if err != nil {
-		return fmt.Errorf("install gpmd: %v", err)
-	}
-	_ = os.Chmod(fname, 0o777)
-
-	link, _ = os.Readlink(gpmd)
-	_ = os.Remove(gpmd)
-	err = os.Symlink(fname, gpmd)
-	if err != nil {
-		return fmt.Errorf("create gpmd link: %v", err)
-	}
-	if v != "" && v != internal.GitTag {
-		os.Remove(link)
-		fmt.Fprintf(outE, "remove old version: %v\n", link)
-	}
-
 	fmt.Fprintf(outE, "install gpm %s successfully!\n", internal.GitTag)
-
-	if isRun {
-		cmd := exec.Command("gpmd", dArgs...)
-		if err := cmd.Start(); err != nil {
-			return fmt.Errorf("gpmd start: %v", err)
-		}
-
-		fmt.Fprintf(outE, "start gpmd successfully!\n")
-	}
 
 	return nil
 }
 
 func DeployCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deploy",
-		Short: "deploy gpmd and gpm",
-		RunE:  deploy,
+		Use:     "deploy",
+		Short:   "deploy gpmd and gpm",
+		GroupID: "gpm",
+		RunE:    deploy,
 	}
-
-	cmd.PersistentFlags().Bool("run", false, "run gpmd after deployed")
-	cmd.PersistentFlags().StringP("args", "A", "", "the specify args for gpmd")
 
 	return cmd
 }
 
-func run(c *cobra.Command, args []string) error {
+func initRun(root *cobra.Command) error {
 
-	outE := os.Stdout
-	nArgs, _ := c.Flags().GetStringSlice("args")
-	cmd := exec.Command("gpmd", nArgs...)
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("gpmd start: %v", err)
+	s := vine.NewService(
+		vine.Cmd(vcmd.NewCmd(vcmd.NewApp(root))),
+		vine.Name(internal.GpmName),
+		vine.ID(internal.GpmId),
+		vine.Address(":33700"),
+		vine.Version(internal.GetVersion()),
+		vine.Metadata(map[string]string{
+			"namespace": internal.Namespace,
+		}),
+		vine.WrapHandler(wrap.NewLoggerWrapper()),
+	)
+
+	app, err := server.New(s)
+	if err != nil {
+		return err
 	}
 
-	fmt.Fprintf(outE, "start gpmd successfully!\n")
-	return nil
+	action := vine.Action(func(cmd *cobra.Command, args []string) error {
+		if err = server.Action(cmd, args); err != nil {
+			return err
+		}
+
+		if err = app.Init(); err != nil {
+			return err
+		}
+
+		return app.Run()
+	})
+
+	return s.Init(action)
 }
 
-func RunCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "run",
-		Short: "run gpmd process",
-		RunE:  run,
+func RunCmd() (*cobra.Command, error) {
+	runCmd := &cobra.Command{
+		Use:     "run",
+		Short:   "run gpmd process",
+		GroupID: "gpm",
 	}
 
-	cmd.PersistentFlags().StringSliceP("args", "A", []string{}, "the specify args for gpmd")
+	if err := initRun(runCmd); err != nil {
+		return nil, err
+	}
 
-	return cmd
+	return runCmd, nil
 }
 
 func shutdown(c *cobra.Command, args []string) error {
 
 	outE := os.Stdout
-	b, err := exec.Command("sh", "-c", `ps aux|grep "gpmd" | grep -v "grep" |  awk -F' ' '{print $2}'`).CombinedOutput()
+	b, err := exec.Command("bash", "-c", `ps aux|grep "gpm run" | grep -v "grep" | head -1 |  awk -F' ' '{print $2}'`).CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("get gpmd failed: %v", err)
 	}
@@ -211,9 +198,10 @@ func shutdown(c *cobra.Command, args []string) error {
 
 func ShutdownCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "shutdown",
-		Short: "stop gpmd process",
-		RunE:  shutdown,
+		Use:     "shutdown",
+		Short:   "stop gpm service process",
+		GroupID: "gpm",
+		RunE:    shutdown,
 	}
 
 	return cmd

@@ -108,7 +108,7 @@ func pullBash(c *cobra.Command, args []string) error {
 				if strings.Contains(t, "/") || strings.Contains(t, "\\") {
 					t = strings.ReplaceAll(t, "\\", "/")
 					newDir := filepath.Join(dst, filepath.Dir(t))
-					_ = os.MkdirAll(newDir, 0o777)
+					_ = os.MkdirAll(newDir, os.ModePerm)
 				}
 				file, err = os.Create(filepath.Join(dst, t))
 			} else {

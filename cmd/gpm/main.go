@@ -25,77 +25,13 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
-	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/ctl"
 	verrs "github.com/vine-io/vine/lib/errors"
 )
 
 func main() {
-	rootCmd := &cobra.Command{
-		Use:     "gpm",
-		Short:   "package manage tools",
-		Version: ctl.GetGitTag(),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return fmt.Errorf("invalid subcommand")
-		},
-	}
-
-	rootCmd.AddGroup(
-		&cobra.Group{
-			ID:    "service",
-			Title: "Service Subcommands",
-		},
-		&cobra.Group{
-			ID:    "bash",
-			Title: "Bash Subcommands",
-		},
-	)
-
-	rootCmd.ResetCommands()
-	rootCmd.AddCommand(
-		ctl.HealthCmd(),
-		ctl.DeployCmd(),
-		ctl.TarCmd(),
-		ctl.UnTarCmd(),
-		ctl.UpdateCmd(),
-		ctl.RunCmd(),
-		ctl.ShutdownCmd(),
-
-		ctl.ListServicesCmd(),
-		ctl.InfoServiceCmd(),
-		ctl.GetServiceCmd(),
-		ctl.CreateServiceCmd(),
-		ctl.EditServiceCmd(),
-		ctl.StartServiceCmd(),
-		ctl.StopServiceCmd(),
-		ctl.DeleteServiceCmd(),
-		ctl.RestartServiceCmd(),
-		ctl.TailServiceCmd(),
-
-		ctl.InstallServiceCmd(),
-		ctl.UpgradeServiceCmd(),
-		ctl.RollbackServiceCmd(),
-		ctl.ForgetServiceCmd(),
-		ctl.VersionServiceCmd(),
-
-		ctl.LsBashCmd(),
-		ctl.ExecBashCmd(),
-		ctl.PushBashCmd(),
-		ctl.PullBashCmd(),
-		ctl.TerminalBashCmd(),
-	)
-
-	rootCmd.ResetFlags()
-	rootCmd.PersistentFlags().StringP("host", "H", "127.0.0.1:33700", "the ip address of gpmd")
-	rootCmd.PersistentFlags().Duration("dial-timeout", time.Second*30, "specify dial timeout for call option")
-	rootCmd.PersistentFlags().Duration("request-timeout", time.Second*30, "pecify request timeout for call option")
-
-	//sort.Sort(cli.FlagsByName(app.Flags))
-	//sort.Sort(cli.CommandsByName(app.Commands))
-
-	err := rootCmd.Execute()
+	err := ctl.ExecCmd()
 	if err != nil {
 		fmt.Fprintf(os.Stdout, "gpm exec: %s\n", verrs.FromErr(err).Detail)
 	}

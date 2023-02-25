@@ -221,7 +221,7 @@ func (s *sftp) Push(ctx context.Context, stream IOReader) error {
 			}
 			dir := filepath.Dir(dst)
 			if stat == nil {
-				err = os.MkdirAll(dir, 0o777)
+				err = os.MkdirAll(dir, os.ModePerm)
 				if err != nil {
 					return err
 				}

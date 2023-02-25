@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 //go:build windows
-// +build windows
 
 package ctl
 
@@ -41,22 +40,29 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/vine-io/gpm/pkg/client"
 	"github.com/vine-io/gpm/pkg/internal"
+	"github.com/vine-io/gpm/pkg/internal/wrap"
+	"github.com/vine-io/gpm/pkg/server"
+	"github.com/vine-io/vine"
+	vcmd "github.com/vine-io/vine/lib/cmd"
 )
 
 //go:embed testdata/nssm.exe
-//go:embed testdata/gpmd.exe
 var f embed.FS
 
 const (
 	root = "C:\\opt\\gpm"
 	gpm  = "c:\\opt\\gpm\\bin\\gpm.exe"
-	gpmd = "c:\\opt\\gpm\\bin\\gpmd.exe"
 )
 
-func deploy(c *cobra.Command, args []string) error {
+var gpmdYaml = `
+server:
+  address: 127.0.0.1:33700
 
-	isRun, _ := c.Flags().GetBool("run")
-	dArgs, _ := c.Flags().GetStringSlice("args")
+gpm:
+  root: /opt/gpm
+`
+
+func deploy(c *cobra.Command, args []string) error {
 
 	outE := os.Stdout
 	_, err := exec.Command(root+"\\bin\\"+"gpm", "-v").CombinedOutput()
@@ -74,7 +80,7 @@ func deploy(c *cobra.Command, args []string) error {
 	}
 
 	for _, dir := range dirs {
-		_ = os.MkdirAll(dir, 0o777)
+		_ = os.MkdirAll(dir, os.ModePerm)
 	}
 
 	// 安装 gpm
@@ -93,7 +99,7 @@ func deploy(c *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("install gpm: %v", err)
 	}
-	_ = dst.Chmod(0o777)
+	_ = dst.Chmod(os.ModePerm)
 
 	link, _ := os.Readlink(gpm)
 	_ = os.Remove(gpm)
@@ -106,42 +112,19 @@ func deploy(c *cobra.Command, args []string) error {
 		fmt.Fprintf(outE, "remove old version: %v\n", link)
 	}
 
-	// 安装 gpmd
-	buf, err := f.ReadFile("testdata/gpmd.exe")
-	if err != nil {
-		return fmt.Errorf("get gpmd binary: %v", err)
-	}
-	fname = filepath.Join(root, "bin", "gpmd-"+internal.GitTag+".exe")
-	err = os.WriteFile(fname, buf, 0o777)
-	if err != nil {
-		return fmt.Errorf("install gpmd: %v", err)
-	}
-	_ = os.Chmod(fname, 0o777)
-
-	link, _ = os.Readlink(gpmd)
-	_ = os.Remove(gpmd)
-	err = os.Symlink(fname, gpmd)
-	if err != nil {
-		return fmt.Errorf("create gpmd link: %v", err)
-	}
-	if filepath.Base(link) != "gpmd"+"-"+internal.GitTag+".exe" {
-		os.Remove(link)
-		fmt.Fprintf(outE, "remove old version: %v\n", link)
-	}
-
 	// 安装 nssm.exe
 	stat, _ := os.Stat(root + "\\bin\\nssm.exe")
 	if stat == nil {
-		buf, err = f.ReadFile("testdata/nssm.exe")
+		buf, err := f.ReadFile("testdata/nssm.exe")
 		if err != nil {
 			return fmt.Errorf("get nssm binary: %v", err)
 		}
 		fname = filepath.Join(root, "bin", "nssm.exe")
-		err = ioutil.WriteFile(fname, buf, 0o777)
+		err = ioutil.WriteFile(fname, buf, os.ModePerm)
 		if err != nil {
 			return fmt.Errorf("install nssm: %v", err)
 		}
-		_ = os.Chmod(fname, 0o777)
+		_ = os.Chmod(fname, os.ModePerm)
 	}
 
 	fmt.Fprintf(outE, "install gpm %s successfully!\n", internal.GitTag)
@@ -155,7 +138,8 @@ func deploy(c *cobra.Command, args []string) error {
 	}
 
 	// TODO: 设置 nssm
-	nssmShell := fmt.Sprintf("\r\n\r\n%s\\bin\\nssm.exe install gpmd %s\\bin\\gpmd", root, root)
+	dArgs := []string{"run"}
+	nssmShell := fmt.Sprintf("\r\n\r\n%s\\bin\\nssm.exe install gpmd %s\\bin\\gpm", root, root)
 	if len(dArgs) > 0 {
 		nssmShell += " " + strings.Join(dArgs, " ")
 	}
@@ -163,19 +147,10 @@ func deploy(c *cobra.Command, args []string) error {
 	bb.WriteString(nssmShell)
 	startBat := filepath.Join(os.TempDir(), "start.bat")
 	defer os.Remove(startBat)
-	_ = ioutil.WriteFile(startBat, bb.Bytes(), 0o777)
+	_ = os.WriteFile(startBat, bb.Bytes(), os.ModePerm)
 	_, err = exec.Command("cmd", "/C", startBat).CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("execute %s: %v", startBat, err)
-	}
-
-	if isRun {
-		cmd := exec.Command(root+"\\bin\\"+"nssm.exe", "start", "gpmd")
-		if _, err = cmd.CombinedOutput(); err != nil {
-			return fmt.Errorf("gpmd start: %v", err)
-		}
-
-		fmt.Fprintf(outE, "start gpmd successfully!\n")
 	}
 
 	fmt.Fprintf(outE, "install gpm successfully!\n")
@@ -184,57 +159,61 @@ func deploy(c *cobra.Command, args []string) error {
 
 func DeployCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "deploy",
-		Short: "deploy gpmd and gpm",
-		RunE:  deploy,
+		Use:     "deploy",
+		Short:   "deploy gpmd and gpm",
+		GroupID: "gpm",
+		RunE:    deploy,
 	}
-
-	cmd.PersistentFlags().Bool("run", false, "run gpmd after deployed")
-	cmd.PersistentFlags().StringP("args", "A", "", "the specify args for gpmd")
 
 	return cmd
 }
 
-func run(c *cobra.Command, args []string) error {
+func initRun(root *cobra.Command) error {
 
-	outE := os.Stdout
-	args, _ = c.Flags().GetStringSlice("args")
+	s := vine.NewService(
+		vine.Cmd(vcmd.NewCmd(vcmd.NewApp(root))),
+		vine.Name(internal.GpmName),
+		vine.ID(internal.GpmId),
+		vine.Address(":33700"),
+		vine.Version(internal.GetVersion()),
+		vine.Metadata(map[string]string{
+			"namespace": internal.Namespace,
+		}),
+		vine.WrapHandler(wrap.NewLoggerWrapper()),
+	)
 
-	bb := bytes.NewBuffer([]byte("@echo off\r\n\r\n"))
-	// TODO: 设置 nssm
-	nssmShell := fmt.Sprintf("\r\n\r\n%s\\bin\\nssm.exe install gpmd %s\\bin\\gpmd", root, root)
-	if len(args) > 0 {
-		nssmShell += " " + strings.Join(args, " ")
-	}
-	bb.WriteString(fmt.Sprintf("\r\n\r\n%s\\bin\\nssm.exe remove gpmd confirm\r\n", root))
-	bb.WriteString(nssmShell)
-	startBat := filepath.Join(root, "start.bat")
-	defer os.Remove(startBat)
-	_ = ioutil.WriteFile(startBat, bb.Bytes(), 0o777)
-	_, err := exec.Command("cmd", "/C", startBat).CombinedOutput()
+	app, err := server.New(s)
 	if err != nil {
-		return fmt.Errorf("execute %s: %v", startBat, err)
+		return err
 	}
 
-	cmd := exec.Command(root+"\\bin\\"+"nssm.exe", "start", "gpmd")
-	if err := cmd.Start(); err != nil {
-		return fmt.Errorf("gpmd start: %v", err)
-	}
+	action := vine.Action(func(cmd *cobra.Command, args []string) error {
+		if err = server.Action(cmd, args); err != nil {
+			return err
+		}
 
-	fmt.Fprintf(outE, "start gpmd successfully!\n")
-	return nil
+		if err = app.Init(); err != nil {
+			return err
+		}
+
+		return app.Run()
+	})
+
+	return s.Init(action)
 }
 
-func RunCmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "run",
-		Short: "run gpmd process",
-		RunE:  run,
+func RunCmd() (*cobra.Command, error) {
+	runCmd := &cobra.Command{
+		Use:     "run",
+		Short:   "run gpmd process",
+		GroupID: "gpm",
 	}
 
-	cmd.PersistentFlags().StringSliceP("args", "A", []string{}, "the specify args for gpmd")
+	if err := initRun(runCmd); err != nil {
+		return nil, err
+	}
 
-	return cmd
+	return runCmd, nil
 }
 
 func shutdown(c *cobra.Command, args []string) error {
@@ -261,9 +240,10 @@ func shutdown(c *cobra.Command, args []string) error {
 
 func ShutdownCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "shutdown",
-		Short: "stop gpmd process",
-		RunE:  shutdown,
+		Use:     "shutdown",
+		Short:   "stop gpmd process",
+		GroupID: "gpm",
+		RunE:    shutdown,
 	}
 
 	return cmd

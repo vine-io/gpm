@@ -37,32 +37,27 @@ vendor:
 build-darwin-amd64:
 	mkdir -p $(GPM_DIR)
 	mkdir -p _output/darwin
-	GOOS=darwin GOARCH=amd64 go build -o $(GPM_DIR)/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
 	GOOS=darwin GOARCH=amd64 go build -o _output/darwin/gpm -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpm/main.go
 
 build-darwin-arm64:
 	mkdir -p $(GPM_DIR)
 	mkdir -p _output/darwin
-	GOOS=darwin GOARCH=arm64 go build -o $(GPM_DIR)/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
 	GOOS=darwin GOARCH=arm64 go build -o _output/darwin/gpm -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpm/main.go
 
 build-windows:
 	mkdir -p $(GPM_DIR)
 	mkdir -p _output/windows
 	cp nssm.exe $(GPM_DIR)/nssm.exe
-	GOOS=windows GOARCH=amd64 go build -o $(GPM_DIR)/gpmd.exe -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
 	GOOS=windows GOARCH=amd64 go build -o _output/windows/gpm.exe -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpm/main.go
 
 build-linux-amd64:
 	mkdir -p $(GPM_DIR)
 	mkdir -p _output/linux
-	GOOS=linux GOARCH=amd64 go build -o $(GPM_DIR)/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
 	GOOS=linux GOARCH=amd64 go build -o _output/linux/gpm -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpm/main.go
 
 build-linux-arm64:
 	mkdir -p $(GPM_DIR)
 	mkdir -p _output/linux
-	GOOS=linux GOARCH=arm64 go build -o $(GPM_DIR)/gpmd -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpmd/main.go
 	GOOS=linux GOARCH=arm64 go build -o _output/linux/gpm -a -installsuffix cgo -ldflags "-s -w ${LDFLAGS}" cmd/gpm/main.go
 
 build-amd: build-darwin-amd64 build-linux-amd64 build-windows

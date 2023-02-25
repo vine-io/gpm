@@ -76,7 +76,7 @@ func NewManagerService(ctx context.Context, server vserver.Server, db *store.DB)
 func (g *manager) Init() error {
 	var err error
 
-	if err = os.MkdirAll(filepath.Join(config.LoadRoot(), "services"), 0o777); err != nil {
+	if err = os.MkdirAll(filepath.Join(config.LoadRoot(), "services"), os.ModePerm); err != nil {
 		return err
 	}
 	ctx := context.Background()

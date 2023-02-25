@@ -30,7 +30,13 @@ import (
 	"github.com/vine-io/gpm/pkg/internal"
 	"github.com/vine-io/vine/core/client"
 	"github.com/vine-io/vine/core/client/grpc"
+	"github.com/vine-io/vine/core/registry"
+	"github.com/vine-io/vine/core/registry/mdns"
 )
+
+func init() {
+	registry.DefaultRegistry = mdns.NewRegistry(mdns.WithDomain("gpm"))
+}
 
 type SimpleClient struct {
 	cc pb.GpmService

@@ -6,8 +6,9 @@ Wants=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=/opt/gpm/
-ExecStart=/opt/gpm/bin/gpm run
+ExecStart=/usr/sbin/gpm run
 Restart=on-failure
 LimitNOFILE=65536
+
 [Install]
 WantedBy=multi-user.target

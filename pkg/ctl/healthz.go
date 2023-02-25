@@ -49,8 +49,9 @@ func healthService(c *cobra.Command, args []string) error {
 
 func HealthCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "health",
-		Short: "confirm gpmd status",
-		RunE:  healthService,
+		Use:     "health",
+		Short:   "confirm gpmd status",
+		GroupID: "gpm",
+		RunE:    healthService,
 	}
 }

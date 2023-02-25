@@ -39,6 +39,7 @@ import (
 	"github.com/vine-io/pkg/release"
 	"github.com/vine-io/plugins/logger/zap"
 	"github.com/vine-io/vine"
+	"github.com/vine-io/vine/core/registry"
 	"github.com/vine-io/vine/core/registry/mdns"
 	grpcServer "github.com/vine-io/vine/core/server/grpc"
 	"github.com/vine-io/vine/lib/api/handler/openapi"
@@ -55,40 +56,47 @@ func init() {
 	uc.AddConfigPath(".")
 	uc.AddConfigPath("deploy")
 	uc.AddConfigPath("config")
+	uc.AddConfigPath("/etc/")
 
-	mdns.DefaultMdnsDomain = "gpm"
 	Flag.String("gpm.root", config.DefaultRoot, "Sets the Base directory for gpm service")
+
+	registry.DefaultRegistry = mdns.NewRegistry(mdns.WithDomain("gpm"))
 }
 
 type GpmApp struct {
 	s vine.Service
 }
 
-func New(opts ...vine.Option) (*GpmApp, error) {
-	s := vine.NewService(opts...)
+func New(s vine.Service) (*GpmApp, error) {
 
-	app := &GpmApp{
-		s: vine.NewService(opts...),
+	if s == nil {
+		opts := []vine.Option{
+			vine.Name(internal.GpmName),
+			vine.ID(internal.GpmId),
+			vine.Version(internal.GetVersion()),
+			vine.Metadata(map[string]string{
+				"namespace": internal.Namespace,
+			}),
+			vine.WrapHandler(wrap.NewLoggerWrapper()),
+			vine.Action(Action),
+		}
+		s = vine.NewService(opts...)
+
+		// vine service 初始化，解析命令行参数
+		if err := s.Init(opts...); err != nil {
+			return nil, err
+		}
 	}
 
-	opts = append(opts,
-		vine.Name(internal.GpmName),
-		vine.ID(internal.GpmId),
-		vine.Version(internal.GetVersion()),
-		vine.Metadata(map[string]string{
-			"namespace": internal.Namespace,
-		}),
-		vine.WrapHandler(wrap.NewLoggerWrapper()),
-		vine.Action(newAction),
-	)
+	app := &GpmApp{s: s}
 
-	// vine service 初始化，解析命令行参数
-	if err := app.s.Init(opts...); err != nil {
-		return nil, err
-	}
+	return app, nil
+}
+
+func (app *GpmApp) Init(opts ...vine.Option) error {
 
 	if err := uc.UnmarshalKey(&config.DefaultConfig, "gpm"); err != nil {
-		return nil, fmt.Errorf("unmarshal config file: %v", err)
+		return fmt.Errorf("unmarshal config file: %v", err)
 	}
 	_ = uc.UnmarshalKey(&config.DefaultAddress, "server.address")
 
@@ -100,35 +108,35 @@ func New(opts ...vine.Option) (*GpmApp, error) {
 	db := new(store.DB)
 	manager, err := service.NewManagerService(ctx, server, db)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	sftp, err := service.NewSFtpService(ctx, server)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if err = RegistryGpmRpcServer(ctx, server, manager, sftp); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err = openapi.RegisterOpenAPIHandler(server); err != nil {
-		return nil, err
+		return err
 	}
 
 	handler, err := RegistryGpmAPIServer(ctx, reg, client)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	if err = s.Server().Init(grpcServer.HttpHandler(handler)); err != nil {
-		return nil, err
+	if err = app.s.Server().Init(grpcServer.HttpHandler(handler)); err != nil {
+		return err
 	}
 
 	or, _ := release.Get()
 	log.Infof("system information: %s", or)
 
-	return app, nil
+	return nil
 }
 
 func (app *GpmApp) Run() error {
@@ -139,7 +147,7 @@ func (app *GpmApp) Run() error {
 	return nil
 }
 
-func newAction(cmd *cobra.Command, args []string) error {
+func Action(cmd *cobra.Command, args []string) error {
 	root := uc.GetString("gpm.root")
 	if root == "" {
 
@@ -149,12 +157,15 @@ func newAction(cmd *cobra.Command, args []string) error {
 		default:
 			root = "/opt/gpm"
 		}
-		_ = os.MkdirAll(filepath.Join(root, "logs"), 0o777)
-		_ = os.MkdirAll(filepath.Join(root, "services"), 0o777)
-		_ = os.MkdirAll(filepath.Join(root, "packages"), 0o777)
+		_ = os.MkdirAll(filepath.Join(root, "logs"), os.ModePerm)
+		_ = os.MkdirAll(filepath.Join(root, "services"), os.ModePerm)
+		_ = os.MkdirAll(filepath.Join(root, "packages"), os.ModePerm)
 	}
 
-	lopts := []log.Option{zap.WithJSONEncode()}
+	lopts := []log.Option{}
+	if uc.GetString("logger.zap.format") == "json" {
+		lopts = append(lopts, zap.WithJSONEncode())
+	}
 	filename := uc.GetString("logger.zap.filename")
 	if filename != "" {
 		writer := zap.FileWriter{

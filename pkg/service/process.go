@@ -126,12 +126,12 @@ func (p *Process) run() (int32, error) {
 	}
 
 	root := filepath.Join(config.LoadRoot(), "logs", p.Name)
-	_ = os.MkdirAll(root, 0o777)
+	_ = os.MkdirAll(root, os.ModePerm)
 
 	flog := filepath.Join(root, p.Name+".log")
 	_ = os.Rename(flog, filepath.Join(root, fmt.Sprintf("%s.log-%s", p.Name, time.Now().Format(timeFormat))))
 
-	lw, err := os.OpenFile(flog, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0o777)
+	lw, err := os.OpenFile(flog, os.O_CREATE|os.O_RDWR|os.O_APPEND, os.ModePerm)
 	if err != nil {
 		return 0, err
 	}
@@ -365,7 +365,7 @@ func statProcess(s *gpmv1.Service) {
 }
 
 func rotate(rl string, total, size int64) error {
-	pf, e := os.OpenFile(rl, os.O_RDWR|os.O_SYNC, 0o777)
+	pf, e := os.OpenFile(rl, os.O_RDWR|os.O_SYNC, os.ModePerm)
 	if e != nil {
 		return fmt.Errorf("open log file %s: %v", rl, e)
 	}
@@ -379,7 +379,7 @@ func rotate(rl string, total, size int64) error {
 	}
 
 	flog := rl + "-" + time.Now().Format(timeFormat)
-	e = ioutil.WriteFile(flog, buf[:n], 0o777)
+	e = ioutil.WriteFile(flog, buf[:n], os.ModePerm)
 	if e != nil {
 		return fmt.Errorf("write log %s: %v", flog, e)
 	}
@@ -390,7 +390,7 @@ func rotate(rl string, total, size int64) error {
 		return fmt.Errorf("open log file %s: %v", rl, e)
 	}
 
-	e = os.WriteFile(rl, buf1[:n], 0o777)
+	e = os.WriteFile(rl, buf1[:n], os.ModePerm)
 	if e != nil {
 		return fmt.Errorf("rewrite log file %s: %v", rl, e)
 	}

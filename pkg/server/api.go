@@ -16,7 +16,6 @@ import (
 	"github.com/vine-io/gpm/pkg/internal"
 	vclient "github.com/vine-io/vine/core/client"
 	"github.com/vine-io/vine/core/registry"
-	"github.com/vine-io/vine/lib/api/handler/openapi"
 	log "github.com/vine-io/vine/lib/logger"
 	uapi "github.com/vine-io/vine/util/api"
 )
@@ -35,11 +34,10 @@ func RegistryGpmAPIServer(ctx context.Context, reg registry.Registry, client vcl
 	app.Use(gin.Recovery())
 
 	s := &GpmHttpServer{
+		Engine:   app,
 		register: reg,
 		client:   client,
 	}
-
-	openapi.RegisterOpenAPI(client, reg, app)
 
 	s.GET("/metrics", gin.WrapH(promhttp.Handler()))
 	s.GET("/api/v1/endpoints", s.getEndpointsHandle)
@@ -63,8 +61,7 @@ func RegistryGpmAPIServer(ctx context.Context, reg registry.Registry, client vcl
 	}
 
 	ns := internal.Namespace
-	uapi.PrimpHandler(app, reg, client, ns)
-	s.Engine = app
+	uapi.PrimpHandler(s.Engine, reg, client, ns)
 
 	return s, nil
 }
