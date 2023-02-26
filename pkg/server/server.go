@@ -39,8 +39,10 @@ import (
 	"github.com/vine-io/pkg/release"
 	"github.com/vine-io/plugins/logger/zap"
 	"github.com/vine-io/vine"
+	vclient "github.com/vine-io/vine/core/client"
 	"github.com/vine-io/vine/core/registry"
 	"github.com/vine-io/vine/core/registry/mdns"
+	vserver "github.com/vine-io/vine/core/server"
 	grpcServer "github.com/vine-io/vine/core/server/grpc"
 	"github.com/vine-io/vine/lib/api/handler/openapi"
 	log "github.com/vine-io/vine/lib/logger"
@@ -58,9 +60,9 @@ func init() {
 	uc.AddConfigPath("config")
 	uc.AddConfigPath("/etc/")
 
-	Flag.String("gpm.root", config.DefaultRoot, "Sets the Base directory for gpm service")
-
 	registry.DefaultRegistry = mdns.NewRegistry(mdns.WithDomain("gpm"))
+
+	Flag.String("gpm.root", config.DefaultRoot, "Sets the Base directory for gpm service")
 }
 
 type GpmApp struct {
@@ -70,6 +72,7 @@ type GpmApp struct {
 func New(s vine.Service) (*GpmApp, error) {
 
 	if s == nil {
+
 		opts := []vine.Option{
 			vine.Name(internal.GpmName),
 			vine.ID(internal.GpmId),
@@ -197,6 +200,15 @@ func Action(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	log.DefaultLogger = l
+
+	err = vclient.DefaultClient.Init(vclient.Registry(registry.DefaultRegistry))
+	if err != nil {
+		return err
+	}
+	err = vserver.DefaultServer.Init(vserver.Registry(registry.DefaultRegistry))
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

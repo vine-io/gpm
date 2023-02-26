@@ -135,7 +135,7 @@ func (s *sftp) Pull(ctx context.Context, name string, isDir bool, sender IOWrite
 					Length:   int64(nr),
 					Finished: false,
 				}
-				stream.Send(out)
+				_ = stream.Send(out)
 			}
 			if er != nil {
 				if er != io.EOF {

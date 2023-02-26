@@ -268,7 +268,7 @@ func (db *DB) UpdateService(ctx context.Context, s *gpmv1.Service) (*gpmv1.Servi
 			return
 		}
 		f := filepath.Join(config.LoadRoot(), "services", s.Name, s.Name+".yml")
-		if err = ioutil.WriteFile(f, b, os.ModePerm); err != nil {
+		if err = os.WriteFile(f, b, os.ModePerm); err != nil {
 			ech <- err
 			return
 		}
