@@ -23,20 +23,18 @@ import (
 type GpmHttpServer struct {
 	*gin.Engine
 
-	register registry.Registry
-	client   vclient.Client
+	client vclient.Client
 }
 
-func RegistryGpmAPIServer(ctx context.Context, reg registry.Registry, client vclient.Client) (http.Handler, error) {
+func RegistryGpmAPIServer(ctx context.Context, client vclient.Client) (http.Handler, error) {
 
 	gin.SetMode(gin.ReleaseMode)
 	app := gin.New()
 	app.Use(gin.Recovery())
 
 	s := &GpmHttpServer{
-		Engine:   app,
-		register: reg,
-		client:   client,
+		Engine: app,
+		client: client,
 	}
 
 	s.GET("/metrics", gin.WrapH(promhttp.Handler()))
@@ -61,7 +59,7 @@ func RegistryGpmAPIServer(ctx context.Context, reg registry.Registry, client vcl
 	}
 
 	ns := internal.Namespace
-	uapi.PrimpHandler(s.Engine, reg, client, ns)
+	uapi.PrimpHandler(s.Engine, client, ns)
 
 	return s, nil
 }

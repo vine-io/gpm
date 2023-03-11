@@ -187,10 +187,6 @@ github.com/imdario/mergo v0.3.11/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH
 github.com/inconshreveable/mousetrap v1.0.1 h1:U3uMjPSQEBMNp1lFxmllqCPM6P5u/Xq7Pgzkat/bFNc=
 github.com/inconshreveable/mousetrap v1.0.1/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
 github.com/jessevdk/go-flags v1.4.0/go.mod h1:4FA24M0QyGHXBuZZK/XkWh8h0e1EYbRYJSGM75WSRxI=
-github.com/jinzhu/inflection v1.0.0 h1:K317FqzuhWc8YvSVlFMCCUb36O/S9MCKRDI7QkRKD/E=
-github.com/jinzhu/inflection v1.0.0/go.mod h1:h+uFLlag+Qp1Va5pdKtLDYj+kHp5pxUVkryuEj+Srlc=
-github.com/jinzhu/now v1.1.1 h1:g39TucaRWyV3dwDO++eEc6qf8TVIQ/Da48WmqjZ3i7E=
-github.com/jinzhu/now v1.1.1/go.mod h1:d3SSVoowX0Lcu0IBviAWJpolVfI5UJVZZ7cO71lE/z8=
 github.com/jpillora/backoff v1.0.0/go.mod h1:J/6gKK9jxlEcS3zixgDgUAsiuZ7yrSoa/FX5e0EB2j4=
 github.com/json-iterator/go v1.1.6/go.mod h1:+SdeFBvtyEkXs7REEP0seUULqWtbJapLOCVDaaPEHmU=
 github.com/json-iterator/go v1.1.10/go.mod h1:KdQUCv79m/52Kvf8AW2vK1V8akMuk1QjK/uOdHXbAo4=
@@ -337,10 +333,10 @@ github.com/vine-io/pkg/release v0.1.0 h1:QzWJJpbSan/6C9Bdbmvxoksp2A6LwJNVmQ4pp+m
 github.com/vine-io/pkg/release v0.1.0/go.mod h1:bhsoo8+rj4X2cEuwP78FdYTxmVQ/NS8KwG35o7NMikM=
 github.com/vine-io/pkg/unit v0.1.0 h1:SlvVbSnDovLTsVzb4ikJEJf8oaxLX3Bjyq+QACLUlV0=
 github.com/vine-io/pkg/unit v0.1.0/go.mod h1:nyfkjNg2pEYlP7CxfexM1dpUuqGhDxBidLu6gJCkHPE=
-github.com/vine-io/plugins/logger/zap v1.5.3 h1:hxaAdh4UWJkQAuKjTVRRul0g9z/z8YHSvr1V1LY4nxU=
-github.com/vine-io/plugins/logger/zap v1.5.3/go.mod h1:HV2bnIa0BUNqqioDl0y9mRyu9l4iyFdVHchLlOQSNis=
-github.com/vine-io/vine v1.5.3 h1:53uvPiWVkVvIGFac6symtFGzHSQcjJrEzfXrtRhpxhI=
-github.com/vine-io/vine v1.5.3/go.mod h1:1DjFEihbt4WQaB/SrScDvUuIJsPoKKsmaxdAYwp8R8g=
+github.com/vine-io/plugins/logger/zap v1.5.9 h1:x4oyUduiSNIvIRhjzaGisfPJIQCFfLiA9fzE1lnSpps=
+github.com/vine-io/plugins/logger/zap v1.5.9/go.mod h1:yngXpbi7skeTlHefpQHibcku37nTy5VeeLMltx2WbN8=
+github.com/vine-io/vine v1.5.9 h1:9cUOR1PwN/I4FyF4R61TxzpwnPzk+uLLELAZuetYPYQ=
+github.com/vine-io/vine v1.5.9/go.mod h1:1DjFEihbt4WQaB/SrScDvUuIJsPoKKsmaxdAYwp8R8g=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

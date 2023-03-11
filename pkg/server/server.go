@@ -104,7 +104,6 @@ func (app *GpmApp) Init(opts ...vine.Option) error {
 	_ = uc.UnmarshalKey(&config.DefaultAddress, "server.address")
 
 	ctx := app.s.Options().Context
-	reg := app.s.Options().Registry
 	client := app.s.Options().Client
 	server := app.s.Options().Server
 
@@ -127,7 +126,7 @@ func (app *GpmApp) Init(opts ...vine.Option) error {
 		return err
 	}
 
-	handler, err := RegistryGpmAPIServer(ctx, reg, client)
+	handler, err := RegistryGpmAPIServer(ctx, client)
 	if err != nil {
 		return err
 	}
