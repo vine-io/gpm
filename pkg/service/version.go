@@ -65,6 +65,10 @@ func (g *manager) Install(ctx context.Context, stream IOStream) error {
 		}
 		b := data.(*gpmv1.InstallServiceIn)
 		spec = b.Spec
+		if spec.Dir == "" {
+			root := uc.GetString("root")
+			spec.Dir = filepath.Join(root, "local", spec.Name)
+		}
 		pack := b.Pack
 
 		if file == nil {

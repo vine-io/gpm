@@ -176,6 +176,7 @@ func InstallServiceCmd() *cobra.Command {
 		RunE:    installService,
 	}
 
+	cmd.PersistentFlags().StringP("package", "P", "", "specify the package for service")
 	cmd.PersistentFlags().StringP("name", "N", "", "specify the name for service")
 	cmd.PersistentFlags().StringP("bin", "B", "", "specify the bin for service")
 	cmd.PersistentFlags().StringSliceP("args", "A", []string{}, "specify the args for service")

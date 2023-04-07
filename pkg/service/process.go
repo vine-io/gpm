@@ -27,7 +27,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -126,7 +125,10 @@ func (p *Process) run() (int32, error) {
 	}
 
 	root := filepath.Join(config.LoadRoot(), "logs", p.Name)
-	_ = os.MkdirAll(root, os.ModePerm)
+	target := filepath.Join(p.Dir, "logs")
+	_ = os.MkdirAll(target, os.ModePerm)
+	_ = os.Remove(root)
+	_ = os.Symlink(target, root)
 
 	flog := filepath.Join(root, p.Name+".log")
 	_ = os.Rename(flog, filepath.Join(root, fmt.Sprintf("%s.log-%s", p.Name, time.Now().Format(timeFormat))))
@@ -379,7 +381,7 @@ func rotate(rl string, total, size int64) error {
 	}
 
 	flog := rl + "-" + time.Now().Format(timeFormat)
-	e = ioutil.WriteFile(flog, buf[:n], os.ModePerm)
+	e = os.WriteFile(flog, buf[:n], os.ModePerm)
 	if e != nil {
 		return fmt.Errorf("write log %s: %v", flog, e)
 	}

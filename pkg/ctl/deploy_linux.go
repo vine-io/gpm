@@ -166,6 +166,7 @@ func initRun(root *cobra.Command) error {
 		vine.Cmd(vcmd.NewCmd(vcmd.NewApp(root))),
 		vine.Name(internal.GpmName),
 		vine.ID(internal.GpmId),
+		vine.Address(":33700"),
 		vine.Version(internal.GetVersion()),
 		vine.Metadata(map[string]string{
 			"namespace": internal.Namespace,

@@ -9,7 +9,7 @@ require (
 	github.com/hpcloud/tail v1.0.0
 	github.com/json-iterator/go v1.1.12
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/prometheus/client_golang v1.11.0
+	github.com/prometheus/client_golang v1.11.1
 	github.com/schollz/progressbar/v3 v3.8.2
 	github.com/shirou/gopsutil v3.21.6+incompatible
 	github.com/spf13/cast v1.5.0
@@ -18,7 +18,7 @@ require (
 	github.com/vine-io/pkg/release v0.1.0
 	github.com/vine-io/pkg/unit v0.1.0
 	github.com/vine-io/plugins/logger/zap v1.5.9
-	github.com/vine-io/vine v1.5.9
+	github.com/vine-io/vine v1.5.10
 	golang.org/x/text v0.6.0
 	google.golang.org/grpc v1.52.0
 	gopkg.in/yaml.v3 v3.0.1
