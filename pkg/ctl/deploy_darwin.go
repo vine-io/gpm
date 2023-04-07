@@ -110,10 +110,11 @@ func deploy(c *cobra.Command, args []string) error {
 
 func DeployCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "deploy",
-		Short:   "deploy gpmd and gpm",
-		GroupID: "gpm",
-		RunE:    deploy,
+		Use:          "deploy",
+		Short:        "deploy gpmd and gpm",
+		GroupID:      "gpm",
+		SilenceUsage: true,
+		RunE:         deploy,
 	}
 
 	return cmd
@@ -155,9 +156,11 @@ func initRun(root *cobra.Command) error {
 
 func RunCmd() (*cobra.Command, error) {
 	runCmd := &cobra.Command{
-		Use:     "run",
-		Short:   "run gpmd process",
-		GroupID: "gpm",
+		Use:          "run",
+		Short:        "run gpmd process",
+		SilenceUsage: true,
+		SilenceUsage: true,
+		GroupID:      "gpm",
 	}
 
 	if err := initRun(runCmd); err != nil {
@@ -198,10 +201,11 @@ func shutdown(c *cobra.Command, args []string) error {
 
 func ShutdownCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "shutdown",
-		Short:   "stop gpm service process",
-		GroupID: "gpm",
-		RunE:    shutdown,
+		Use:          "shutdown",
+		Short:        "stop gpm service process",
+		GroupID:      "gpm",
+		SilenceUsage: true,
+		RunE:         shutdown,
 	}
 
 	return cmd
