@@ -56,7 +56,7 @@ const (
 
 var gpmdYaml = `
 server:
-  address: 127.0.0.1:33700
+  address: 0.0.0.0:33700
 
 gpm:
   root: /opt/gpm
