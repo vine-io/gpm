@@ -41,6 +41,7 @@ import (
 	"github.com/vine-io/gpm/pkg/server"
 	"github.com/vine-io/vine"
 	vcmd "github.com/vine-io/vine/lib/cmd"
+	log "github.com/vine-io/vine/lib/logger"
 )
 
 var f embed.FS
@@ -185,6 +186,7 @@ func initRun(root *cobra.Command) error {
 			return err
 		}
 
+		log.Infof("app init")
 		if err = app.Init(); err != nil {
 			return err
 		}

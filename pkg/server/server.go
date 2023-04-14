@@ -103,43 +103,49 @@ func (app *GpmApp) Init(opts ...vine.Option) error {
 	}
 	_ = uc.UnmarshalKey(&config.DefaultAddress, "server.address")
 
+	ctx := app.s.Options().Context
+	server := app.s.Options().Server
+
+	osRelease, _ := release.Get()
+	log.Infof("system information: %s", osRelease)
+
+	handler, err := RegistryGpmAPIServer(app.s)
+	if err != nil {
+		return err
+	}
+
+	if err = app.s.Server().Init(grpcServer.HttpHandler(handler)); err != nil {
+		return err
+	}
+
 	db := new(store.DB)
-	svc := app.s
-	manager, err := service.NewManagerService(svc, db)
+	manager, err := service.NewManagerService(ctx, server, db)
 	if err != nil {
 		return err
 	}
 
-	sftp, err := service.NewSFtpService(svc)
+	sftp, err := service.NewSFtpService(ctx, server)
 	if err != nil {
 		return err
 	}
 
-	if err = RegistryGpmRpcServer(svc, manager, sftp); err != nil {
+	if err = RegistryGpmRpcServer(ctx, server, manager, sftp); err != nil {
 		return err
 	}
 
-	if err = openapi.RegisterOpenAPIHandler(svc.Server()); err != nil {
+	if err = openapi.RegisterOpenAPIHandler(server); err != nil {
 		return err
 	}
-
-	handler, err := RegistryGpmAPIServer(svc)
-	if err != nil {
-		return err
-	}
-
-	if err = svc.Server().Init(grpcServer.HttpHandler(handler)); err != nil {
-		return err
-	}
-
-	or, _ := release.Get()
-	log.Infof("system information: %s", or)
 
 	return nil
 }
 
 func (app *GpmApp) Run() error {
-	return app.s.Run()
+	if err := app.s.Run(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func Action(cmd *cobra.Command, args []string) error {

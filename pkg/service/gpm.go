@@ -38,14 +38,16 @@ import (
 	"github.com/vine-io/gpm/pkg/internal"
 	"github.com/vine-io/gpm/pkg/internal/config"
 	"github.com/vine-io/gpm/pkg/internal/store"
-	"github.com/vine-io/vine"
+	vserver "github.com/vine-io/vine/core/server"
 	verrs "github.com/vine-io/vine/lib/errors"
 	log "github.com/vine-io/vine/lib/logger"
 )
 
 type manager struct {
 	sync.RWMutex
-	vine.Service
+	ctx context.Context
+
+	server vserver.Server
 
 	db *store.DB
 
@@ -53,39 +55,52 @@ type manager struct {
 	ps map[string]*Process
 }
 
-func NewManagerService(s vine.Service, db *store.DB) (GenerateManager, error) {
+func NewManagerService(ctx context.Context, server vserver.Server, db *store.DB) (GenerateManager, error) {
 
-	var err error
-
-	m := &manager{
-		Service: s,
+	s := &manager{
+		ctx:     ctx,
+		server:  server,
 		db:      db,
 		up:      time.Time{},
 		RWMutex: sync.RWMutex{},
 		ps:      nil,
 	}
 
-	if err = os.MkdirAll(filepath.Join(config.LoadRoot(), "services"), os.ModePerm); err != nil {
+	log.Infof("init manager service")
+	if err := s.Init(); err != nil {
 		return nil, err
+	}
+
+	return s, nil
+}
+
+func (g *manager) Init() error {
+	var err error
+
+	if err = os.MkdirAll(filepath.Join(config.LoadRoot(), "services"), os.ModePerm); err != nil {
+		return err
 	}
 	ctx := context.Background()
-	list, err := db.FindAllServices(ctx)
+	list, err := g.db.FindAllServices(ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	m.ps = map[string]*Process{}
+	g.ps = map[string]*Process{}
 	for _, item := range list {
-		p := NewProcess(item, db)
+		p := NewProcess(item, g.db)
 		if item.Status == gpmv1.StatusRunning {
-			_, _ = m.startService(ctx, p)
+			_, _ = g.startService(ctx, p)
 		}
-		m.ps[item.Name] = p
+		g.ps[item.Name] = p
 	}
 
-	m.up = time.Now()
+	g.up = time.Now()
+	return nil
+}
 
-	return m, nil
+func (g *manager) Name() string {
+	return g.server.Options().Name
 }
 
 func (g *manager) Info(ctx context.Context) (*gpmv1.GpmInfo, error) {

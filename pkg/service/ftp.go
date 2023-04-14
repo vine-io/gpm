@@ -33,22 +33,29 @@ import (
 
 	"github.com/google/uuid"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
-	"github.com/vine-io/vine"
+	vserver "github.com/vine-io/vine/core/server"
 	verrs "github.com/vine-io/vine/lib/errors"
 	log "github.com/vine-io/vine/lib/logger"
 )
 
-func NewSFtpService(s vine.Service) (GenerateFTP, error) {
+func NewSFtpService(ctx context.Context, server vserver.Server) (GenerateFTP, error) {
 
 	ftp := &sftp{
-		Service: s,
+		ctx:    ctx,
+		server: server,
 	}
 
 	return ftp, nil
 }
 
 type sftp struct {
-	vine.Service
+	ctx context.Context
+
+	server vserver.Server
+}
+
+func (s *sftp) Name() string {
+	return s.server.Options().Name
 }
 
 func (s *sftp) List(ctx context.Context, root string) ([]*gpmv1.FileInfo, error) {

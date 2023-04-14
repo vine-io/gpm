@@ -7,6 +7,7 @@ import (
 )
 
 type GenerateManager interface {
+	Init() error
 	Info(context.Context) (*gpmv1.GpmInfo, error)
 	Update(context.Context, IOStream) error
 	List(context.Context) ([]*gpmv1.Service, int64, error)
