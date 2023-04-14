@@ -28,34 +28,30 @@ import (
 	pb "github.com/vine-io/gpm/api/service/gpm/v1"
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/service"
-	vserver "github.com/vine-io/vine/core/server"
+	"github.com/vine-io/vine"
 	verrs "github.com/vine-io/vine/lib/errors"
 )
 
 type GpmServer struct {
-	server vserver.Server
+	vine.Service
 
 	manager service.GenerateManager
 	ftp     service.GenerateFTP
 }
 
-func RegistryGpmRpcServer(ctx context.Context, s vserver.Server, manager service.GenerateManager, ftp service.GenerateFTP) error {
+func RegistryGpmRpcServer(s vine.Service, manager service.GenerateManager, ftp service.GenerateFTP) error {
 
 	gs := &GpmServer{
-		server:  s,
+		Service: s,
 		manager: manager,
 		ftp:     ftp,
 	}
 
-	if err := pb.RegisterGpmServiceHandler(s, gs); err != nil {
+	if err := pb.RegisterGpmServiceHandler(s.Server(), gs); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func (s *GpmServer) Name() string {
-	return s.server.Options().Name
 }
 
 func (s *GpmServer) Healthz(ctx context.Context, _ *pb.Empty, rsp *pb.Empty) error {

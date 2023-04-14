@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +13,7 @@ import (
 	gpmv1 "github.com/vine-io/gpm/api/types/gpm/v1"
 	"github.com/vine-io/gpm/pkg/client"
 	"github.com/vine-io/gpm/pkg/internal"
+	"github.com/vine-io/vine"
 	vclient "github.com/vine-io/vine/core/client"
 	"github.com/vine-io/vine/core/registry"
 	log "github.com/vine-io/vine/lib/logger"
@@ -26,7 +26,7 @@ type GpmHttpServer struct {
 	client vclient.Client
 }
 
-func RegistryGpmAPIServer(ctx context.Context, client vclient.Client) (http.Handler, error) {
+func RegistryGpmAPIServer(svc vine.Service) (http.Handler, error) {
 
 	gin.SetMode(gin.ReleaseMode)
 	app := gin.New()
@@ -34,7 +34,7 @@ func RegistryGpmAPIServer(ctx context.Context, client vclient.Client) (http.Hand
 
 	s := &GpmHttpServer{
 		Engine: app,
-		client: client,
+		client: svc.Client(),
 	}
 
 	s.GET("/metrics", gin.WrapH(promhttp.Handler()))
@@ -59,7 +59,7 @@ func RegistryGpmAPIServer(ctx context.Context, client vclient.Client) (http.Hand
 	}
 
 	ns := internal.Namespace
-	uapi.PrimpHandler(s.Engine, client, ns)
+	uapi.PrimpHandler(svc.Name(), ns, s.Engine, svc.Client())
 
 	return s, nil
 }

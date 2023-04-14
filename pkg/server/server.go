@@ -103,35 +103,32 @@ func (app *GpmApp) Init(opts ...vine.Option) error {
 	}
 	_ = uc.UnmarshalKey(&config.DefaultAddress, "server.address")
 
-	ctx := app.s.Options().Context
-	client := app.s.Options().Client
-	server := app.s.Options().Server
-
 	db := new(store.DB)
-	manager, err := service.NewManagerService(ctx, server, db)
+	svc := app.s
+	manager, err := service.NewManagerService(svc, db)
 	if err != nil {
 		return err
 	}
 
-	sftp, err := service.NewSFtpService(ctx, server)
+	sftp, err := service.NewSFtpService(svc)
 	if err != nil {
 		return err
 	}
 
-	if err = RegistryGpmRpcServer(ctx, server, manager, sftp); err != nil {
+	if err = RegistryGpmRpcServer(svc, manager, sftp); err != nil {
 		return err
 	}
 
-	if err = openapi.RegisterOpenAPIHandler(server); err != nil {
+	if err = openapi.RegisterOpenAPIHandler(svc.Server()); err != nil {
 		return err
 	}
 
-	handler, err := RegistryGpmAPIServer(ctx, client)
+	handler, err := RegistryGpmAPIServer(svc)
 	if err != nil {
 		return err
 	}
 
-	if err = app.s.Server().Init(grpcServer.HttpHandler(handler)); err != nil {
+	if err = svc.Server().Init(grpcServer.HttpHandler(handler)); err != nil {
 		return err
 	}
 
@@ -142,11 +139,7 @@ func (app *GpmApp) Init(opts ...vine.Option) error {
 }
 
 func (app *GpmApp) Run() error {
-	if err := app.s.Run(); err != nil {
-		return err
-	}
-
-	return nil
+	return app.s.Run()
 }
 
 func Action(cmd *cobra.Command, args []string) error {

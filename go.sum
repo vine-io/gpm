@@ -276,8 +276,6 @@ github.com/prometheus/procfs v0.0.2/go.mod h1:TjEm7ze935MbeOT/UhFTIMYKhuLP4wbCsT
 github.com/prometheus/procfs v0.1.3/go.mod h1:lV6e/gmhEcM9IjHGsFOCxxuZ+z1YqCvr4OA4YeYWdaU=
 github.com/prometheus/procfs v0.6.0 h1:mxy4L2jP6qMonqmq+aTtOx1ifVWUgG/TAmntgbh3xv4=
 github.com/prometheus/procfs v0.6.0/go.mod h1:cz+aTbrPOrUb4q7XlbU9ygM+/jj0fzG6c1xBZuNvfVA=
-github.com/rakyll/statik v0.1.7 h1:OF3QCZUuyPxuGEP7B4ypUa7sB/iHtqOTDYZXGM8KOdQ=
-github.com/rakyll/statik v0.1.7/go.mod h1:AlZONWzMtEnMs7W4e/1LURLiI49pIMmp6V9Unghqrcc=
 github.com/rivo/uniseg v0.2.0 h1:S1pD9weZBuJdFmowNwbpi7BJ8TNftyUImj/0WQi72jY=
 github.com/rivo/uniseg v0.2.0/go.mod h1:J6wj4VEh+S6ZtnVlnTBMWIodfgj8LQOQFoIToxlJtxc=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
@@ -333,10 +331,10 @@ github.com/vine-io/pkg/release v0.1.0 h1:QzWJJpbSan/6C9Bdbmvxoksp2A6LwJNVmQ4pp+m
 github.com/vine-io/pkg/release v0.1.0/go.mod h1:bhsoo8+rj4X2cEuwP78FdYTxmVQ/NS8KwG35o7NMikM=
 github.com/vine-io/pkg/unit v0.1.0 h1:SlvVbSnDovLTsVzb4ikJEJf8oaxLX3Bjyq+QACLUlV0=
 github.com/vine-io/pkg/unit v0.1.0/go.mod h1:nyfkjNg2pEYlP7CxfexM1dpUuqGhDxBidLu6gJCkHPE=
-github.com/vine-io/plugins/logger/zap v1.5.9 h1:x4oyUduiSNIvIRhjzaGisfPJIQCFfLiA9fzE1lnSpps=
-github.com/vine-io/plugins/logger/zap v1.5.9/go.mod h1:yngXpbi7skeTlHefpQHibcku37nTy5VeeLMltx2WbN8=
-github.com/vine-io/vine v1.5.10 h1:cJw3+Cce8b8rBhWAvPOnfBFs3k9dILJlHmyWXCF7QEE=
-github.com/vine-io/vine v1.5.10/go.mod h1:1DjFEihbt4WQaB/SrScDvUuIJsPoKKsmaxdAYwp8R8g=
+github.com/vine-io/plugins/logger/zap v1.6.3 h1:JyR7t9fqbX26HO8iaK48I3hvmVK4hoTBrD+tk/nmqDk=
+github.com/vine-io/plugins/logger/zap v1.6.3/go.mod h1:6JDj01pOUJXq5PWR2GE4TrH0s8EmpQqBmrH9wPSCdSY=
+github.com/vine-io/vine v1.6.3 h1:atGGhCYmPnFJBYarZjsiaCyTvE77hHl2Z1EyRmMCQlc=
+github.com/vine-io/vine v1.6.3/go.mod h1:ugSGB0662PIPzxh0fyS1MnSqMBfbFUITV23PX6Xj2mc=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

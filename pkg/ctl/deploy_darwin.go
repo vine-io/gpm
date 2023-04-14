@@ -156,11 +156,11 @@ func initRun(root *cobra.Command) error {
 
 func RunCmd() (*cobra.Command, error) {
 	runCmd := &cobra.Command{
-		Use:          "run",
-		Short:        "run gpmd process",
-		SilenceUsage: true,
-		SilenceUsage: true,
-		GroupID:      "gpm",
+		Use:           "run",
+		Short:         "run gpmd process",
+		SilenceUsage:  true,
+		SilenceErrors: true,
+		GroupID:       "gpm",
 	}
 
 	if err := initRun(runCmd); err != nil {
