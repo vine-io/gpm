@@ -331,10 +331,10 @@ github.com/vine-io/pkg/release v0.1.0 h1:QzWJJpbSan/6C9Bdbmvxoksp2A6LwJNVmQ4pp+m
 github.com/vine-io/pkg/release v0.1.0/go.mod h1:bhsoo8+rj4X2cEuwP78FdYTxmVQ/NS8KwG35o7NMikM=
 github.com/vine-io/pkg/unit v0.1.0 h1:SlvVbSnDovLTsVzb4ikJEJf8oaxLX3Bjyq+QACLUlV0=
 github.com/vine-io/pkg/unit v0.1.0/go.mod h1:nyfkjNg2pEYlP7CxfexM1dpUuqGhDxBidLu6gJCkHPE=
-github.com/vine-io/plugins/logger/zap v1.6.3 h1:JyR7t9fqbX26HO8iaK48I3hvmVK4hoTBrD+tk/nmqDk=
-github.com/vine-io/plugins/logger/zap v1.6.3/go.mod h1:6JDj01pOUJXq5PWR2GE4TrH0s8EmpQqBmrH9wPSCdSY=
-github.com/vine-io/vine v1.6.3 h1:atGGhCYmPnFJBYarZjsiaCyTvE77hHl2Z1EyRmMCQlc=
-github.com/vine-io/vine v1.6.3/go.mod h1:ugSGB0662PIPzxh0fyS1MnSqMBfbFUITV23PX6Xj2mc=
+github.com/vine-io/plugins/logger/zap v1.6.6 h1:jVIUqj7ZHaNINa5cGXmzf72OGSOSz4FROgceldd5fME=
+github.com/vine-io/plugins/logger/zap v1.6.6/go.mod h1:QzWGSU4EXS5Y1kGJ5plTY4zLdLbLNAawuDA5BIoN1eQ=
+github.com/vine-io/vine v1.6.6 h1:dCIIWAxJb9/6vn9ig1RhpMYPwWqfIaNE+X4FtYmLeQ4=
+github.com/vine-io/vine v1.6.6/go.mod h1:la1ckJNYi9oOyJmsMMzwLvJ4OmfA84UgdLmKxVpgtgQ=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.27/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/yuin/goldmark v1.1.32/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

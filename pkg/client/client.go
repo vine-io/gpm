@@ -35,7 +35,7 @@ import (
 )
 
 func init() {
-	registry.DefaultRegistry = mdns.NewRegistry(mdns.WithDomain("gpm"))
+	registry.DefaultRegistry = mdns.NewRegistry(registry.Namespace("gpm"))
 }
 
 type SimpleClient struct {
